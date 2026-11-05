@@ -1,15 +1,15 @@
 import FlickCore
 
 final class CommandRunner {
-    let caffeine = Caffeine()
+    let keepAwake = KeepAwake()
 
-    var available: [Command] { Command.available(isCaffeinated: caffeine.isActive) }
+    var available: [Command] { Command.available(isKeepingAwake: keepAwake.isActive) }
 
     func run(_ command: Command) {
         switch command {
-        case .caffeinate: caffeine.start()
-        case .caffeinateFor(let minutes): caffeine.start(minutes: minutes)
-        case .decaffeinate: caffeine.stop()
+        case .keepAwake: keepAwake.start()
+        case .keepAwakeFor(let minutes): keepAwake.start(minutes: minutes)
+        case .allowSleep: keepAwake.stop()
         case .loremSentence: Paster.paste(LoremIpsum.sentence())
         case .loremParagraph: Paster.paste(LoremIpsum.paragraph())
         }

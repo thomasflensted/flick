@@ -17,7 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onShow: { [weak self] in self?.panel.show() },
             onManage: { [weak self] in self?.showManager() },
             onImport: { [weak self] in self?.importFromRaycast() })
-        commands.caffeine.onChange = { [weak self] active in self?.statusMenu?.showCaffeinated(active) }
+        commands.keepAwake.onChange = { [weak self] active in self?.statusMenu?.showKeepingAwake(active) }
         registerHotKeys()
     }
 

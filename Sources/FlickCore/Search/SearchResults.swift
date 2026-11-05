@@ -9,7 +9,7 @@ public struct SearchResults {
     static let quicklinkBonus = 50
     static let keywordScore = 1100
     static let argumentScore = 5000
-    static let caffeinateTrigger = "caffeinate"
+    static let keepAwakeTriggers = ["keep awake", "awake", "caffeinate"]
     static let minimumTriggerPrefix = 3
 
     public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = []) {
@@ -22,7 +22,7 @@ public struct SearchResults {
     public func results(for query: String) -> [ResultItem] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         if trimmed.isEmpty { return recents() }
-        let ranked = (argumentMatches(query) + timedCaffeinate(trimmed) + quicklinkMatches(trimmed, excluding: query)
+        let ranked = (argumentMatches(query) + timedKeepAwake(trimmed) + quicklinkMatches(trimmed, excluding: query)
                       + appMatches(trimmed) + commandMatches(trimmed) + modeMatches(trimmed))
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
@@ -88,7 +88,7 @@ public struct SearchResults {
 
     private func commandMatches(_ query: String) -> [Scored] {
         commands.compactMap { command in
-            MatchScore.score(query, against: command.title).map { ($0 + boost(UsageKey.command(command)), .command(command)) }
+            bestScore(query, [command.title] + command.aliases).map { ($0 + boost(UsageKey.command(command)), .command(command)) }
         }
     }
 
@@ -98,20 +98,25 @@ public struct SearchResults {
         }
     }
 
-    private func timedCaffeinate(_ query: String) -> [Scored] {
-        guard let minutes = Self.caffeinateMinutes(in: query) else { return [] }
-        return [(Self.argumentScore, .command(.caffeinateFor(minutes: minutes)))]
+    private func timedKeepAwake(_ query: String) -> [Scored] {
+        guard let minutes = Self.keepAwakeMinutes(in: query) else { return [] }
+        return [(Self.argumentScore, .command(.keepAwakeFor(minutes: minutes)))]
     }
 
-    static func caffeinateMinutes(in query: String) -> Int? {
-        let parts = query.lowercased().split(separator: " ", maxSplits: 1)
-        guard parts.count == 2, parts[0].count >= minimumTriggerPrefix, caffeinateTrigger.hasPrefix(parts[0]) else { return nil }
-        return DurationText.minutes(from: String(parts[1]))
+    static func keepAwakeMinutes(in query: String) -> Int? {
+        guard let space = query.lastIndex(of: " ") else { return nil }
+        let trigger = query[..<space].lowercased()
+        guard trigger.count >= minimumTriggerPrefix, keepAwakeTriggers.contains(where: { $0.hasPrefix(trigger) }) else { return nil }
+        return DurationText.minutes(from: String(query[query.index(after: space)...]))
     }
 
     private func webResults(_ query: String) -> [ResultItem] {
         let open = URLText.looksLikeWebAddress(query) ? URLText.url(from: query).map { ResultItem.url($0, typed: query) } : nil
         return [open, .google(query)].compactMap { $0 }
+    }
+
+    private func bestScore(_ query: String, _ texts: [String]) -> Int? {
+        texts.compactMap { MatchScore.score(query, against: $0) }.max()
     }
 
     private func boost(_ key: String) -> Int { Self.usageBoost(usage[key] ?? 0) }

@@ -4,7 +4,7 @@ final class StatusMenu {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     init(onShow: @escaping () -> Void, onManage: @escaping () -> Void, onImport: @escaping () -> Void) {
-        showCaffeinated(false)
+        showKeepingAwake(false)
         let menu = NSMenu()
         menu.addItem(ActionMenuItem(title: "Open Flick", action: onShow))
         menu.addItem(ActionMenuItem(title: "Manage Quicklinks…", key: ",", action: onManage))
@@ -16,9 +16,9 @@ final class StatusMenu {
         item.menu = menu
     }
 
-    func showCaffeinated(_ active: Bool) {
-        let symbol = active ? "cup.and.saucer.fill" : "command"
-        item.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: active ? "Flick (caffeinated)" : "Flick")
+    func showKeepingAwake(_ active: Bool) {
+        let symbol = active ? "sun.max.fill" : "command"
+        item.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: active ? "Flick (keeping awake)" : "Flick")
     }
 
     private func loginItem() -> NSMenuItem {

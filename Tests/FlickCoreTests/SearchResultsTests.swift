@@ -61,30 +61,36 @@ struct SearchResultsTests {
 }
 
 struct CommandSearchTests {
-    func search(_ query: String, caffeinated: Bool = false) -> [ResultItem] {
-        SearchResults(links: [], apps: [], usage: [:], commands: Command.available(isCaffeinated: caffeinated)).results(for: query)
+    func search(_ query: String, keepingAwake: Bool = false) -> [ResultItem] {
+        SearchResults(links: [], apps: [], usage: [:], commands: Command.available(isKeepingAwake: keepingAwake)).results(for: query)
     }
 
-    @Test func offersCaffeinateWhenAwakeIsOff() {
-        #expect(search("caff").first?.kind == .command(.caffeinate))
+    @Test func offersKeepAwakeWhenOff() {
+        #expect(search("awake").first?.kind == .command(.keepAwake))
     }
 
-    @Test func offersDecaffeinateWhenOn() {
-        #expect(search("decaf", caffeinated: true).first?.kind == .command(.decaffeinate))
-        #expect(!search("caff", caffeinated: true).contains { $0.kind == .command(.caffeinate) })
+    @Test func oldNameStillFindsIt() {
+        #expect(search("caf").first?.kind == .command(.keepAwake))
+        #expect(search("decaf", keepingAwake: true).first?.kind == .command(.allowSleep))
     }
 
-    @Test func timedCaffeinateFromQuery() {
-        #expect(search("caf 1h30").first?.kind == .command(.caffeinateFor(minutes: 90)))
-        #expect(search("caffeinate 20").first?.title == "Caffeinate for 20 min")
+    @Test func offersAllowSleepWhenOn() {
+        #expect(search("sleep", keepingAwake: true).first?.kind == .command(.allowSleep))
+        #expect(!search("awake", keepingAwake: true).contains { $0.kind == .command(.keepAwake) })
+    }
+
+    @Test func timedKeepAwakeFromQuery() {
+        #expect(search("awake 1h30").first?.kind == .command(.keepAwakeFor(minutes: 90)))
+        #expect(search("keep awake 20").first?.title == "Keep Awake for 20 min")
+        #expect(search("caf 45").first?.kind == .command(.keepAwakeFor(minutes: 45)))
     }
 
     @Test func findsEmojiMode() {
         #expect(search("emoji").first?.kind == .mode(.emoji))
     }
 
-    @Test func noTimedCaffeinateWithoutDuration() {
-        #expect(SearchResults.caffeinateMinutes(in: "caffeinate later") == nil)
-        #expect(SearchResults.caffeinateMinutes(in: "ca 20") == nil)
+    @Test func noTimedKeepAwakeWithoutDuration() {
+        #expect(SearchResults.keepAwakeMinutes(in: "awake later") == nil)
+        #expect(SearchResults.keepAwakeMinutes(in: "aw 20") == nil)
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-final class Caffeine {
+final class KeepAwake {
     var onChange: (Bool) -> Void = { _ in }
     private var activity: NSObjectProtocol?
     private var timer: Timer?
@@ -10,7 +10,7 @@ final class Caffeine {
     func start(minutes: Int? = nil) {
         stop()
         activity = ProcessInfo.processInfo.beginActivity(options: [.idleDisplaySleepDisabled, .userInitiated],
-                                                         reason: "Caffeinate")
+                                                         reason: "Keep Awake")
         if let minutes {
             timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(minutes * 60), repeats: false) { [weak self] _ in self?.stop() }
         }
