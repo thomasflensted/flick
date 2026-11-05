@@ -1,14 +1,15 @@
 import AppKit
 import ApplicationServices
 import Carbon
+import FlickCore
 
 enum Paster {
     private static let delayForPanelToClose = 0.12
 
-    static func paste(_ text: String) {
+    static func deliver(_ text: String, _ delivery: Delivery) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        guard isTrusted(prompting: true) else { return }
+        guard delivery == .paste, isTrusted() else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + delayForPanelToClose, execute: pressCommandV)
     }
 
@@ -22,8 +23,8 @@ enum Paster {
     }
 
     // The options dictionary is built with CFDictionaryCreate to avoid a bridging cast.
-    private static func isTrusted(prompting: Bool) -> Bool {
-        guard prompting, let yes = kCFBooleanTrue else { return AXIsProcessTrusted() }
+    private static func isTrusted() -> Bool {
+        guard let yes = kCFBooleanTrue else { return AXIsProcessTrusted() }
         var keys: [UnsafeRawPointer?] = [UnsafeRawPointer(Unmanaged.passUnretained(kAXTrustedCheckOptionPrompt.takeUnretainedValue()).toOpaque())]
         var values: [UnsafeRawPointer?] = [UnsafeRawPointer(Unmanaged.passUnretained(yes).toOpaque())]
         let options = CFDictionaryCreate(nil, &keys, &values, 1, nil, nil)

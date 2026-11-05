@@ -51,7 +51,8 @@ final class PanelController {
         switch Int(event.keyCode) {
         case kVK_DownArrow: model.move(1)
         case kVK_UpArrow: model.move(-1)
-        case kVK_Return, kVK_ANSI_KeypadEnter: model.activate()
+        case kVK_Return, kVK_ANSI_KeypadEnter:
+            model.activate(delivery: event.modifierFlags.contains(.command) ? .copy : .paste)
         case kVK_Tab: model.tab()
         case kVK_Escape: if !model.escape() { hide() }
         case kVK_Delete: return model.deleteBackwardWhenEmpty()

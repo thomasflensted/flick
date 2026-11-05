@@ -68,7 +68,12 @@ struct SearchView: View {
     private var footer: some View {
         HStack(spacing: 16) {
             Spacer()
-            KeyHint(key: "↵", label: "Open")
+            if model.selectedProducesText {
+                KeyHint(key: "↵", label: "Paste")
+                KeyHint(key: "⌘↵", label: "Copy")
+            } else {
+                KeyHint(key: "↵", label: "Open")
+            }
             KeyHint(key: "⇥", label: model.argumentTarget == nil ? "Add query" : "Back to search")
             KeyHint(key: "⌘,", label: "Manage quicklinks")
             KeyHint(key: "esc", label: model.mode == .root ? "Close" : "Back")

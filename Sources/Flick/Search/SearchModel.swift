@@ -93,7 +93,11 @@ final class SearchModel: ObservableObject {
         requestFocus(.query)
     }
 
-    func activate(_ index: Int? = nil) {
+    var selectedProducesText: Bool {
+        argumentTarget == nil && results.indices.contains(selected) && results[selected].kind.producesText
+    }
+
+    func activate(_ index: Int? = nil, delivery: Delivery = .paste) {
         if index == nil, let ql = argumentTarget {
             activateArgument(of: ql)
             return
@@ -102,7 +106,7 @@ final class SearchModel: ObservableObject {
         let i = index ?? selected
         guard results.indices.contains(i) else { return }
         selected = i
-        run(results[i].kind)
+        run(results[i].kind, delivery: delivery)
     }
 
     private func activateArgument(of ql: Quicklink) {
@@ -111,8 +115,8 @@ final class SearchModel: ObservableObject {
         run(.quicklink(ql, argument: text))
     }
 
-    private func run(_ kind: ResultKind) {
-        switch runner.run(kind) {
+    private func run(_ kind: ResultKind, delivery: Delivery = .paste) {
+        switch runner.run(kind, delivery: delivery) {
         case .askArgument(let ql):
             enterArgument(ql)
         case .done:

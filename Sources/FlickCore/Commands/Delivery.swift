@@ -1,0 +1,23 @@
+public enum Delivery {
+    case paste
+    case copy
+}
+
+extension ResultKind {
+    public var producesText: Bool {
+        switch self {
+        case .command(let command): return command.producesText
+        case .emoji: return true
+        case .quicklink, .app, .url, .google, .mode, .message: return false
+        }
+    }
+}
+
+extension Command {
+    public var producesText: Bool {
+        switch self {
+        case .loremSentence, .loremParagraph: return true
+        case .keepAwake, .keepAwakeFor, .allowSleep: return false
+        }
+    }
+}
