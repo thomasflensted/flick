@@ -9,6 +9,7 @@ final class AISettings: ObservableObject {
         didSet { UserDefaults.standard.set(modelID, forKey: Self.modelKey) }
     }
     @Published private(set) var models: [AIModel] = []
+    @Published private(set) var popularModels: [AIModel] = []
     @Published private(set) var modelsError: String?
 
     var key: String? { Keychain.read() }
@@ -27,17 +28,34 @@ final class AISettings: ObservableObject {
         hasKey = false
     }
 
+    func visibleModels(matching query: String) -> [AIModel] {
+        ModelCatalog.visible(query: query, popular: popularModels, all: models, selectedID: modelID)
+    }
+
     func loadModels() {
         guard models.isEmpty else { return }
         Task { @MainActor in
             do {
-                let (data, _) = try await URLSession.shared.data(from: OpenRouter.modelsURL)
-                models = try ModelCatalog.models(fromJSON: data).sorted { $0.name < $1.name }
+                models = try await Self.fetch(OpenRouter.modelsURL).sorted { $0.name < $1.name }
+                popularModels = ModelCatalog.merged(try await Self.fetchPopular())
                 modelsError = nil
                 if modelID == nil { modelID = ModelCatalog.preferredDefault(in: models)?.id }
             } catch {
                 modelsError = "Couldn't load models from OpenRouter: \(error.localizedDescription)"
             }
         }
+    }
+
+    private static func fetchPopular() async throws -> [[AIModel]] {
+        var lists: [[AIModel]] = []
+        for category in ModelCatalog.popularCategories {
+            lists.append(try await fetch(ModelCatalog.categoryURL(category)))
+        }
+        return lists
+    }
+
+    private static func fetch(_ url: URL) async throws -> [AIModel] {
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try ModelCatalog.models(fromJSON: data)
     }
 }

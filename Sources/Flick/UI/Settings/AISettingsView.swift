@@ -44,15 +44,20 @@ struct AISettingsView: View {
                 Spacer()
                 Text(settings.modelName).foregroundStyle(.secondary)
             }
-            TextField("Search models…", text: $modelQuery)
+            TextField("Search all \(settings.models.count) models…", text: $modelQuery)
+            Text(modelQuery.isEmpty ? "Popular models on OpenRouter" : "All matching models")
+                .font(.caption).foregroundStyle(.secondary)
             if let error = settings.modelsError {
                 Label(error, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange).font(.caption)
             }
-            List(ModelCatalog.search(modelQuery, in: settings.models), selection: $settings.modelID) { model in
+            List(settings.visibleModels(matching: modelQuery), selection: $settings.modelID) { model in
                 HStack {
-                    Text(model.name)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(model.name)
+                        Text(model.id).foregroundStyle(.secondary).font(.caption)
+                    }
                     Spacer()
-                    Text(model.id).foregroundStyle(.secondary).font(.caption)
+                    Text(model.priceText ?? "").foregroundStyle(.secondary).font(.caption.monospacedDigit())
                 }
                 .tag(Optional(model.id))
             }
