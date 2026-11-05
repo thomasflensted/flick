@@ -63,23 +63,23 @@ struct ModelCatalogTests {
     }
 
     @Test func showsPopularWhenNotSearching() {
-        let visible = ModelCatalog.visible(query: "", popular: [models[0]], all: models, selectedID: nil)
+        let visible = ModelCatalog.visible(query: "", popular: [models[0]], all: models, includingID: nil)
         #expect(visible.map(\.id) == ["openai/gpt-x"])
     }
 
-    @Test func pinsSelectedPopularModelFirst() {
-        let visible = ModelCatalog.visible(query: "", popular: [models[0], models[2]], all: models, selectedID: "anthropic/claude-sonnet-5")
-        #expect(visible.map(\.id) == ["anthropic/claude-sonnet-5", "openai/gpt-x"])
+    @Test func keepsPopularOrderWhenSelectedModelIsPopular() {
+        let visible = ModelCatalog.visible(query: "", popular: [models[0], models[2]], all: models, includingID: "anthropic/claude-sonnet-5")
+        #expect(visible.map(\.id) == ["openai/gpt-x", "anthropic/claude-sonnet-5"])
     }
 
     @Test func keepsSelectedModelVisible() {
-        let visible = ModelCatalog.visible(query: "", popular: [models[0]], all: models, selectedID: "anthropic/claude-sonnet-4")
+        let visible = ModelCatalog.visible(query: "", popular: [models[0]], all: models, includingID: "anthropic/claude-sonnet-4")
         #expect(visible.map(\.id) == ["anthropic/claude-sonnet-4", "openai/gpt-x"])
     }
 
     @Test func searchesAllModelsButHidesVariants() {
         let all = models + [AIModel(id: "openai/gpt-x:batch", name: "GPT X (batch)", created: 300)]
-        let visible = ModelCatalog.visible(query: "gpt", popular: [], all: all, selectedID: nil)
+        let visible = ModelCatalog.visible(query: "gpt", popular: [], all: all, includingID: nil)
         #expect(visible.map(\.id) == ["openai/gpt-x"])
     }
 

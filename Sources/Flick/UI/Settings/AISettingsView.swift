@@ -5,6 +5,7 @@ struct AISettingsView: View {
     @ObservedObject var settings: AISettings
     @State private var newKey = ""
     @State private var modelQuery = ""
+    @State private var modelAtOpen: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -14,7 +15,10 @@ struct AISettingsView: View {
         }
         .padding()
         .frame(minWidth: 720, minHeight: 420)
-        .onAppear { settings.loadModels() }
+        .onAppear {
+            modelAtOpen = settings.modelID
+            settings.loadModels()
+        }
     }
 
     private var keySection: some View {
@@ -50,7 +54,7 @@ struct AISettingsView: View {
             if let error = settings.modelsError {
                 Label(error, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange).font(.caption)
             }
-            List(settings.visibleModels(matching: modelQuery), selection: $settings.modelID) { model in
+            List(settings.visibleModels(matching: modelQuery, including: modelAtOpen), selection: $settings.modelID) { model in
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(Color.accentColor)

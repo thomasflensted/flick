@@ -28,8 +28,8 @@ final class AISettings: ObservableObject {
         hasKey = false
     }
 
-    func visibleModels(matching query: String) -> [AIModel] {
-        ModelCatalog.visible(query: query, popular: popularModels, all: models, selectedID: modelID)
+    func visibleModels(matching query: String, including modelID: String?) -> [AIModel] {
+        ModelCatalog.visible(query: query, popular: popularModels, all: models, includingID: modelID)
     }
 
     func loadModels() {

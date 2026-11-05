@@ -62,11 +62,11 @@ public enum ModelCatalog {
         return lists.joined().filter { seen.insert($0.id).inserted }.sorted { $0.name < $1.name }
     }
 
-    public static func visible(query: String, popular: [AIModel], all: [AIModel], selectedID: String?) -> [AIModel] {
+    public static func visible(query: String, popular: [AIModel], all: [AIModel], includingID: String?) -> [AIModel] {
         let all = all.filter { !$0.isVariant }
         if !query.trimmingCharacters(in: .whitespaces).isEmpty { return search(query, in: all) }
-        let selected = all.filter { $0.id == selectedID }
-        return selected + popular.filter { $0.id != selectedID }
+        let missing = all.filter { $0.id == includingID && !popular.contains($0) }
+        return missing + popular
     }
 
     public static func search(_ query: String, in models: [AIModel]) -> [AIModel] {
