@@ -72,7 +72,20 @@ final class SearchModel: ObservableObject {
     }
 
     func tab() {
-        if argumentTarget != nil { exitArgument() } else if let ql = argumentLink { enterArgument(ql) }
+        if argumentTarget != nil { exitArgument(); return }
+        if let ql = argumentLink { enterArgument(ql); return }
+        if mode == .root { askAI(query) }
+    }
+
+    var tabHint: String {
+        if argumentTarget != nil { return "Back to search" }
+        return argumentLink == nil ? "Ask AI" : "Add query"
+    }
+
+    private func askAI(_ question: String) {
+        let question = question.trimmingCharacters(in: .whitespaces)
+        enter(.chat)
+        if !question.isEmpty { chat.send(question) }
     }
 
     func escape() -> Bool {
@@ -148,8 +161,7 @@ final class SearchModel: ObservableObject {
             recordUsage(of: kind)
             enter(mode)
         case .ask(let question):
-            enter(.chat)
-            chat.send(question)
+            askAI(question)
         }
     }
 

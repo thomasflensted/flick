@@ -76,7 +76,7 @@ struct SearchView: View {
                 KeyHint(key: "↵", label: "Open")
             }
             if model.mode == .root {
-                KeyHint(key: "⇥", label: model.argumentTarget == nil ? "Add query" : "Back to search")
+                KeyHint(key: "⇥", label: model.tabHint)
                 KeyHint(key: "⌘,", label: "Settings")
             }
             KeyHint(key: "esc", label: model.mode == .root ? "Close" : "Back")
