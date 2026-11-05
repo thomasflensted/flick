@@ -8,11 +8,11 @@ final class PanelController {
 
     private let model: SearchModel
     private let panel: LauncherPanel
-    private let onOpenManager: () -> Void
+    private let onOpenSettings: () -> Void
 
-    init(model: SearchModel, onOpenManager: @escaping () -> Void) {
+    init(model: SearchModel, onOpenSettings: @escaping () -> Void) {
         self.model = model
-        self.onOpenManager = onOpenManager
+        self.onOpenSettings = onOpenSettings
         let host = NSHostingView(rootView: SearchView(model: model))
         host.frame = NSRect(origin: .zero, size: Self.size)
         panel = LauncherPanel(content: host)
@@ -60,7 +60,7 @@ final class PanelController {
         case kVK_Delete: return model.deleteBackwardWhenEmpty()
         case kVK_ANSI_Comma where event.modifierFlags.contains(.command):
             hide()
-            onOpenManager()
+            onOpenSettings()
         default: return false
         }
         return true

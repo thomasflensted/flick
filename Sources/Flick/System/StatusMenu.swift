@@ -3,11 +3,11 @@ import AppKit
 final class StatusMenu {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
-    init(onShow: @escaping () -> Void, onManage: @escaping () -> Void, onImport: @escaping () -> Void) {
+    init(onShow: @escaping () -> Void, onSettings: @escaping () -> Void, onImport: @escaping () -> Void) {
         showKeepingAwake(false)
         let menu = NSMenu()
         menu.addItem(ActionMenuItem(title: "Open Flick", action: onShow))
-        menu.addItem(ActionMenuItem(title: "Manage Quicklinks…", key: ",", action: onManage))
+        menu.addItem(ActionMenuItem(title: "Settings…", key: ",", action: onSettings))
         menu.addItem(ActionMenuItem(title: "Import from Raycast…", action: onImport))
         menu.addItem(.separator())
         menu.addItem(loginItem())

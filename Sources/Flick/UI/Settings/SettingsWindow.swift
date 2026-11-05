@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-final class ManagerWindow {
+final class SettingsWindow {
     private var window: NSWindow?
 
     func show(library: Library, onImport: @escaping () -> Void) {
@@ -19,7 +19,7 @@ final class ManagerWindow {
         }
         .padding(.top, 8)
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
-        window.title = "Flick"
+        window.title = "Flick Settings"
         window.setContentSize(NSSize(width: 820, height: 540))
         window.isReleasedWhenClosed = false
         window.center()

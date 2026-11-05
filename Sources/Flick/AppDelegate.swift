@@ -5,18 +5,18 @@ import FlickCore
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let library = Library()
     private let usage = UsageStore()
-    private let manager = ManagerWindow()
+    private let settings = SettingsWindow()
     private let commands = CommandRunner()
     private lazy var expander = SnippetExpander(store: library.snippets)
     private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands))
-    private lazy var panel = PanelController(model: model, onOpenManager: { [weak self] in self?.showManager() })
+    private lazy var panel = PanelController(model: model, onOpenSettings: { [weak self] in self?.showSettings() })
     private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusMenu = StatusMenu(
             onShow: { [weak self] in self?.panel.show() },
-            onManage: { [weak self] in self?.showManager() },
+            onSettings: { [weak self] in self?.showSettings() },
             onImport: { [weak self] in self?.importFromRaycast() })
         commands.keepAwake.onChange = { [weak self] active in self?.statusMenu?.showKeepingAwake(active) }
         commands.keepAwake.onExpire = { Toast.shared.show(.sleepAllowed) }
@@ -35,11 +35,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.runModal()
     }
 
-    private func showManager() {
-        manager.show(library: library, onImport: { [weak self] in self?.importFromRaycast() })
+    private func showSettings() {
+        settings.show(library: library, onImport: { [weak self] in self?.importFromRaycast() })
     }
 
     private func importFromRaycast() {
-        if RaycastImportFlow.run(into: library) { showManager() }
+        if RaycastImportFlow.run(into: library) { showSettings() }
     }
 }
