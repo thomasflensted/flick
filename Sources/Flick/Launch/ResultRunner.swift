@@ -1,7 +1,7 @@
 import FlickCore
 
 enum RunOutcome {
-    case done
+    case done(delivered: Delivery?)
     case enter(Mode)
     case askArgument(Quicklink)
 }
@@ -14,17 +14,25 @@ final class ResultRunner {
     }
 
     func run(_ kind: ResultKind, delivery: Delivery) -> RunOutcome {
+        let outcome = perform(kind, delivery: delivery)
+        if case .done(let delivered) = outcome, let feedback = Feedback.after(kind, delivered: delivered) {
+            Toast.shared.show(feedback)
+        }
+        return outcome
+    }
+
+    private func perform(_ kind: ResultKind, delivery: Delivery) -> RunOutcome {
         switch kind {
         case .quicklink(let ql, nil) where ql.takesArgument: return .askArgument(ql)
         case .quicklink(let ql, let argument): Launcher.open(ql, argument: argument ?? "")
         case .app(let app): Launcher.open(app)
         case .url(let url): Launcher.open(url)
         case .google(let query): Launcher.open(URLText.googleSearch(query))
-        case .command(let command): commands.run(command, delivery: delivery)
+        case .command(let command): return .done(delivered: commands.run(command, delivery: delivery))
         case .mode(let mode): return .enter(mode)
-        case .emoji(let emoji): Paster.deliver(emoji.character, delivery)
+        case .emoji(let emoji): return .done(delivered: Paster.deliver(emoji.character, delivery))
         case .message: Launcher.revealQuicklinksFile()
         }
-        return .done
+        return .done(delivered: nil)
     }
 }

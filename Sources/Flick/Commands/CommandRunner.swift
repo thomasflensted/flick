@@ -5,13 +5,14 @@ final class CommandRunner {
 
     var available: [Command] { Command.available(isKeepingAwake: keepAwake.isActive) }
 
-    func run(_ command: Command, delivery: Delivery) {
+    func run(_ command: Command, delivery: Delivery) -> Delivery? {
         switch command {
         case .keepAwake: keepAwake.start()
         case .keepAwakeFor(let minutes): keepAwake.start(minutes: minutes)
         case .allowSleep: keepAwake.stop()
-        case .loremSentence: Paster.deliver(LoremIpsum.sentence(), delivery)
-        case .loremParagraph: Paster.deliver(LoremIpsum.paragraph(), delivery)
+        case .loremSentence: return Paster.deliver(LoremIpsum.sentence(), delivery)
+        case .loremParagraph: return Paster.deliver(LoremIpsum.paragraph(), delivery)
         }
+        return nil
     }
 }

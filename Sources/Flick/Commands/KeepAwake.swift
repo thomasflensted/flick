@@ -2,6 +2,7 @@ import Foundation
 
 final class KeepAwake {
     var onChange: (Bool) -> Void = { _ in }
+    var onExpire: () -> Void = {}
     private var activity: NSObjectProtocol?
     private var timer: Timer?
 
@@ -12,9 +13,14 @@ final class KeepAwake {
         activity = ProcessInfo.processInfo.beginActivity(options: [.idleDisplaySleepDisabled, .userInitiated],
                                                          reason: "Keep Awake")
         if let minutes {
-            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(minutes * 60), repeats: false) { [weak self] _ in self?.stop() }
+            timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(minutes * 60), repeats: false) { [weak self] _ in self?.expire() }
         }
         onChange(true)
+    }
+
+    private func expire() {
+        stop()
+        onExpire()
     }
 
     func stop() {

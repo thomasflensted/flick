@@ -6,11 +6,13 @@ import FlickCore
 enum Paster {
     private static let delayForPanelToClose = 0.12
 
-    static func deliver(_ text: String, _ delivery: Delivery) {
+    @discardableResult
+    static func deliver(_ text: String, _ delivery: Delivery) -> Delivery {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        guard delivery == .paste, isTrusted() else { return }
+        guard delivery == .paste, isTrusted() else { return .copy }
         DispatchQueue.main.asyncAfter(deadline: .now() + delayForPanelToClose, execute: pressCommandV)
+        return .paste
     }
 
     private static func pressCommandV() {
