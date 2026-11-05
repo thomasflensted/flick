@@ -10,6 +10,8 @@ final class CommandRunner {
         case .caffeinate: caffeine.start()
         case .caffeinateFor(let minutes): caffeine.start(minutes: minutes)
         case .decaffeinate: caffeine.stop()
+        case .loremSentence: Paster.paste(LoremIpsum.sentence())
+        case .loremParagraph: Paster.paste(LoremIpsum.paragraph())
         }
     }
 }

@@ -25,7 +25,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
 PLIST
-codesign --force --sign - "$APP"
+IDENTITY=$(security find-identity -v -p codesigning | grep -o '"Apple Development[^"]*"' | head -1 | tr -d '"')
+codesign --force --sign "${IDENTITY:--}" "$APP"
 if [[ "${1:-}" != "--no-install" ]]; then
   pkill -x Flick 2>/dev/null || true
   rm -rf /Applications/Flick.app
