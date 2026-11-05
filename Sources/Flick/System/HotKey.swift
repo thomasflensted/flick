@@ -1,6 +1,5 @@
 import Carbon
 
-/// Global hotkey via Carbon. Needs no Accessibility permission.
 final class HotKey {
     private var ref: EventHotKeyRef?
     private var handler: EventHandlerRef?

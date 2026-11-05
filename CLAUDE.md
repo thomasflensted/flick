@@ -10,6 +10,7 @@
 - Extract business rules to separate functions. The naming of the function alone justifies the extraction.
 - Put all functions and files in appropriate packages/folders/files.
 - Do not optimize for or handle theoretical or near-theoretical edge cases. Tell the user if in doubt.
+- Do not use type casting (`as`, `as?`, `as!`).
 - Do not write comments. The code should be self-explanatory. Only add comments if something is genuinely hard to understand or there's a weird reason something needs to be done in a special way.
 
 ## Testing
@@ -27,7 +28,10 @@
 
 A small native macOS launcher (Raycast replacement): ⌘Space opens a search panel for
 quicklinks, apps and Google search. SwiftPM project; `./build.sh` builds and installs to
-/Applications (`--no-install` to only build into `build/Flick.app`).
+/Applications (`--no-install` to only build into `build/Flick.app`). `swift test` runs the tests.
+
+Pure logic (templates, URL handling, matching, ranking, Raycast parsing) lives in `Sources/FlickCore`
+and is unit tested in `Tests/FlickCoreTests`. `Sources/Flick` is the AppKit/SwiftUI app.
 
 ## Editing quicklinks (for agents)
 
@@ -48,8 +52,8 @@ Only `name` and `link` are required; `id` is generated if missing (keep existing
 ```
 
 - `link`: URL, app URL scheme (e.g. `slack://`), or file/folder path (`/…` or `~/…`).
-- `{argument}` / `{query}` is replaced by the text typed after the name or keyword (URL-encoded).
-  `{argument name="x" default="y"}` and `{clipboard}` are supported; add `| raw` to skip encoding.
+- `{argument}` is replaced by the text typed after the name or keyword (URL-encoded for URLs).
+  `{argument name="x" default="y"}` sets the input label and the value used when nothing is typed.
 - `keyword`: optional short alias. Typing `gh react` runs "Search GitHub" with `react`.
 - `openWith`: optional bundle id (`com.google.Chrome`, `com.apple.Safari`, `company.thebrowser.Browser`)
   or a path to a `.app`. Omit to use the default handler.
