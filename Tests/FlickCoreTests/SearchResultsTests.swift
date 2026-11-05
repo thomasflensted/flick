@@ -31,8 +31,9 @@ struct SearchResultsTests {
         #expect(results.first?.kind == .app(safari))
     }
 
-    @Test func alwaysEndsWithGoogle() {
-        #expect(search("anything at all").last?.kind == .google("anything at all"))
+    @Test func alwaysEndsWithGoogleThenAskAI() {
+        let kinds = search("anything at all").suffix(2).map(\.kind)
+        #expect(kinds == [.google("anything at all"), .askAI("anything at all")])
     }
 
     @Test func offersToOpenWebAddresses() {

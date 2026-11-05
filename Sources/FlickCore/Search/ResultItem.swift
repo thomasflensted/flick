@@ -15,6 +15,7 @@ public enum ResultKind: Equatable {
     case app(AppEntry)
     case url(URL)
     case google(String)
+    case askAI(String)
     case command(Command)
     case mode(Mode)
     case emoji(Emoji)
@@ -81,6 +82,10 @@ public struct ResultItem: Identifiable, Equatable {
 
     public static func google(_ query: String) -> ResultItem {
         ResultItem(id: "google", kind: .google(query), title: "Search Google for \u{201C}\(query)\u{201D}", subtitle: "google.com")
+    }
+
+    public static func askAI(_ question: String) -> ResultItem {
+        ResultItem(id: "askAI", kind: .askAI(question), title: "Ask AI \u{201C}\(question)\u{201D}", subtitle: "OpenRouter")
     }
 
     public static func message(_ text: String) -> ResultItem {

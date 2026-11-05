@@ -15,6 +15,7 @@ struct ResultIcon: View {
         case .quicklink(let ql, _): quicklinkIcon(ql)
         case .url: symbol("safari", padding: 2).foregroundStyle(.blue)
         case .google: symbol("magnifyingglass")
+        case .askAI: SymbolTile(symbol: Mode.chat.symbol, color: Mode.chat.tint)
         case .command(let command): SymbolTile(symbol: command.symbol, color: command.tint)
         case .mode(let mode): SymbolTile(symbol: mode.symbol, color: mode.tint)
         case .emoji(let emoji): Text(emoji.character).font(.system(size: size * 0.8))

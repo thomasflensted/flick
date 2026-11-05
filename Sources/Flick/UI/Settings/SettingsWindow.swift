@@ -4,18 +4,19 @@ import SwiftUI
 final class SettingsWindow {
     private var window: NSWindow?
 
-    func show(library: Library, onImport: @escaping () -> Void) {
+    func show(library: Library, ai: AISettings, onImport: @escaping () -> Void) {
         library.reloadIfChanged()
-        let window = window ?? makeWindow(library: library, onImport: onImport)
+        let window = window ?? makeWindow(library: library, ai: ai, onImport: onImport)
         self.window = window
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
     }
 
-    private func makeWindow(library: Library, onImport: @escaping () -> Void) -> NSWindow {
+    private func makeWindow(library: Library, ai: AISettings, onImport: @escaping () -> Void) -> NSWindow {
         let content = TabView {
             QuicklinksView(store: library.quicklinks, onImport: onImport).tabItem { Text("Quicklinks") }
             SnippetsView(store: library.snippets).tabItem { Text("Snippets") }
+            AISettingsView(settings: ai).tabItem { Text("AI") }
         }
         .padding(.top, 8)
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))

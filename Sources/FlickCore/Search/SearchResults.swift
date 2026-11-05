@@ -112,7 +112,7 @@ public struct SearchResults {
 
     private func webResults(_ query: String) -> [ResultItem] {
         let open = URLText.looksLikeWebAddress(query) ? URLText.url(from: query).map { ResultItem.url($0, typed: query) } : nil
-        return [open, .google(query)].compactMap { $0 }
+        return [open, .google(query), .askAI(query)].compactMap { $0 }
     }
 
     private func bestScore(_ query: String, _ texts: [String]) -> Int? {

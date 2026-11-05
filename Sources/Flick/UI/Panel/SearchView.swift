@@ -48,7 +48,9 @@ struct SearchView: View {
     }
 
     @ViewBuilder private var results: some View {
-        if let columns = model.mode.gridColumns {
+        if model.mode == .chat {
+            ChatView(chat: model.chat, settings: model.chat.settings)
+        } else if let columns = model.mode.gridColumns {
             EmojiGrid(model: model, columns: columns)
         } else {
             ResultList(model: model)
@@ -60,8 +62,14 @@ struct SearchView: View {
             if model.movesInGrid, let title = model.selectedTitle {
                 Text(title).font(.system(size: 12, weight: .medium)).lineLimit(1)
             }
+            if model.mode == .chat {
+                Text(model.chat.settings.modelName).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+            }
             Spacer()
-            if model.selectedProducesText {
+            if model.mode == .chat {
+                KeyHint(key: "↵", label: "Send")
+                KeyHint(key: "⌘N", label: "New chat")
+            } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
                 KeyHint(key: "⌘↵", label: "Copy")
             } else {

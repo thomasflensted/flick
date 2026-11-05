@@ -17,12 +17,14 @@ final class SearchModel: ObservableObject {
     private let library: Library
     private let usage: UsageStore
     private let runner: ResultRunner
+    let chat: ChatSession
     private var apps = AppIndex.scan()
 
-    init(library: Library, usage: UsageStore, runner: ResultRunner) {
+    init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession) {
         self.library = library
         self.usage = usage
         self.runner = runner
+        self.chat = chat
     }
 
     var argumentLink: Quicklink? {
@@ -104,6 +106,10 @@ final class SearchModel: ObservableObject {
     }
 
     func activate(_ index: Int? = nil, delivery: Delivery = .paste) {
+        if mode == .chat {
+            sendChatMessage()
+            return
+        }
         if index == nil, let ql = argumentTarget {
             activateArgument(of: ql)
             return
@@ -113,6 +119,16 @@ final class SearchModel: ObservableObject {
         guard results.indices.contains(i) else { return }
         selected = i
         run(results[i].kind, delivery: delivery)
+    }
+
+    func newChat() {
+        chat.newChat()
+        requestFocus(.query)
+    }
+
+    private func sendChatMessage() {
+        chat.send(query)
+        query = ""
     }
 
     private func activateArgument(of ql: Quicklink) {
@@ -131,6 +147,9 @@ final class SearchModel: ObservableObject {
         case .enter(let mode):
             recordUsage(of: kind)
             enter(mode)
+        case .ask(let question):
+            enter(.chat)
+            chat.send(question)
         }
     }
 
@@ -166,6 +185,8 @@ final class SearchModel: ObservableObject {
             return EmojiCatalog.results(for: query, usage: usage.counts)
         case .snippets:
             return SnippetSearch.results(for: query, snippets: library.snippets.items, usage: usage.counts)
+        case .chat:
+            return []
         }
     }
 

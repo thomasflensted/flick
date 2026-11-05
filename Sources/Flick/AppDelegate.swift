@@ -7,8 +7,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let usage = UsageStore()
     private let settings = SettingsWindow()
     private let commands = CommandRunner()
+    private let ai = AISettings()
     private lazy var expander = SnippetExpander(store: library.snippets)
-    private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands))
+    private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands),
+                                         chat: ChatSession(settings: ai))
     private lazy var panel = PanelController(model: model, onOpenSettings: { [weak self] in self?.showSettings() })
     private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?
@@ -36,7 +38,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showSettings() {
-        settings.show(library: library, onImport: { [weak self] in self?.importFromRaycast() })
+        settings.show(library: library, ai: ai, onImport: { [weak self] in self?.importFromRaycast() })
     }
 
     private func importFromRaycast() {

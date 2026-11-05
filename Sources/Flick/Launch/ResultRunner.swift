@@ -4,6 +4,7 @@ enum RunOutcome {
     case done(delivered: Delivery?)
     case enter(Mode)
     case askArgument(Quicklink)
+    case ask(String)
 }
 
 final class ResultRunner {
@@ -28,6 +29,7 @@ final class ResultRunner {
         case .app(let app): Launcher.open(app)
         case .url(let url): Launcher.open(url)
         case .google(let query): Launcher.open(URLText.googleSearch(query))
+        case .askAI(let question): return .ask(question)
         case .command(let command): return .done(delivered: commands.run(command, delivery: delivery))
         case .mode(let mode): return .enter(mode)
         case .emoji(let emoji): return .done(delivered: Paster.deliver(emoji.character, delivery))

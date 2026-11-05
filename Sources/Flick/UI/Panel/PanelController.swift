@@ -58,6 +58,7 @@ final class PanelController {
         case kVK_Tab: model.tab()
         case kVK_Escape: if !model.escape() { hide() }
         case kVK_Delete: return model.deleteBackwardWhenEmpty()
+        case kVK_ANSI_N where event.modifierFlags.contains(.command) && model.mode == .chat: model.newChat()
         case kVK_ANSI_Comma where event.modifierFlags.contains(.command):
             hide()
             onOpenSettings()

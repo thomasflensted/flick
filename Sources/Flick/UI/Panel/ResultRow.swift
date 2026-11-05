@@ -34,6 +34,7 @@ struct ResultRow: View {
         case .app: return "Application"
         case .url: return "URL"
         case .google: return "Web"
+        case .askAI: return "AI"
         case .command, .mode: return "Command"
         case .emoji: return ""
         case .snippet: return "Snippet"
