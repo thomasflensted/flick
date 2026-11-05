@@ -23,7 +23,7 @@ public struct SearchResults {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         if trimmed.isEmpty { return recents() }
         let ranked = (argumentMatches(query) + timedCaffeinate(trimmed) + quicklinkMatches(trimmed, excluding: query)
-                      + appMatches(trimmed) + commandMatches(trimmed))
+                      + appMatches(trimmed) + commandMatches(trimmed) + modeMatches(trimmed))
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
             .map(\.item)
@@ -63,6 +63,7 @@ public struct SearchResults {
         if let ql = links.first(where: { UsageKey.quicklink($0) == key }) { return .quicklink(ql) }
         if let app = apps.first(where: { UsageKey.app($0) == key }) { return .app(app) }
         if let command = commands.first(where: { UsageKey.command($0) == key }) { return .command(command) }
+        if let mode = Mode.openable.first(where: { UsageKey.mode($0) == key }) { return .mode(mode) }
         return nil
     }
 
@@ -88,6 +89,12 @@ public struct SearchResults {
     private func commandMatches(_ query: String) -> [Scored] {
         commands.compactMap { command in
             MatchScore.score(query, against: command.title).map { ($0 + boost(UsageKey.command(command)), .command(command)) }
+        }
+    }
+
+    private func modeMatches(_ query: String) -> [Scored] {
+        Mode.openable.compactMap { mode in
+            MatchScore.score(query, against: mode.commandTitle).map { ($0 + boost(UsageKey.mode(mode)), .mode(mode)) }
         }
     }
 

@@ -27,7 +27,8 @@ struct SearchView: View {
     private var searchBar: some View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass").font(.system(size: 18)).foregroundStyle(.secondary)
-            TextField("Search apps, quicklinks, or Google…", text: $model.query)
+            if model.mode != .root { ModeChip(title: model.mode.chip) }
+            TextField(model.mode.placeholder, text: $model.query)
                 .textFieldStyle(.plain)
                 .font(.system(size: Self.queryFontSize))
                 .focused($focus, equals: .query)
@@ -70,7 +71,7 @@ struct SearchView: View {
             KeyHint(key: "↵", label: "Open")
             KeyHint(key: "⇥", label: model.argumentTarget == nil ? "Add query" : "Back to search")
             KeyHint(key: "⌘,", label: "Manage quicklinks")
-            KeyHint(key: "esc", label: "Close")
+            KeyHint(key: "esc", label: model.mode == .root ? "Close" : "Back")
         }
         .padding(.horizontal, 14)
         .frame(height: 30)
@@ -79,6 +80,17 @@ struct SearchView: View {
     private func syncFocusToModel(_ old: Field?, _ new: Field?) {
         if new == .argument, model.argumentTarget == nil, let link = model.inlineArgumentLink { model.enterArgument(link) }
         if new == .query, model.argumentTarget != nil { model.exitArgument() }
+    }
+}
+
+struct ModeChip: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 13, weight: .semibold))
+            .padding(.horizontal, 8).padding(.vertical, 3)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(0.2)))
     }
 }
 

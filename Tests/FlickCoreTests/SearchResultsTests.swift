@@ -79,6 +79,10 @@ struct CommandSearchTests {
         #expect(search("caffeinate 20").first?.title == "Caffeinate for 20 min")
     }
 
+    @Test func findsEmojiMode() {
+        #expect(search("emoji").first?.kind == .mode(.emoji))
+    }
+
     @Test func noTimedCaffeinateWithoutDuration() {
         #expect(SearchResults.caffeinateMinutes(in: "caffeinate later") == nil)
         #expect(SearchResults.caffeinateMinutes(in: "ca 20") == nil)

@@ -1,5 +1,6 @@
 import AppKit
 import Carbon
+import FlickCore
 import SwiftUI
 
 final class PanelController {
@@ -23,12 +24,12 @@ final class PanelController {
         }
     }
 
-    func toggle() {
-        panel.isVisible ? hide() : show()
+    func toggle(_ mode: Mode = .root) {
+        panel.isVisible && model.mode == mode ? hide() : show(mode)
     }
 
-    func show() {
-        model.prepareForShow()
+    func show(_ mode: Mode = .root) {
+        model.prepareForShow(in: mode)
         panel.setFrameOrigin(origin(on: screenUnderMouse()))
         panel.makeKeyAndOrderFront(nil)
     }
@@ -53,7 +54,7 @@ final class PanelController {
         case kVK_Return, kVK_ANSI_KeypadEnter: model.activate()
         case kVK_Tab: model.tab()
         case kVK_Escape: if !model.escape() { hide() }
-        case kVK_Delete: return model.deleteInEmptyArgument()
+        case kVK_Delete: return model.deleteBackwardWhenEmpty()
         case kVK_ANSI_Comma where event.modifierFlags.contains(.command):
             hide()
             onOpenManager()

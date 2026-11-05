@@ -1,5 +1,6 @@
 import AppKit
 import Carbon
+import FlickCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let store = QuicklinkStore()
@@ -8,7 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let commands = CommandRunner()
     private lazy var model = SearchModel(store: store, usage: usage, runner: ResultRunner(commands: commands))
     private lazy var panel = PanelController(model: model, onOpenManager: { [weak self] in self?.showManager() })
-    private var hotKey: HotKey?
+    private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -17,12 +18,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onManage: { [weak self] in self?.showManager() },
             onImport: { [weak self] in self?.importFromRaycast() })
         commands.caffeine.onChange = { [weak self] active in self?.statusMenu?.showCaffeinated(active) }
-        registerHotKey()
+        registerHotKeys()
     }
 
-    private func registerHotKey() {
-        hotKey = HotKey(keyCode: UInt32(kVK_Space), modifiers: UInt32(cmdKey)) { [weak self] in self?.panel.toggle() }
-        guard hotKey == nil else { return }
+    private func registerHotKeys() {
+        let launcher = HotKey(keyCode: UInt32(kVK_Space), modifiers: UInt32(cmdKey)) { [weak self] in self?.panel.toggle() }
+        let emoji = HotKey(keyCode: UInt32(kVK_Space), modifiers: UInt32(cmdKey | controlKey)) { [weak self] in self?.panel.toggle(.emoji) }
+        hotKeys = [launcher, emoji].compactMap { $0 }
+        guard launcher == nil else { return }
         let alert = NSAlert()
         alert.messageText = "Couldn't register ⌘Space"
         alert.informativeText = "Another app (Raycast or Spotlight) is using ⌘Space. Quit it or change its shortcut, then relaunch Flick."

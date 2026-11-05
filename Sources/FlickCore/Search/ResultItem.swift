@@ -16,6 +16,8 @@ public enum ResultKind: Equatable {
     case url(URL)
     case google(String)
     case command(Command)
+    case mode(Mode)
+    case emoji(Emoji)
     case message(String)
 
     public var usageKey: String? {
@@ -23,6 +25,8 @@ public enum ResultKind: Equatable {
         case .quicklink(let ql, _): return UsageKey.quicklink(ql)
         case .app(let app): return UsageKey.app(app)
         case .command(let command): return UsageKey.command(command)
+        case .mode(let mode): return UsageKey.mode(mode)
+        case .emoji(let emoji): return UsageKey.emoji(emoji)
         default: return nil
         }
     }
@@ -32,6 +36,8 @@ public enum UsageKey {
     public static func quicklink(_ ql: Quicklink) -> String { "ql:\(ql.id)" }
     public static func app(_ app: AppEntry) -> String { "app:\(app.path)" }
     public static func command(_ command: Command) -> String { "cmd:\(command.id)" }
+    public static func emoji(_ emoji: Emoji) -> String { "emoji:\(emoji.character)" }
+    public static func mode(_ mode: Mode) -> String { "mode:\(mode.id)" }
 }
 
 public struct ResultItem: Identifiable, Equatable {
@@ -46,11 +52,19 @@ public struct ResultItem: Identifiable, Equatable {
     }
 
     public static func app(_ app: AppEntry) -> ResultItem {
-        ResultItem(id: UsageKey.app(app), kind: .app(app), title: app.name, subtitle: "Application")
+        ResultItem(id: UsageKey.app(app), kind: .app(app), title: app.name, subtitle: "")
     }
 
     public static func command(_ command: Command) -> ResultItem {
         ResultItem(id: UsageKey.command(command), kind: .command(command), title: command.title, subtitle: command.subtitle)
+    }
+
+    public static func mode(_ mode: Mode) -> ResultItem {
+        ResultItem(id: UsageKey.mode(mode), kind: .mode(mode), title: mode.commandTitle, subtitle: mode.commandSubtitle)
+    }
+
+    public static func emoji(_ emoji: Emoji) -> ResultItem {
+        ResultItem(id: UsageKey.emoji(emoji), kind: .emoji(emoji), title: emoji.name.capitalized, subtitle: "")
     }
 
     public static func url(_ url: URL, typed: String) -> ResultItem {

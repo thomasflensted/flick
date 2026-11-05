@@ -9,6 +9,7 @@ final class SearchModel: ObservableObject {
     @Published var argument = ""
     @Published private(set) var results: [ResultItem] = []
     @Published private(set) var argumentTarget: Quicklink?
+    @Published private(set) var mode: Mode = .root
     @Published private(set) var focus: Field = .query
     @Published private(set) var focusRequest = 0
 
@@ -41,14 +42,19 @@ final class SearchModel: ObservableObject {
         return target.resolved(argument: argument)
     }
 
-    func prepareForShow() {
+    func prepareForShow(in mode: Mode) {
         store.reloadIfChanged()
         argumentTarget = nil
         argument = ""
+        enter(mode)
+        rescanApps()
+    }
+
+    func enter(_ mode: Mode) {
+        self.mode = mode
         query = ""
         refresh()
         requestFocus(.query)
-        rescanApps()
     }
 
     func move(_ delta: Int) {
@@ -64,13 +70,14 @@ final class SearchModel: ObservableObject {
     func escape() -> Bool {
         if argumentTarget != nil { exitArgument(); return true }
         if !query.isEmpty { query = ""; return true }
+        if mode != .root { enter(.root); return true }
         return false
     }
 
-    func deleteInEmptyArgument() -> Bool {
-        guard argumentTarget != nil, argument.isEmpty else { return false }
-        exitArgument()
-        return true
+    func deleteBackwardWhenEmpty() -> Bool {
+        if argumentTarget != nil, argument.isEmpty { exitArgument(); return true }
+        if argumentTarget == nil, mode != .root, query.isEmpty { enter(.root); return true }
+        return false
     }
 
     func enterArgument(_ ql: Quicklink) {
@@ -105,17 +112,24 @@ final class SearchModel: ObservableObject {
     }
 
     private func run(_ kind: ResultKind) {
-        if case .quicklink(let ql, nil) = kind, ql.takesArgument {
+        switch runner.run(kind) {
+        case .askArgument(let ql):
             enterArgument(ql)
-            return
+        case .done:
+            recordUsage(of: kind)
+            onDone()
+        case .enter(let mode):
+            recordUsage(of: kind)
+            enter(mode)
         }
-        runner.run(kind)
+    }
+
+    private func recordUsage(of kind: ResultKind) {
         if let key = kind.usageKey { usage.record(key) }
-        onDone()
     }
 
     private func queryChanged() {
-        if argumentTarget == nil, query.hasSuffix(" "), let ql = searchResults.linkTriggered(by: String(query.dropLast())) {
+        if mode == .root, argumentTarget == nil, query.hasSuffix(" "), let ql = searchResults.linkTriggered(by: String(query.dropLast())) {
             query = String(query.dropLast())
             refresh()
             enterArgument(ql)
@@ -129,9 +143,18 @@ final class SearchModel: ObservableObject {
     }
 
     private func refresh() {
-        let error = store.loadError.map { [ResultItem.message($0)] } ?? []
-        results = error + searchResults.results(for: query)
+        results = currentResults()
         selected = 0
+    }
+
+    private func currentResults() -> [ResultItem] {
+        switch mode {
+        case .root:
+            let error = store.loadError.map { [ResultItem.message($0)] } ?? []
+            return error + searchResults.results(for: query)
+        case .emoji:
+            return EmojiCatalog.results(for: query, usage: usage.counts)
+        }
     }
 
     private func requestFocus(_ field: Field) {

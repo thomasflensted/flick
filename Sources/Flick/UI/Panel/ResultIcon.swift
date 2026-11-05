@@ -15,7 +15,9 @@ struct ResultIcon: View {
         case .quicklink(let ql, _): quicklinkIcon(ql)
         case .url: symbol("safari", padding: 2).foregroundStyle(.blue)
         case .google: symbol("magnifyingglass")
-        case .command(let command): symbol(command.symbol, padding: 3).foregroundStyle(.secondary)
+        case .command(let command): symbol(command.symbol, padding: 3)
+        case .mode(let mode): symbol(mode.symbol, padding: 3)
+        case .emoji(let emoji): Text(emoji.character).font(.system(size: size * 0.8))
         case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
         }
     }

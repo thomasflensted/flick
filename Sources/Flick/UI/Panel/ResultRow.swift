@@ -11,8 +11,8 @@ struct ResultRow: View {
             ResultIcon(kind: item.kind)
             VStack(alignment: .leading, spacing: 1) {
                 Text(item.title).font(.system(size: 14, weight: .medium)).lineLimit(1)
-                if showsSubtitle {
-                    Text(subtitle ?? item.subtitle)
+                if !shownSubtitle.isEmpty {
+                    Text(shownSubtitle)
                         .font(.system(size: 11)).foregroundStyle(.secondary)
                         .lineLimit(1).truncationMode(.middle)
                 }
@@ -26,10 +26,7 @@ struct ResultRow: View {
         .contentShape(Rectangle())
     }
 
-    private var showsSubtitle: Bool {
-        if case .app = item.kind { return false }
-        return true
-    }
+    private var shownSubtitle: String { subtitle ?? item.subtitle }
 
     private var badge: String {
         switch item.kind {
@@ -37,7 +34,8 @@ struct ResultRow: View {
         case .app: return "Application"
         case .url: return "URL"
         case .google: return "Web"
-        case .command: return "Command"
+        case .command, .mode: return "Command"
+        case .emoji: return ""
         case .message: return ""
         }
     }
