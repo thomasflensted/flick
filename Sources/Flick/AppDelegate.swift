@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let usage = UsageStore()
     private let manager = ManagerWindow()
     private let commands = CommandRunner()
+    private lazy var expander = SnippetExpander(store: library.snippets)
     private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands))
     private lazy var panel = PanelController(model: model, onOpenManager: { [weak self] in self?.showManager() })
     private var hotKeys: [HotKey] = []
@@ -20,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         commands.keepAwake.onChange = { [weak self] active in self?.statusMenu?.showKeepingAwake(active) }
         commands.keepAwake.onExpire = { Toast.shared.show(.sleepAllowed) }
         registerHotKeys()
+        expander.start()
     }
 
     private func registerHotKeys() {
