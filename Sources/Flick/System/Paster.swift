@@ -7,6 +7,7 @@ enum Paster {
     private static let delayForPanelToClose = 0.12
     private static let delayBeforeRestoringClipboard = 0.4
     private static let syntheticMarker: Int64 = 0x464C_434B
+    private static let transientType = NSPasteboard.PasteboardType("org.nspasteboard.TransientType")
 
     @discardableResult
     static func deliver(_ text: String, _ delivery: Delivery) -> Delivery {
@@ -19,7 +20,7 @@ enum Paster {
     static func replaceTyped(characters count: Int, with text: String) {
         guard isTrusted() else { return }
         let saved = savedClipboard()
-        setClipboard(text)
+        setClipboard(text, transient: true)
         for _ in 0..<count { press(kVK_Delete) }
         press(kVK_ANSI_V, flags: .maskCommand)
         DispatchQueue.main.asyncAfter(deadline: .now() + delayBeforeRestoringClipboard) { restoreClipboard(saved) }
@@ -29,9 +30,10 @@ enum Paster {
         event.getIntegerValueField(.eventSourceUserData) == syntheticMarker
     }
 
-    private static func setClipboard(_ text: String) {
+    private static func setClipboard(_ text: String, transient: Bool = false) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+        if transient { NSPasteboard.general.setData(Data(), forType: transientType) }
     }
 
     private static func savedClipboard() -> [NSPasteboardItem] {
@@ -47,6 +49,7 @@ enum Paster {
     private static func restoreClipboard(_ items: [NSPasteboardItem]) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.writeObjects(items)
+        NSPasteboard.general.setData(Data(), forType: transientType)
     }
 
     private static func press(_ key: Int, flags: CGEventFlags = []) {

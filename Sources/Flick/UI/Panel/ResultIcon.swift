@@ -20,6 +20,7 @@ struct ResultIcon: View {
         case .mode(let mode): SymbolTile(symbol: mode.symbol, color: mode.tint)
         case .emoji(let emoji): Text(emoji.character).font(.system(size: size * 0.8))
         case .snippet: SymbolTile(symbol: Mode.snippets.symbol, color: Mode.snippets.tint)
+        case .clip(let entry): clipIcon(entry)
         case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
         }
     }
@@ -35,6 +36,14 @@ struct ResultIcon: View {
             fileIcon(app.path)
         } else {
             symbol("link")
+        }
+    }
+
+    @ViewBuilder private func clipIcon(_ entry: ClipEntry) -> some View {
+        if let path = entry.appPath {
+            fileIcon(path)
+        } else {
+            SymbolTile(symbol: Mode.clipboard.symbol, color: Mode.clipboard.tint)
         }
     }
 

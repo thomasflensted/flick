@@ -20,6 +20,7 @@ public enum ResultKind: Equatable {
     case mode(Mode)
     case emoji(Emoji)
     case snippet(Snippet)
+    case clip(ClipEntry)
     case message(String)
 
     public var usageKey: String? {
@@ -74,6 +75,12 @@ public struct ResultItem: Identifiable, Equatable {
     public static func snippet(_ snippet: Snippet) -> ResultItem {
         let preview = snippet.text.split(whereSeparator: \.isNewline).joined(separator: " ")
         return ResultItem(id: UsageKey.snippet(snippet), kind: .snippet(snippet), title: snippet.name, subtitle: preview)
+    }
+
+    public static func clip(_ entry: ClipEntry, now: Date) -> ResultItem {
+        let age = ClipHistory.age(of: entry.copiedAt, now: now)
+        let subtitle = [entry.appName, age].compactMap { $0 }.joined(separator: " · ")
+        return ResultItem(id: "clip:\(entry.id)", kind: .clip(entry), title: ClipHistory.title(of: entry.text), subtitle: subtitle)
     }
 
     public static func url(_ url: URL, typed: String) -> ResultItem {

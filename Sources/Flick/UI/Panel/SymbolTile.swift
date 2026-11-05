@@ -33,6 +33,7 @@ extension Mode {
         case .root: return .gray
         case .emoji: return .yellow
         case .snippets: return .pink
+        case .clipboard: return .blue
         case .chat: return .purple
         }
     }

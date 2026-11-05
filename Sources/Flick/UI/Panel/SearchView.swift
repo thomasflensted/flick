@@ -75,6 +75,9 @@ struct SearchView: View {
             } else {
                 KeyHint(key: "↵", label: "Open")
             }
+            if model.mode == .clipboard {
+                KeyHint(key: "⌘⌫", label: "Delete")
+            }
             if model.mode == .root {
                 KeyHint(key: "⇥", label: model.tabHint)
                 KeyHint(key: "⌘,", label: "Settings")

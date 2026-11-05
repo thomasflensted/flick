@@ -134,6 +134,14 @@ final class SearchModel: ObservableObject {
         run(results[i].kind, delivery: delivery)
     }
 
+    func deleteSelectedClip() {
+        guard results.indices.contains(selected), case .clip(let entry) = results[selected].kind else { return }
+        library.clipboard.delete(entry.id)
+        let keep = selected
+        refresh()
+        selected = min(keep, max(results.count - 1, 0))
+    }
+
     func newChat() {
         chat.newChat()
         requestFocus(.query)
@@ -197,6 +205,8 @@ final class SearchModel: ObservableObject {
             return EmojiCatalog.results(for: query, usage: usage.counts)
         case .snippets:
             return SnippetSearch.results(for: query, snippets: library.snippets.items, usage: usage.counts)
+        case .clipboard:
+            return ClipHistory.results(for: query, in: library.clipboard.entries, now: Date())
         case .chat:
             return []
         }

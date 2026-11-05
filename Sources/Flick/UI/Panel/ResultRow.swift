@@ -38,6 +38,7 @@ struct ResultRow: View {
         case .command, .mode: return "Command"
         case .emoji: return ""
         case .snippet: return "Snippet"
+        case .clip: return ""
         case .message: return ""
         }
     }
