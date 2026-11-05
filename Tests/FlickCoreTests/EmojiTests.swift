@@ -7,6 +7,14 @@ struct EmojiTests {
         #expect(characters.isSuperset(of: ["😀", "😂", "👍", "🎉", "❤\u{FE0F}", "☀\u{FE0F}"]))
     }
 
+    @Test func startsWithSmileys() {
+        #expect(EmojiCatalog.all.first?.character == "😀")
+    }
+
+    @Test func listsEachEmojiOnce() {
+        #expect(Set(EmojiCatalog.all.map(\.character)).count == EmojiCatalog.all.count)
+    }
+
     @Test func excludesModifiersAndRegionalIndicators() {
         let characters = Set(EmojiCatalog.all.map(\.character))
         #expect(!characters.contains("🏻"))

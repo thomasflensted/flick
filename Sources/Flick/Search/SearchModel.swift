@@ -57,10 +57,16 @@ final class SearchModel: ObservableObject {
         requestFocus(.query)
     }
 
-    func move(_ delta: Int) {
+    var selectedTitle: String? {
+        results.indices.contains(selected) ? results[selected].title : nil
+    }
+
+    var movesInGrid: Bool { mode.gridColumns != nil }
+
+    func move(_ direction: Direction) {
         guard !results.isEmpty else { return }
         if argumentTarget != nil { exitArgument() }
-        selected = (selected + delta + results.count) % results.count
+        selected = Selection.next(from: selected, direction, count: results.count, columns: mode.gridColumns)
     }
 
     func tab() {

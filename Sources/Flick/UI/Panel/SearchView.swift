@@ -11,7 +11,7 @@ struct SearchView: View {
         VStack(spacing: 0) {
             searchBar
             Divider()
-            resultList
+            results
             Divider()
             footer
         }
@@ -47,26 +47,19 @@ struct SearchView: View {
         model.inlineArgumentLink == nil ? nil : textWidth(model.query, fontSize: Self.queryFontSize) + 6
     }
 
-    private var resultList: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: 2) {
-                    ForEach(Array(model.results.enumerated()), id: \.element.id) { index, item in
-                        ResultRow(item: item, selected: index == model.selected, subtitle: model.liveSubtitle(for: item))
-                            .id(item.id)
-                            .onTapGesture { model.activate(index) }
-                    }
-                }
-                .padding(8)
-            }
-            .onChange(of: model.selected) { _, index in
-                if model.results.indices.contains(index) { proxy.scrollTo(model.results[index].id) }
-            }
+    @ViewBuilder private var results: some View {
+        if let columns = model.mode.gridColumns {
+            EmojiGrid(model: model, columns: columns)
+        } else {
+            ResultList(model: model)
         }
     }
 
     private var footer: some View {
         HStack(spacing: 16) {
+            if model.movesInGrid, let title = model.selectedTitle {
+                Text(title).font(.system(size: 12, weight: .medium)).lineLimit(1)
+            }
             Spacer()
             if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
@@ -74,8 +67,10 @@ struct SearchView: View {
             } else {
                 KeyHint(key: "↵", label: "Open")
             }
-            KeyHint(key: "⇥", label: model.argumentTarget == nil ? "Add query" : "Back to search")
-            KeyHint(key: "⌘,", label: "Manage quicklinks")
+            if model.mode == .root {
+                KeyHint(key: "⇥", label: model.argumentTarget == nil ? "Add query" : "Back to search")
+                KeyHint(key: "⌘,", label: "Manage quicklinks")
+            }
             KeyHint(key: "esc", label: model.mode == .root ? "Close" : "Back")
         }
         .padding(.horizontal, 14)

@@ -4,6 +4,13 @@ public enum Mode: Hashable, CaseIterable {
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
+    public var gridColumns: Int? {
+        switch self {
+        case .root: return nil
+        case .emoji: return 9
+        }
+    }
+
     public var id: String {
         switch self {
         case .root: return "root"

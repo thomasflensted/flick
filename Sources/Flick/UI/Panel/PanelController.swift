@@ -49,8 +49,10 @@ final class PanelController {
 
     private func handle(_ event: NSEvent) -> Bool {
         switch Int(event.keyCode) {
-        case kVK_DownArrow: model.move(1)
-        case kVK_UpArrow: model.move(-1)
+        case kVK_DownArrow: model.move(.down)
+        case kVK_UpArrow: model.move(.up)
+        case kVK_LeftArrow where model.movesInGrid: model.move(.left)
+        case kVK_RightArrow where model.movesInGrid: model.move(.right)
         case kVK_Return, kVK_ANSI_KeypadEnter:
             model.activate(delivery: event.modifierFlags.contains(.command) ? .copy : .paste)
         case kVK_Tab: model.tab()
