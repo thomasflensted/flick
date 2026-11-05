@@ -67,6 +67,11 @@ struct ModelCatalogTests {
         #expect(visible.map(\.id) == ["openai/gpt-x"])
     }
 
+    @Test func pinsSelectedPopularModelFirst() {
+        let visible = ModelCatalog.visible(query: "", popular: [models[0], models[2]], all: models, selectedID: "anthropic/claude-sonnet-5")
+        #expect(visible.map(\.id) == ["anthropic/claude-sonnet-5", "openai/gpt-x"])
+    }
+
     @Test func keepsSelectedModelVisible() {
         let visible = ModelCatalog.visible(query: "", popular: [models[0]], all: models, selectedID: "anthropic/claude-sonnet-4")
         #expect(visible.map(\.id) == ["anthropic/claude-sonnet-4", "openai/gpt-x"])

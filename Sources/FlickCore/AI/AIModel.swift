@@ -65,8 +65,8 @@ public enum ModelCatalog {
     public static func visible(query: String, popular: [AIModel], all: [AIModel], selectedID: String?) -> [AIModel] {
         let all = all.filter { !$0.isVariant }
         if !query.trimmingCharacters(in: .whitespaces).isEmpty { return search(query, in: all) }
-        let selected = all.filter { $0.id == selectedID && !popular.contains($0) }
-        return selected + popular
+        let selected = all.filter { $0.id == selectedID }
+        return selected + popular.filter { $0.id != selectedID }
     }
 
     public static func search(_ query: String, in models: [AIModel]) -> [AIModel] {

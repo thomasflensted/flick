@@ -52,8 +52,11 @@ struct AISettingsView: View {
             }
             List(settings.visibleModels(matching: modelQuery), selection: $settings.modelID) { model in
                 HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Color.accentColor)
+                        .opacity(model.id == settings.modelID ? 1 : 0)
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(model.name)
+                        Text(model.name).fontWeight(model.id == settings.modelID ? .semibold : .regular)
                         Text(model.id).foregroundStyle(.secondary).font(.caption)
                     }
                     Spacer()
