@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusMenu: StatusMenu?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        MainMenu.install()
         statusMenu = StatusMenu(
             onShow: { [weak self] in self?.panel.show() },
             onSettings: { [weak self] in self?.showSettings() },
