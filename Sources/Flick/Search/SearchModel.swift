@@ -73,13 +73,13 @@ final class SearchModel: ObservableObject {
 
     func tab() {
         if argumentTarget != nil { exitArgument(); return }
-        if let ql = argumentLink { enterArgument(ql); return }
+        if let ql = inlineArgumentLink { enterArgument(ql); return }
         if mode == .root { askAI(query) }
     }
 
     var tabHint: String {
         if argumentTarget != nil { return "Back to search" }
-        return argumentLink == nil ? "Ask AI" : "Add query"
+        return inlineArgumentLink == nil ? "Ask AI" : "Add query"
     }
 
     private func askAI(_ question: String) {
