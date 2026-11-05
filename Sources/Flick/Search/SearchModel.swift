@@ -14,13 +14,13 @@ final class SearchModel: ObservableObject {
     @Published private(set) var focusRequest = 0
 
     var onDone: () -> Void = {}
-    private let store: QuicklinkStore
+    private let library: Library
     private let usage: UsageStore
     private let runner: ResultRunner
     private var apps = AppIndex.scan()
 
-    init(store: QuicklinkStore, usage: UsageStore, runner: ResultRunner) {
-        self.store = store
+    init(library: Library, usage: UsageStore, runner: ResultRunner) {
+        self.library = library
         self.usage = usage
         self.runner = runner
     }
@@ -43,7 +43,7 @@ final class SearchModel: ObservableObject {
     }
 
     func prepareForShow(in mode: Mode) {
-        store.reloadIfChanged()
+        library.reloadIfChanged()
         argumentTarget = nil
         argument = ""
         enter(mode)
@@ -149,7 +149,7 @@ final class SearchModel: ObservableObject {
     }
 
     private var searchResults: SearchResults {
-        SearchResults(links: store.links, apps: apps, usage: usage.counts, commands: runner.commands.available)
+        SearchResults(links: library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available)
     }
 
     private func refresh() {
@@ -160,10 +160,12 @@ final class SearchModel: ObservableObject {
     private func currentResults() -> [ResultItem] {
         switch mode {
         case .root:
-            let error = store.loadError.map { [ResultItem.message($0)] } ?? []
+            let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
             return error + searchResults.results(for: query)
         case .emoji:
             return EmojiCatalog.results(for: query, usage: usage.counts)
+        case .snippets:
+            return SnippetSearch.results(for: query, snippets: library.snippets.items, usage: usage.counts)
         }
     }
 

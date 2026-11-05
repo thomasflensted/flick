@@ -9,5 +9,6 @@ enum AppSupport {
     }()
 
     static let quicklinksFile = directory.appending(path: "quicklinks.json")
+    static let snippetsFile = directory.appending(path: "snippets.json")
     static let usageFile = directory.appending(path: "usage.json")
 }

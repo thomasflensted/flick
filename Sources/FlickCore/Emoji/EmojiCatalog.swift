@@ -8,7 +8,7 @@ public enum EmojiCatalog {
     public static let all: [Emoji] = smileysFirst.flatMap { $0.compactMap(emoji(for:)) }
 
     public static func results(for query: String, usage: [String: Int]) -> [ResultItem] {
-        Ranker(usage: usage).rank(all, query: query, text: \.name, key: UsageKey.emoji).map(ResultItem.emoji)
+        Ranker(usage: usage).rank(all, query: query, texts: { [$0.name] }, key: UsageKey.emoji).map(ResultItem.emoji)
     }
 
     static func emoji(for value: UInt32) -> Emoji? {

@@ -18,6 +18,7 @@ public enum ResultKind: Equatable {
     case command(Command)
     case mode(Mode)
     case emoji(Emoji)
+    case snippet(Snippet)
     case message(String)
 
     public var usageKey: String? {
@@ -27,6 +28,7 @@ public enum ResultKind: Equatable {
         case .command(let command): return UsageKey.command(command)
         case .mode(let mode): return UsageKey.mode(mode)
         case .emoji(let emoji): return UsageKey.emoji(emoji)
+        case .snippet(let snippet): return UsageKey.snippet(snippet)
         default: return nil
         }
     }
@@ -37,6 +39,7 @@ public enum UsageKey {
     public static func app(_ app: AppEntry) -> String { "app:\(app.path)" }
     public static func command(_ command: Command) -> String { "cmd:\(command.id)" }
     public static func emoji(_ emoji: Emoji) -> String { "emoji:\(emoji.character)" }
+    public static func snippet(_ snippet: Snippet) -> String { "snippet:\(snippet.id)" }
     public static func mode(_ mode: Mode) -> String { "mode:\(mode.id)" }
 }
 
@@ -65,6 +68,11 @@ public struct ResultItem: Identifiable, Equatable {
 
     public static func emoji(_ emoji: Emoji) -> ResultItem {
         ResultItem(id: UsageKey.emoji(emoji), kind: .emoji(emoji), title: emoji.name.capitalized, subtitle: "")
+    }
+
+    public static func snippet(_ snippet: Snippet) -> ResultItem {
+        let preview = snippet.text.split(whereSeparator: \.isNewline).joined(separator: " ")
+        return ResultItem(id: UsageKey.snippet(snippet), kind: .snippet(snippet), title: snippet.name, subtitle: preview)
     }
 
     public static func url(_ url: URL, typed: String) -> ResultItem {

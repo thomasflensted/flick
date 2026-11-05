@@ -3,11 +3,11 @@ import Carbon
 import FlickCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let store = QuicklinkStore()
+    private let library = Library()
     private let usage = UsageStore()
     private let manager = ManagerWindow()
     private let commands = CommandRunner()
-    private lazy var model = SearchModel(store: store, usage: usage, runner: ResultRunner(commands: commands))
+    private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands))
     private lazy var panel = PanelController(model: model, onOpenManager: { [weak self] in self?.showManager() })
     private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?
@@ -34,10 +34,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showManager() {
-        manager.show(store: store, onImport: { [weak self] in self?.importFromRaycast() })
+        manager.show(library: library, onImport: { [weak self] in self?.importFromRaycast() })
     }
 
     private func importFromRaycast() {
-        if RaycastImportFlow.run(into: store) { showManager() }
+        if RaycastImportFlow.run(into: library) { showManager() }
     }
 }

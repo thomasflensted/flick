@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Quicklink: Codable, Identifiable, Hashable {
+public struct Quicklink: Codable, Identifiable, Hashable, Listable {
     public var id: UUID
     public var name: String
     public var link: String

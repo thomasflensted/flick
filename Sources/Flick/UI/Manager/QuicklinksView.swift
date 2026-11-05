@@ -23,7 +23,7 @@ struct QuicklinksView: View {
     }
 
     private var table: some View {
-        Table(store.links, selection: $selection) {
+        Table(store.items, selection: $selection) {
             TableColumn("Name", value: \.name)
             TableColumn("Keyword") { Text($0.keyword ?? "").foregroundStyle(.secondary) }.width(70)
             TableColumn("Link", value: \.link)
@@ -42,7 +42,7 @@ struct QuicklinksView: View {
             Button { editing = Quicklink(name: "", link: "") } label: { Image(systemName: "plus") }
             Button { store.delete(ids: selection); selection = [] } label: { Image(systemName: "minus") }
                 .disabled(selection.isEmpty)
-            Text("\(store.links.count) quicklinks").foregroundStyle(.secondary).font(.caption)
+            Text("\(store.items.count) quicklinks").foregroundStyle(.secondary).font(.caption)
             Spacer()
             Button("Import from Raycast…", action: onImport)
             Button("Show JSON File") { NSWorkspace.shared.activateFileViewerSelecting([AppSupport.quicklinksFile]) }
@@ -50,7 +50,7 @@ struct QuicklinksView: View {
     }
 
     private func edit(_ ids: Set<UUID>) {
-        editing = store.links.first { ids.contains($0.id) }
+        editing = store.items.first { ids.contains($0.id) }
     }
 
     private func appName(for link: Quicklink) -> String {

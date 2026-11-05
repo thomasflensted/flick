@@ -2,14 +2,15 @@ import AppKit
 import FlickCore
 
 enum RaycastImportFlow {
-    static func run(into store: QuicklinkStore) -> Bool {
+    static func run(into library: Library) -> Bool {
         NSApp.activate(ignoringOtherApps: true)
         guard let file = chooseFile() else { return false }
         var retry = false
         while let password = askPassword(retry: retry) {
             do {
-                let links = try RaycastExport.quicklinks(fromJSON: RaycastDecryptor.decrypt(file, password: password))
-                showResult(added: store.merge(links), total: links.count)
+                let contents = try RaycastExport.contents(fromJSON: RaycastDecryptor.decrypt(file, password: password))
+                showResult(quicklinks: library.quicklinks.merge(contents.quicklinks),
+                           snippets: library.snippets.merge(contents.snippets))
                 return true
             } catch is RaycastDecryptor.WrongPassword {
                 retry = true
@@ -43,10 +44,10 @@ enum RaycastImportFlow {
         return alert.runModal() == .alertFirstButtonReturn ? field.stringValue : nil
     }
 
-    private static func showResult(added: Int, total: Int) {
+    private static func showResult(quicklinks: Int, snippets: Int) {
         let alert = NSAlert()
-        alert.messageText = "Imported \(added) quicklinks"
-        if added < total { alert.informativeText = "\(total - added) were already in Flick and were skipped." }
+        alert.messageText = "Imported \(quicklinks) quicklinks and \(snippets) snippets"
+        alert.informativeText = "Anything already in Flick was skipped."
         alert.runModal()
     }
 }

@@ -5,12 +5,16 @@ public struct Ranker {
         self.usage = usage
     }
 
-    public func rank<T>(_ items: [T], query: String, text: (T) -> String, key: (T) -> String) -> [T] {
+    public func rank<T>(_ items: [T], query: String, texts: (T) -> [String], key: (T) -> String) -> [T] {
         let query = query.trimmingCharacters(in: .whitespaces)
         let scored = items.enumerated().compactMap { index, item in
-            MatchScore.score(query, against: text(item)).map { (score: $0 + boost(key(item)), index: index, item: item) }
+            bestScore(query, texts(item)).map { (score: $0 + boost(key(item)), index: index, item: item) }
         }
         return scored.sorted { ($0.score, -$0.index) > ($1.score, -$1.index) }.map(\.item)
+    }
+
+    private func bestScore(_ query: String, _ texts: [String]) -> Int? {
+        texts.compactMap { MatchScore.score(query, against: $0) }.max()
     }
 
     private func boost(_ key: String) -> Int { SearchResults.usageBoost(usage[key] ?? 0) }

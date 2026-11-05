@@ -32,6 +32,7 @@ extension Mode {
         switch self {
         case .root: return .gray
         case .emoji: return .yellow
+        case .snippets: return .pink
         }
     }
 }

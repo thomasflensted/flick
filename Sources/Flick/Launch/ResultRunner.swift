@@ -31,6 +31,7 @@ final class ResultRunner {
         case .command(let command): return .done(delivered: commands.run(command, delivery: delivery))
         case .mode(let mode): return .enter(mode)
         case .emoji(let emoji): return .done(delivered: Paster.deliver(emoji.character, delivery))
+        case .snippet(let snippet): return .done(delivered: Paster.deliver(snippet.expanded(), delivery))
         case .message: Launcher.revealQuicklinksFile()
         }
         return .done(delivered: nil)

@@ -36,6 +36,7 @@ struct ResultRow: View {
         case .google: return "Web"
         case .command, .mode: return "Command"
         case .emoji: return ""
+        case .snippet: return "Snippet"
         case .message: return ""
         }
     }

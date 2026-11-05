@@ -63,3 +63,18 @@ Write valid JSON (validate with `python3 -m json.tool <file>`). If the file is i
 Flick keeps the last good list and shows an error row in the panel.
 
 Usage counts for ranking live in `usage.json` next to it.
+
+## Editing snippets (for agents)
+
+Snippets are a plain JSON array at `~/Library/Application Support/Flick/snippets.json`, reloaded the
+same way as quicklinks. Only `name` and `text` are required.
+
+```json
+[
+  { "name": "Work email", "keyword": "@@w", "text": "me@work.com" },
+  { "name": "Test email", "keyword": "@test", "text": "me+{id}@work.com" }
+]
+```
+
+- `keyword`: typing it in any app at the start of a word replaces it with the text.
+- `{id}` becomes a random 8-character nano id each time the snippet is inserted.

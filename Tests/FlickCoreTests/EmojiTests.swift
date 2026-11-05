@@ -33,11 +33,11 @@ struct EmojiTests {
 
 struct RankerTests {
     @Test func keepsOriginalOrderForEqualScores() {
-        let ranked = Ranker(usage: [:]).rank(["banana", "apple", "cherry"], query: "", text: { $0 }, key: { $0 })
+        let ranked = Ranker(usage: [:]).rank(["banana", "apple", "cherry"], query: "", texts: { [$0] }, key: { $0 })
         #expect(ranked == ["banana", "apple", "cherry"])
     }
 
     @Test func dropsNonMatches() {
-        #expect(Ranker(usage: [:]).rank(["banana", "apple"], query: "app", text: { $0 }, key: { $0 }) == ["apple"])
+        #expect(Ranker(usage: [:]).rank(["banana", "apple"], query: "app", texts: { [$0] }, key: { $0 }) == ["apple"])
     }
 }
