@@ -23,6 +23,7 @@
 
 - Work trunk-based; small changes, push often
 - Give branches short and descriptive names. Do not include "claude/" or random id's.
+- Always run the test suite (`swift test`) before pushing, and only push when it passes.
 
 ## Project
 
