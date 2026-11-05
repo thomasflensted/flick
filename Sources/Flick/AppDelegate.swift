@@ -5,7 +5,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let store = QuicklinkStore()
     private let usage = UsageStore()
     private let manager = ManagerWindow()
-    private lazy var model = SearchModel(store: store, usage: usage)
+    private let commands = CommandRunner()
+    private lazy var model = SearchModel(store: store, usage: usage, runner: ResultRunner(commands: commands))
     private lazy var panel = PanelController(model: model, onOpenManager: { [weak self] in self?.showManager() })
     private var hotKey: HotKey?
     private var statusMenu: StatusMenu?
@@ -15,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onShow: { [weak self] in self?.panel.show() },
             onManage: { [weak self] in self?.showManager() },
             onImport: { [weak self] in self?.importFromRaycast() })
+        commands.caffeine.onChange = { [weak self] active in self?.statusMenu?.showCaffeinated(active) }
         registerHotKey()
     }
 

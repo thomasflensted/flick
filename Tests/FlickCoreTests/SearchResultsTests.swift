@@ -59,3 +59,28 @@ struct SearchResultsTests {
         #expect(results.linkTriggered(by: "flokk: render") == nil)
     }
 }
+
+struct CommandSearchTests {
+    func search(_ query: String, caffeinated: Bool = false) -> [ResultItem] {
+        SearchResults(links: [], apps: [], usage: [:], commands: Command.available(isCaffeinated: caffeinated)).results(for: query)
+    }
+
+    @Test func offersCaffeinateWhenAwakeIsOff() {
+        #expect(search("caff").first?.kind == .command(.caffeinate))
+    }
+
+    @Test func offersDecaffeinateWhenOn() {
+        #expect(search("decaf", caffeinated: true).first?.kind == .command(.decaffeinate))
+        #expect(!search("caff", caffeinated: true).contains { $0.kind == .command(.caffeinate) })
+    }
+
+    @Test func timedCaffeinateFromQuery() {
+        #expect(search("caf 1h30").first?.kind == .command(.caffeinateFor(minutes: 90)))
+        #expect(search("caffeinate 20").first?.title == "Caffeinate for 20 min")
+    }
+
+    @Test func noTimedCaffeinateWithoutDuration() {
+        #expect(SearchResults.caffeinateMinutes(in: "caffeinate later") == nil)
+        #expect(SearchResults.caffeinateMinutes(in: "ca 20") == nil)
+    }
+}

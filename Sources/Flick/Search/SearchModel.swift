@@ -15,11 +15,13 @@ final class SearchModel: ObservableObject {
     var onDone: () -> Void = {}
     private let store: QuicklinkStore
     private let usage: UsageStore
+    private let runner: ResultRunner
     private var apps = AppIndex.scan()
 
-    init(store: QuicklinkStore, usage: UsageStore) {
+    init(store: QuicklinkStore, usage: UsageStore, runner: ResultRunner) {
         self.store = store
         self.usage = usage
+        self.runner = runner
     }
 
     var argumentLink: Quicklink? {
@@ -107,7 +109,7 @@ final class SearchModel: ObservableObject {
             enterArgument(ql)
             return
         }
-        Launcher.open(kind)
+        runner.run(kind)
         if let key = kind.usageKey { usage.record(key) }
         onDone()
     }
@@ -123,7 +125,7 @@ final class SearchModel: ObservableObject {
     }
 
     private var searchResults: SearchResults {
-        SearchResults(links: store.links, apps: apps, usage: usage.counts)
+        SearchResults(links: store.links, apps: apps, usage: usage.counts, commands: runner.commands.available)
     }
 
     private func refresh() {

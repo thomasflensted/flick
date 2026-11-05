@@ -37,6 +37,7 @@ struct ResultRow: View {
         case .app: return "Application"
         case .url: return "URL"
         case .google: return "Web"
+        case .command: return "Command"
         case .message: return ""
         }
     }

@@ -15,12 +15,14 @@ public enum ResultKind: Equatable {
     case app(AppEntry)
     case url(URL)
     case google(String)
+    case command(Command)
     case message(String)
 
     public var usageKey: String? {
         switch self {
         case .quicklink(let ql, _): return UsageKey.quicklink(ql)
         case .app(let app): return UsageKey.app(app)
+        case .command(let command): return UsageKey.command(command)
         default: return nil
         }
     }
@@ -29,6 +31,7 @@ public enum ResultKind: Equatable {
 public enum UsageKey {
     public static func quicklink(_ ql: Quicklink) -> String { "ql:\(ql.id)" }
     public static func app(_ app: AppEntry) -> String { "app:\(app.path)" }
+    public static func command(_ command: Command) -> String { "cmd:\(command.id)" }
 }
 
 public struct ResultItem: Identifiable, Equatable {
@@ -44,6 +47,10 @@ public struct ResultItem: Identifiable, Equatable {
 
     public static func app(_ app: AppEntry) -> ResultItem {
         ResultItem(id: UsageKey.app(app), kind: .app(app), title: app.name, subtitle: "Application")
+    }
+
+    public static func command(_ command: Command) -> ResultItem {
+        ResultItem(id: UsageKey.command(command), kind: .command(command), title: command.title, subtitle: command.subtitle)
     }
 
     public static func url(_ url: URL, typed: String) -> ResultItem {
