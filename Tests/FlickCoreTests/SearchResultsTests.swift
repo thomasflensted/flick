@@ -59,6 +59,20 @@ struct SearchResultsTests {
         #expect(results.linkTriggered(by: "search google") == google)
         #expect(results.linkTriggered(by: "flokk: render") == nil)
     }
+
+    @Test func suggestsOnlyWithoutStrongLocalMatch() {
+        let results = SearchResults(links: [google], apps: [slack], usage: [:])
+        #expect(!results.wantsSuggestions(for: "sla"))
+        #expect(results.wantsSuggestions(for: "swift async"))
+        #expect(!results.wantsSuggestions(for: " "))
+        #expect(!results.wantsSuggestions(for: "reddit.com"))
+    }
+
+    @Test func suggestionsComeLast() {
+        let results = SearchResults(links: [], apps: [], usage: [:], suggestions: ["swift async await"]).results(for: "swift async")
+        #expect(results.last == .googleSuggestion("swift async await"))
+        #expect(results.last?.kind == .google("swift async await"))
+    }
 }
 
 struct CommandSearchTests {
