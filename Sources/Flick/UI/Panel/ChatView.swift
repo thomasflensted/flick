@@ -14,8 +14,12 @@ struct ChatView: View {
                         MessageBubble(message: message, thinking: chat.isAnswering && message.id == chat.messages.last?.id)
                     }
                     if let error = chat.error {
-                        Label(error, systemImage: "exclamationmark.triangle.fill")
-                            .font(.system(size: 12)).foregroundStyle(.orange)
+                        Label {
+                            Text(error).foregroundStyle(.primary)
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        }
+                        .font(.system(size: 12))
                     }
                     Color.clear.frame(height: 1).id(Self.bottom)
                 }
