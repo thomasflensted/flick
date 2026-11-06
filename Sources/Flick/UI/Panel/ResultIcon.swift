@@ -21,6 +21,7 @@ struct ResultIcon: View {
         case .emoji(let emoji): Text(emoji.character).font(.system(size: size * 0.8))
         case .snippet: SymbolTile(symbol: Mode.snippets.symbol, color: Mode.snippets.tint)
         case .clip(let entry): clipIcon(entry)
+        case .conversion: SymbolTile(symbol: "dollarsign.arrow.circlepath", color: .green)
         case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
         }
     }

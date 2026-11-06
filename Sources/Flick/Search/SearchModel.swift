@@ -18,13 +18,17 @@ final class SearchModel: ObservableObject {
     private let usage: UsageStore
     private let runner: ResultRunner
     let chat: ChatSession
+    private let rates: CurrencyRatesStore
     private var apps = AppIndex.scan()
 
-    init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession) {
+    init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
+         rates: CurrencyRatesStore) {
         self.library = library
         self.usage = usage
         self.runner = runner
         self.chat = chat
+        self.rates = rates
+        rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
     }
 
     var argumentLink: Quicklink? {
@@ -49,6 +53,7 @@ final class SearchModel: ObservableObject {
         argumentTarget = nil
         argument = ""
         enter(mode)
+        rates.refreshIfStale()
         rescanApps()
     }
 
@@ -188,7 +193,8 @@ final class SearchModel: ObservableObject {
     }
 
     private var searchResults: SearchResults {
-        SearchResults(links: library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available)
+        SearchResults(links: library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
+                      rates: rates.rates)
     }
 
     private func refresh() {

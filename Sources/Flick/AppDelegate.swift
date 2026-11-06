@@ -11,7 +11,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var expander = SnippetExpander(store: library.snippets)
     private lazy var clipboardMonitor = ClipboardMonitor(store: library.clipboard)
     private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands),
-                                         chat: ChatSession(settings: ai))
+                                         chat: ChatSession(settings: ai),
+                                         rates: CurrencyRatesStore())
     private lazy var panel = PanelController(model: model, onOpenSettings: { [weak self] in self?.showSettings() })
     private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?

@@ -1,8 +1,13 @@
+import Foundation
+
+
 public struct SearchResults {
     public let links: [Quicklink]
     public let apps: [AppEntry]
     public let usage: [String: Int]
     public let commands: [Command]
+    public let rates: CurrencyRates?
+    public let locale: Locale
 
     static let recentsLimit = 8
     static let resultLimit = 30
@@ -12,11 +17,13 @@ public struct SearchResults {
     static let keepAwakeTriggers = ["keep awake", "awake", "caffeinate"]
     static let minimumTriggerPrefix = 3
 
-    public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = []) {
+    public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = [], rates: CurrencyRates? = nil, locale: Locale = .current) {
         self.links = links
         self.apps = apps
         self.usage = usage
         self.commands = commands
+        self.rates = rates
+        self.locale = locale
     }
 
     public func results(for query: String) -> [ResultItem] {
@@ -27,7 +34,7 @@ public struct SearchResults {
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
             .map(\.item)
-        return ranked + webResults(trimmed)
+        return conversions(trimmed) + ranked + webResults(trimmed)
     }
 
     public func linkTriggered(by text: String) -> Quicklink? {
@@ -108,6 +115,12 @@ public struct SearchResults {
         let trigger = query[..<space].lowercased()
         guard trigger.count >= minimumTriggerPrefix, keepAwakeTriggers.contains(where: { $0.hasPrefix(trigger) }) else { return nil }
         return DurationText.minutes(from: String(query[query.index(after: space)...]))
+    }
+
+    private func conversions(_ query: String) -> [ResultItem] {
+        guard let rates else { return [] }
+        let local = locale.currency?.identifier ?? "USD"
+        return CurrencyConverter.conversions(for: query, rates: rates, local: local).map { .conversion($0, locale: locale) }
     }
 
     private func webResults(_ query: String) -> [ResultItem] {

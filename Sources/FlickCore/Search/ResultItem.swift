@@ -21,6 +21,7 @@ public enum ResultKind: Equatable {
     case emoji(Emoji)
     case snippet(Snippet)
     case clip(ClipEntry)
+    case conversion(Conversion)
     case message(String)
 
     public var usageKey: String? {
@@ -93,6 +94,11 @@ public struct ResultItem: Identifiable, Equatable {
 
     public static func askAI(_ question: String) -> ResultItem {
         ResultItem(id: "askAI", kind: .askAI(question), title: "Ask AI \u{201C}\(question)\u{201D}", subtitle: "OpenRouter")
+    }
+
+    public static func conversion(_ conversion: Conversion, locale: Locale) -> ResultItem {
+        ResultItem(id: "conversion:\(conversion.to)", kind: .conversion(conversion),
+                   title: conversion.formattedValue(locale), subtitle: conversion.summary(locale))
     }
 
     public static func message(_ text: String) -> ResultItem {

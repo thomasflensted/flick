@@ -39,6 +39,7 @@ struct ResultRow: View {
         case .emoji: return ""
         case .snippet: return "Snippet"
         case .clip: return ""
+        case .conversion: return "Currency"
         case .message: return ""
         }
     }
