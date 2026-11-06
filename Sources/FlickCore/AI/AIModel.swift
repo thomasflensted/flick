@@ -5,20 +5,30 @@ public struct AIModel: Decodable, Hashable, Identifiable {
     public let name: String
     public let created: Int
     public let outputPricePerMillion: Double?
+    public let outputsImages: Bool
 
-    public init(id: String, name: String, created: Int, outputPricePerMillion: Double? = nil) {
+    public init(id: String, name: String, created: Int, outputPricePerMillion: Double? = nil, outputsImages: Bool = false) {
         self.id = id
         self.name = name
         self.created = created
         self.outputPricePerMillion = outputPricePerMillion
+        self.outputsImages = outputsImages
     }
 
     private struct Pricing: Decodable {
         let completion: String
     }
 
+    private struct Architecture: Decodable {
+        let outputModalities: [String]?
+
+        private enum CodingKeys: String, CodingKey {
+            case outputModalities = "output_modalities"
+        }
+    }
+
     private enum CodingKeys: String, CodingKey {
-        case id, name, created, pricing
+        case id, name, created, pricing, architecture
     }
 
     public init(from decoder: Decoder) throws {
@@ -28,6 +38,8 @@ public struct AIModel: Decodable, Hashable, Identifiable {
         created = try c.decode(Int.self, forKey: .created)
         let perToken = try c.decodeIfPresent(Pricing.self, forKey: .pricing).flatMap { Double($0.completion) }
         outputPricePerMillion = perToken.map { $0 * 1_000_000 }
+        let outputs = try c.decodeIfPresent(Architecture.self, forKey: .architecture)?.outputModalities ?? []
+        outputsImages = outputs.contains("image")
     }
 
     public var isVariant: Bool { id.contains(":") }

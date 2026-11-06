@@ -14,8 +14,13 @@ final class AISettings: ObservableObject {
 
     var key: String? { Keychain.read() }
 
+    var model: AIModel? {
+        guard let modelID else { return nil }
+        return models.first { $0.id == modelID } ?? AIModel(id: modelID, name: modelID, created: 0)
+    }
+
     var modelName: String {
-        models.first { $0.id == modelID }?.name ?? modelID ?? "No model"
+        model?.name ?? "No model"
     }
 
     func saveKey(_ key: String) {

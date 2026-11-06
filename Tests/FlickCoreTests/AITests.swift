@@ -4,28 +4,61 @@ import Testing
 
 struct StreamLineTests {
     @Test func readsTextDeltas() {
-        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"content":"Hel"}}]}"#) == .text("Hel"))
+        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"content":"Hel"}}]}"#) == [.answer(.text("Hel"))])
+    }
+
+    @Test func readsImageDeltas() {
+        let line = #"data: {"choices":[{"delta":{"content":"","images":[{"type":"image_url","image_url":{"url":"data:image/png;base64,aGk="}}]}}]}"#
+        #expect(StreamLine.parse(line) == [.answer(.image(Data("hi".utf8)))])
+    }
+
+    @Test func keepsTextArrivingWithImages() {
+        let line = #"data: {"choices":[{"delta":{"content":"Here","images":[{"type":"image_url","image_url":{"url":"data:image/png;base64,aGk="}}]}}]}"#
+        #expect(StreamLine.parse(line) == [.answer(.text("Here")), .answer(.image(Data("hi".utf8)))])
     }
 
     @Test func recognisesEndOfStream() {
-        #expect(StreamLine.parse("data: [DONE]") == .done)
+        #expect(StreamLine.parse("data: [DONE]") == [.done])
     }
 
     @Test func ignoresCommentsAndEmptyDeltas() {
-        #expect(StreamLine.parse(": OPENROUTER PROCESSING") == nil)
-        #expect(StreamLine.parse("") == nil)
-        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"role":"assistant"}}]}"#) == nil)
+        #expect(StreamLine.parse(": OPENROUTER PROCESSING").isEmpty)
+        #expect(StreamLine.parse("").isEmpty)
+        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"role":"assistant"}}]}"#).isEmpty)
     }
 
     @Test func surfacesErrorsInStreamAndBody() {
-        #expect(StreamLine.parse(#"data: {"error":{"message":"Rate limited","code":429}}"#) == .failed("Rate limited"))
-        #expect(StreamLine.parse(#"{"error":{"message":"No auth credentials found","code":401}}"#) == .failed("No auth credentials found"))
+        #expect(StreamLine.parse(#"data: {"error":{"message":"Rate limited","code":429}}"#) == [.failed("Rate limited")])
+        #expect(StreamLine.parse(#"{"error":{"message":"No auth credentials found","code":401}}"#) == [.failed("No auth credentials found")])
+    }
+}
+
+struct ChatMessageTests {
+    @Test func collectsTextAndImagesOfAnAnswer() {
+        var message = ChatMessage(id: 0, role: .assistant, content: "")
+        message.append(.text("Here "))
+        message.append(.image(Data("hi".utf8)))
+        message.append(.text("you go"))
+        #expect(message.content == "Here you go")
+        #expect(message.images == [Data("hi".utf8)])
+    }
+
+    @Test func imageOnlyAnswersAreSentAsPlaceholder() {
+        var message = ChatMessage(id: 0, role: .assistant, content: "")
+        message.append(.image(Data("hi".utf8)))
+        #expect(message.contentForModel == "[image]")
+    }
+
+    @Test func textAnswersAreSentAsIs() {
+        #expect(ChatMessage(id: 0, role: .assistant, content: "Hi").contentForModel == "Hi")
     }
 }
 
 struct OpenRouterTests {
+    let model = AIModel(id: "m", name: "M", created: 0)
+
     @Test func bodyStreamsRolesAndContent() throws {
-        let body = try OpenRouter.chatBody(model: "m", messages: [ChatMessage(id: 1, role: .user, content: "Hi")])
+        let body = try OpenRouter.chatBody(model: model, messages: [ChatMessage(id: 1, role: .user, content: "Hi")])
         let json = try #require(String(data: body, encoding: .utf8))
         #expect(json.contains(#""stream":true"#))
         #expect(json.contains(#""role":"user""#))
@@ -33,13 +66,19 @@ struct OpenRouterTests {
     }
 
     @Test func bodyDisablesReasoning() throws {
-        let body = try OpenRouter.chatBody(model: "m", messages: [])
+        let body = try OpenRouter.chatBody(model: model, messages: [])
         let json = try #require(String(data: body, encoding: .utf8))
         #expect(json.contains(#""reasoning":{"enabled":false}"#))
     }
 
+    @Test func asksImageModelsForImages() throws {
+        let imageModel = AIModel(id: "i", name: "I", created: 0, outputsImages: true)
+        #expect(OpenRouter.modalities(for: imageModel) == ["image", "text"])
+        #expect(OpenRouter.modalities(for: model) == nil)
+    }
+
     @Test func requestCarriesKey() throws {
-        let request = try OpenRouter.chatRequest(key: "sk-test", model: "m", messages: [])
+        let request = try OpenRouter.chatRequest(key: "sk-test", model: model, messages: [])
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer sk-test")
         #expect(request.httpMethod == "POST")
     }
@@ -57,6 +96,11 @@ struct ModelCatalogTests {
         let model = try #require(ModelCatalog.models(fromJSON: Data(json.utf8)).first)
         #expect(model.id == "a/b")
         #expect(model.priceText == "$0.18 / 1M")
+    }
+
+    @Test func decodesImageOutput() throws {
+        let json = #"{"data":[{"id":"a/b","name":"B","created":5,"architecture":{"output_modalities":["image","text"]}}]}"#
+        #expect(try ModelCatalog.models(fromJSON: Data(json.utf8)).first?.outputsImages == true)
     }
 
     @Test func freeModelsSayFree() {
