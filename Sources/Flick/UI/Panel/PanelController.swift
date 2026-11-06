@@ -57,7 +57,7 @@ final class PanelController {
             model.activate(delivery: event.modifierFlags.contains(.command) ? .copy : .paste)
         case kVK_Tab: model.tab()
         case kVK_Escape: if !model.escape() { hide() }
-        case kVK_Delete where event.modifierFlags.contains(.command) && model.mode == .clipboard: model.deleteSelectedClip()
+        case kVK_Delete where event.modifierFlags.contains(.command) && model.mode.removeLabel != nil: model.removeSelected()
         case kVK_Delete: return model.deleteBackwardWhenEmpty()
         case kVK_ANSI_S where event.modifierFlags.contains(.command) && model.mode == .translate: model.swapTranslateLanguages()
         case kVK_ANSI_N where event.modifierFlags.contains(.command) && model.mode == .chat: model.newChat()

@@ -22,6 +22,7 @@ final class SearchModel: ObservableObject {
     private let rates: CurrencyRatesStore
     let translator: Translator
     private var apps = AppIndex.scan()
+    private var servers: [LiveServer] = []
 
     init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
          rates: CurrencyRatesStore, translator: Translator) {
@@ -72,6 +73,7 @@ final class SearchModel: ObservableObject {
         query = ""
         if mode == .translate { translator.translate("") }
         if mode == .chat { chat.clearIfIdle(now: Date()) }
+        if mode == .servers { rescanServers() }
         refresh()
         requestFocus(.query)
     }
@@ -151,9 +153,15 @@ final class SearchModel: ObservableObject {
         run(results[i].kind, delivery: delivery)
     }
 
-    func deleteSelectedClip() {
-        guard results.indices.contains(selected), case .clip(let entry) = results[selected].kind else { return }
-        library.clipboard.delete(entry.id)
+    func removeSelected() {
+        guard results.indices.contains(selected) else { return }
+        switch results[selected].kind {
+        case .clip(let entry): library.clipboard.delete(entry.id)
+        case .server(let server):
+            ListeningServers.stop(server)
+            servers.removeAll { $0 == server }
+        default: return
+        }
         let keep = selected
         refresh()
         selected = min(keep, max(results.count - 1, 0))
@@ -242,6 +250,8 @@ final class SearchModel: ObservableObject {
         case .translate:
             return GoogleTranslate.results(for: translator.state, text: query, pair: translator.pair,
                                            languages: translator.languages, locale: .current)
+        case .servers:
+            return LiveServers.results(for: query, in: servers)
         case .chat:
             return []
         }
@@ -250,6 +260,16 @@ final class SearchModel: ObservableObject {
     private func requestFocus(_ field: Field) {
         focus = field
         focusRequest += 1
+    }
+
+    private func rescanServers() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let scanned = ListeningServers.scan()
+            DispatchQueue.main.async {
+                self.servers = scanned
+                if self.mode == .servers { self.refresh() }
+            }
+        }
     }
 
     private func rescanApps() {

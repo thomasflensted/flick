@@ -36,6 +36,7 @@ extension Mode {
         case .clipboard: return .blue
         case .chat: return .purple
         case .translate: return .cyan
+        case .servers: return .green
         }
     }
 }

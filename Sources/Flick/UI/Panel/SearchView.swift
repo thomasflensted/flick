@@ -81,8 +81,8 @@ struct SearchView: View {
             if model.mode == .translate {
                 KeyHint(key: "⌘S", label: "Swap")
             }
-            if model.mode == .clipboard {
-                KeyHint(key: "⌘⌫", label: "Delete")
+            if let label = model.mode.removeLabel {
+                KeyHint(key: "⌘⌫", label: label)
             }
             if model.mode == .root {
                 KeyHint(key: "⇥", label: model.tabHint)

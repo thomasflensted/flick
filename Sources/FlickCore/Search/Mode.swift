@@ -5,6 +5,7 @@ public enum Mode: Hashable, CaseIterable {
     case clipboard
     case chat
     case translate
+    case servers
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
@@ -16,6 +17,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return nil
         case .chat: return nil
         case .translate: return nil
+        case .servers: return nil
         }
     }
 
@@ -27,6 +29,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "clipboard"
         case .chat: return "chat"
         case .translate: return "translate"
+        case .servers: return "servers"
         }
     }
 
@@ -38,6 +41,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "Clipboard"
         case .chat: return "AI"
         case .translate: return "Translate"
+        case .servers: return "Servers"
         }
     }
 
@@ -49,6 +53,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "Search clipboard history…"
         case .chat: return "Ask anything…"
         case .translate: return "Type text to translate…"
+        case .servers: return "Search live servers…"
         }
     }
 
@@ -60,6 +65,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "Clipboard History"
         case .chat: return "AI Chat"
         case .translate: return "Translate"
+        case .servers: return "Live Servers"
         }
     }
 
@@ -71,6 +77,15 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "Paste something you copied earlier"
         case .chat: return "Chat with AI through OpenRouter"
         case .translate: return "Translate text with Google Translate"
+        case .servers: return "Open a local server in the browser"
+        }
+    }
+
+    public var removeLabel: String? {
+        switch self {
+        case .clipboard: return "Delete"
+        case .servers: return "Stop"
+        case .root, .emoji, .snippets, .chat, .translate: return nil
         }
     }
 
@@ -82,6 +97,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "doc.on.clipboard"
         case .chat: return "sparkles"
         case .translate: return "character.bubble"
+        case .servers: return "server.rack"
         }
     }
 }

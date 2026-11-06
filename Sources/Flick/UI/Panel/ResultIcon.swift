@@ -23,6 +23,7 @@ struct ResultIcon: View {
         case .clip(let entry): clipIcon(entry)
         case .conversion: SymbolTile(symbol: "dollarsign.arrow.circlepath", color: .green)
         case .translation: SymbolTile(symbol: Mode.translate.symbol, color: Mode.translate.tint)
+        case .server: SymbolTile(symbol: Mode.servers.symbol, color: Mode.servers.tint)
         case .hint: symbol("info.circle", padding: 3)
         case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
         }
