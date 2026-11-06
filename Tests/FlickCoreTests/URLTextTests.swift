@@ -26,3 +26,16 @@ struct URLTextTests {
         #expect(!URLText.looksLikeWebAddress(text))
     }
 }
+
+struct FaviconTests {
+    @Test func triesParentDomainsDownToTheSiteItself() {
+        #expect(Favicon.hosts(for: "dashboard.render.com") == ["dashboard.render.com", "render.com"])
+        #expect(Favicon.hosts(for: "a.b.example.com") == ["a.b.example.com", "b.example.com", "example.com"])
+        #expect(Favicon.hosts(for: "github.com") == ["github.com"])
+    }
+
+    @Test func tinyIconsAreNotSharpEnough() {
+        #expect(!Favicon.isSharp(pixelWidth: 16))
+        #expect(Favicon.isSharp(pixelWidth: 32))
+    }
+}

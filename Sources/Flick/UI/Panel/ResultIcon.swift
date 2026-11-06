@@ -30,11 +30,7 @@ struct ResultIcon: View {
 
     @ViewBuilder private func quicklinkIcon(_ ql: Quicklink) -> some View {
         if let host = ql.webHost {
-            AsyncImage(url: URL(string: "https://www.google.com/s2/favicons?domain=\(host)&sz=64")) { image in
-                image.resizable()
-            } placeholder: {
-                symbol("link")
-            }
+            FaviconView(host: host) { symbol("link") }
         } else if let app = Launcher.appURL(for: ql.openWith) {
             fileIcon(app.path)
         } else {
