@@ -22,6 +22,8 @@ public enum ResultKind: Equatable {
     case snippet(Snippet)
     case clip(ClipEntry)
     case conversion(Conversion)
+    case translation(Translation)
+    case hint(String)
     case message(String)
 
     public var usageKey: String? {
@@ -99,6 +101,18 @@ public struct ResultItem: Identifiable, Equatable {
     public static func conversion(_ conversion: Conversion, locale: Locale) -> ResultItem {
         ResultItem(id: "conversion:\(conversion.to)", kind: .conversion(conversion),
                    title: conversion.formattedValue(locale), subtitle: conversion.summary(locale))
+    }
+
+    public static func translation(_ translation: Translation, locale: Locale) -> ResultItem {
+        ResultItem(id: "translation", kind: .translation(translation), title: translation.text, subtitle: translation.languages(locale))
+    }
+
+    public static func openGoogleTranslate(_ url: URL) -> ResultItem {
+        ResultItem(id: "url", kind: .url(url), title: "Open in Google Translate", subtitle: "translate.google.com")
+    }
+
+    public static func hint(_ text: String) -> ResultItem {
+        ResultItem(id: "hint", kind: .hint(text), title: text, subtitle: "")
     }
 
     public static func message(_ text: String) -> ResultItem {

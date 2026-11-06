@@ -38,6 +38,9 @@ struct SearchView: View {
                 ArgumentField(link: link, text: $model.argument, active: model.argumentTarget != nil, focus: $focus)
                 Spacer(minLength: 0)
             }
+            if model.mode == .translate {
+                LanguageBar(translator: model.translator, onChange: model.translateAgain)
+            }
         }
         .padding(.horizontal, 18)
         .frame(height: 56)
@@ -74,6 +77,9 @@ struct SearchView: View {
                 KeyHint(key: "⌘↵", label: "Copy")
             } else {
                 KeyHint(key: "↵", label: "Open")
+            }
+            if model.mode == .translate {
+                KeyHint(key: "⌘S", label: "Swap")
             }
             if model.mode == .clipboard {
                 KeyHint(key: "⌘⌫", label: "Delete")

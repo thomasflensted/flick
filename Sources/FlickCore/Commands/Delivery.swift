@@ -7,8 +7,8 @@ extension ResultKind {
     public var producesText: Bool {
         switch self {
         case .command(let command): return command.producesText
-        case .emoji, .snippet, .clip, .conversion: return true
-        case .quicklink, .app, .url, .google, .askAI, .mode, .message: return false
+        case .emoji, .snippet, .clip, .conversion, .translation: return true
+        case .quicklink, .app, .url, .google, .askAI, .mode, .hint, .message: return false
         }
     }
 }

@@ -4,6 +4,7 @@ public enum Mode: Hashable, CaseIterable {
     case snippets
     case clipboard
     case chat
+    case translate
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
@@ -14,6 +15,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return nil
         case .clipboard: return nil
         case .chat: return nil
+        case .translate: return nil
         }
     }
 
@@ -24,6 +26,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "snippets"
         case .clipboard: return "clipboard"
         case .chat: return "chat"
+        case .translate: return "translate"
         }
     }
 
@@ -34,6 +37,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Snippets"
         case .clipboard: return "Clipboard"
         case .chat: return "AI"
+        case .translate: return "Translate"
         }
     }
 
@@ -44,6 +48,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Search snippets…"
         case .clipboard: return "Search clipboard history…"
         case .chat: return "Ask anything…"
+        case .translate: return "Type text to translate…"
         }
     }
 
@@ -54,6 +59,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Search Snippets"
         case .clipboard: return "Clipboard History"
         case .chat: return "AI Chat"
+        case .translate: return "Translate"
         }
     }
 
@@ -64,6 +70,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Paste saved text"
         case .clipboard: return "Paste something you copied earlier"
         case .chat: return "Chat with AI through OpenRouter"
+        case .translate: return "Translate text with Google Translate"
         }
     }
 
@@ -74,6 +81,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "text.quote"
         case .clipboard: return "doc.on.clipboard"
         case .chat: return "sparkles"
+        case .translate: return "character.bubble"
         }
     }
 }

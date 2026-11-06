@@ -19,16 +19,19 @@ final class SearchModel: ObservableObject {
     private let runner: ResultRunner
     let chat: ChatSession
     private let rates: CurrencyRatesStore
+    let translator: Translator
     private var apps = AppIndex.scan()
 
     init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
-         rates: CurrencyRatesStore) {
+         rates: CurrencyRatesStore, translator: Translator) {
         self.library = library
         self.usage = usage
         self.runner = runner
         self.chat = chat
         self.rates = rates
+        self.translator = translator
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
+        translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
     }
 
     var argumentLink: Quicklink? {
@@ -60,6 +63,7 @@ final class SearchModel: ObservableObject {
     func enter(_ mode: Mode) {
         self.mode = mode
         query = ""
+        if mode == .translate { translator.translate("") }
         refresh()
         requestFocus(.query)
     }
@@ -147,6 +151,17 @@ final class SearchModel: ObservableObject {
         selected = min(keep, max(results.count - 1, 0))
     }
 
+    func translateAgain() {
+        translator.translate(query)
+        refresh()
+        requestFocus(.query)
+    }
+
+    func swapTranslateLanguages() {
+        translator.swap()
+        translateAgain()
+    }
+
     func newChat() {
         chat.newChat()
         requestFocus(.query)
@@ -175,6 +190,8 @@ final class SearchModel: ObservableObject {
             enter(mode)
         case .ask(let question):
             askAI(question)
+        case .stay:
+            break
         }
     }
 
@@ -188,6 +205,7 @@ final class SearchModel: ObservableObject {
             refresh()
             enterArgument(ql)
         } else {
+            if mode == .translate { translator.translate(query) }
             refresh()
         }
     }
@@ -213,6 +231,9 @@ final class SearchModel: ObservableObject {
             return SnippetSearch.results(for: query, snippets: library.snippets.items, usage: usage.counts)
         case .clipboard:
             return ClipHistory.results(for: query, in: library.clipboard.entries, now: Date())
+        case .translate:
+            return GoogleTranslate.results(for: translator.state, text: query, pair: translator.pair,
+                                           languages: translator.languages, locale: .current)
         case .chat:
             return []
         }

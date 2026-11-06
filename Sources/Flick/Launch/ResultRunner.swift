@@ -5,6 +5,7 @@ enum RunOutcome {
     case enter(Mode)
     case askArgument(Quicklink)
     case ask(String)
+    case stay
 }
 
 final class ResultRunner {
@@ -36,6 +37,8 @@ final class ResultRunner {
         case .snippet(let snippet): return .done(delivered: Paster.deliver(snippet.expanded(), delivery))
         case .clip(let entry): return .done(delivered: Paster.deliver(entry.text, delivery))
         case .conversion(let conversion): return .done(delivered: Paster.deliver(conversion.plainValue(.current), delivery))
+        case .translation(let translation): return .done(delivered: Paster.deliver(translation.text, delivery))
+        case .hint: return .stay
         case .message: Launcher.revealQuicklinksFile()
         }
         return .done(delivered: nil)

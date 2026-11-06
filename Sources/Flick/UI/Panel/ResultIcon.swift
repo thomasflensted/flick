@@ -22,6 +22,8 @@ struct ResultIcon: View {
         case .snippet: SymbolTile(symbol: Mode.snippets.symbol, color: Mode.snippets.tint)
         case .clip(let entry): clipIcon(entry)
         case .conversion: SymbolTile(symbol: "dollarsign.arrow.circlepath", color: .green)
+        case .translation: SymbolTile(symbol: Mode.translate.symbol, color: Mode.translate.tint)
+        case .hint: symbol("info.circle", padding: 3)
         case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
         }
     }
