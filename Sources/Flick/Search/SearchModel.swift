@@ -21,6 +21,7 @@ final class SearchModel: ObservableObject {
     let chat: ChatSession
     private let rates: CurrencyRatesStore
     let translator: Translator
+    private let suggester = Suggester()
     private var apps = AppIndex.scan()
     private var servers: [LiveServer] = []
 
@@ -34,6 +35,7 @@ final class SearchModel: ObservableObject {
         self.translator = translator
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
         translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
+        suggester.onUpdate = { [weak self] in if self?.mode == .root { self?.refreshKeepingSelection() } }
     }
 
     var argumentLink: Quicklink? {
@@ -162,9 +164,7 @@ final class SearchModel: ObservableObject {
             servers.removeAll { $0 == server }
         default: return
         }
-        let keep = selected
-        refresh()
-        selected = min(keep, max(results.count - 1, 0))
+        refreshKeepingSelection()
     }
 
     func translateAgain() {
@@ -222,18 +222,33 @@ final class SearchModel: ObservableObject {
             enterArgument(ql)
         } else {
             if mode == .translate { translator.translate(query) }
+            updateSuggestions()
             refresh()
         }
     }
 
     private var searchResults: SearchResults {
         SearchResults(links: library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
-                      rates: rates.rates)
+                      rates: rates.rates, suggestions: suggester.suggestions(for: query))
+    }
+
+    private func updateSuggestions() {
+        if mode == .root, argumentTarget == nil, searchResults.wantsSuggestions(for: query) {
+            suggester.suggest(query)
+        } else {
+            suggester.clear()
+        }
     }
 
     private func refresh() {
         results = currentResults()
         selected = 0
+    }
+
+    private func refreshKeepingSelection() {
+        let keep = selected
+        results = currentResults()
+        selected = min(keep, max(results.count - 1, 0))
     }
 
     private func currentResults() -> [ResultItem] {
