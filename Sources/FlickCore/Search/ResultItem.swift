@@ -95,8 +95,8 @@ public struct ResultItem: Identifiable, Equatable {
         ResultItem(id: "google", kind: .google(query), title: "Search Google for \u{201C}\(query)\u{201D}", subtitle: "google.com")
     }
 
-    public static func googleSuggestion(_ suggestion: String) -> ResultItem {
-        ResultItem(id: "google:\(suggestion)", kind: .google(suggestion), title: suggestion, subtitle: "Google suggestion")
+    public static func suggestion(_ suggestion: String, for ql: Quicklink) -> ResultItem {
+        ResultItem(id: "suggestion:\(suggestion)", kind: .quicklink(ql, argument: suggestion), title: suggestion, subtitle: ql.name)
     }
 
     public static func askAI(_ question: String) -> ResultItem {

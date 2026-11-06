@@ -17,3 +17,19 @@ struct GoogleSuggestTests {
         #expect(throws: (any Error).self) { try GoogleSuggest.parse(Data("{}".utf8), query: "a") }
     }
 }
+
+struct GoogleSuggestLinkTests {
+    @Test func supportsGoogleSearchQuicklinks() {
+        #expect(GoogleSuggest.supports(Quicklink(name: "G", link: "https://google.com/search?q={argument}")))
+        #expect(GoogleSuggest.supports(Quicklink(name: "G", link: "https://www.google.dk/search?q={argument}")))
+        #expect(!GoogleSuggest.supports(Quicklink(name: "Maps", link: "https://www.google.com/maps?q={argument}")))
+        #expect(!GoogleSuggest.supports(Quicklink(name: "GitHub", link: "https://github.com/search?q={argument}")))
+        #expect(!GoogleSuggest.supports(Quicklink(name: "G", link: "https://google.com/search")))
+    }
+
+    @Test func suggestionsRunTheQuicklinkWithTheSuggestion() {
+        let ql = Quicklink(name: "Search Google", link: "https://google.com/search?q={argument}")
+        let results = GoogleSuggest.results(for: ql, suggestions: ["swift async await"])
+        #expect(results.map(\.kind) == [.quicklink(ql, argument: nil), .quicklink(ql, argument: "swift async await")])
+    }
+}

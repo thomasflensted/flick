@@ -8,7 +8,6 @@ public struct SearchResults {
     public let commands: [Command]
     public let rates: CurrencyRates?
     public let locale: Locale
-    public let suggestions: [String]
 
     static let recentsLimit = 8
     static let resultLimit = 30
@@ -17,33 +16,28 @@ public struct SearchResults {
     static let argumentScore = 5000
     static let keepAwakeTriggers = ["keep awake", "awake", "caffeinate"]
     static let minimumTriggerPrefix = 3
-    static let strongMatchScore = MatchScore.prefix
 
-    public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = [], rates: CurrencyRates? = nil,
-                locale: Locale = .current, suggestions: [String] = []) {
+    public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = [], rates: CurrencyRates? = nil, locale: Locale = .current) {
         self.links = links
         self.apps = apps
         self.usage = usage
         self.commands = commands
         self.rates = rates
         self.locale = locale
-        self.suggestions = suggestions
     }
 
     public func results(for query: String) -> [ResultItem] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         if trimmed.isEmpty { return recents() }
-        let ranked = candidates(for: query)
+        let candidates: [[Scored]] = [
+            argumentMatches(query), timedKeepAwake(trimmed), quicklinkMatches(trimmed, excluding: query),
+            appMatches(trimmed), commandMatches(trimmed), modeMatches(trimmed),
+        ]
+        let ranked = candidates.flatMap { $0 }
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
             .map(\.item)
-        return conversions(trimmed) + ranked + webResults(trimmed) + suggestions.map(ResultItem.googleSuggestion)
-    }
-
-    public func wantsSuggestions(for query: String) -> Bool {
-        let trimmed = query.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty, !URLText.looksLikeWebAddress(trimmed) else { return false }
-        return !candidates(for: query).contains { $0.score >= Self.strongMatchScore }
+        return conversions(trimmed) + ranked + webResults(trimmed)
     }
 
     public func linkTriggered(by text: String) -> Quicklink? {
@@ -69,12 +63,6 @@ public struct SearchResults {
     }
 
     private typealias Scored = (score: Int, item: ResultItem)
-
-    private func candidates(for query: String) -> [Scored] {
-        let trimmed = query.trimmingCharacters(in: .whitespaces)
-        return argumentMatches(query) + timedKeepAwake(trimmed) + quicklinkMatches(trimmed, excluding: query)
-            + appMatches(trimmed) + commandMatches(trimmed) + modeMatches(trimmed)
-    }
 
     private func recents() -> [ResultItem] {
         let items = usage.sorted { $0.value > $1.value }.compactMap { item(forUsageKey: $0.key) }.prefix(Self.recentsLimit)
