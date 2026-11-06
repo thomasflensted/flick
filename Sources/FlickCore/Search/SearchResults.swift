@@ -29,8 +29,11 @@ public struct SearchResults {
     public func results(for query: String) -> [ResultItem] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         if trimmed.isEmpty { return recents() }
-        let ranked = (argumentMatches(query) + timedKeepAwake(trimmed) + quicklinkMatches(trimmed, excluding: query)
-                      + appMatches(trimmed) + commandMatches(trimmed) + modeMatches(trimmed))
+        let candidates: [[Scored]] = [
+            argumentMatches(query), timedKeepAwake(trimmed), quicklinkMatches(trimmed, excluding: query),
+            appMatches(trimmed), commandMatches(trimmed), modeMatches(trimmed),
+        ]
+        let ranked = candidates.flatMap { $0 }
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
             .map(\.item)
