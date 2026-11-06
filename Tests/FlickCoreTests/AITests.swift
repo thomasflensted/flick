@@ -32,6 +32,12 @@ struct OpenRouterTests {
         #expect(!json.contains(#""id""#))
     }
 
+    @Test func bodyDisablesReasoning() throws {
+        let body = try OpenRouter.chatBody(model: "m", messages: [])
+        let json = try #require(String(data: body, encoding: .utf8))
+        #expect(json.contains(#""reasoning":{"enabled":false}"#))
+    }
+
     @Test func requestCarriesKey() throws {
         let request = try OpenRouter.chatRequest(key: "sk-test", model: "m", messages: [])
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer sk-test")
