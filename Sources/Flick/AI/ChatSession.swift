@@ -42,21 +42,25 @@ final class ChatSession: ObservableObject {
     @MainActor
     private func answer(key: String, model: AIModel, history: [ChatMessage]) async {
         do {
-            for try await text in OpenRouterClient.stream(key: key, model: model, messages: history) {
+            for try await event in OpenRouterClient.stream(key: key, model: model, messages: history) {
                 if Task.isCancelled { return }
-                appendToAnswer(text)
+                appendToAnswer(event)
             }
         } catch {
             if Task.isCancelled { return }
             self.error = error.localizedDescription
-            if messages.last?.content.isEmpty == true { messages.removeLast() }
+            if messages.last?.isEmpty == true { messages.removeLast() }
         }
         isAnswering = false
         lastActivity = Date()
     }
 
-    private func appendToAnswer(_ text: String) {
+    private func appendToAnswer(_ event: StreamEvent) {
         guard let last = messages.indices.last, messages[last].role == .assistant else { return }
-        messages[last].content += text
+        switch event {
+        case .text(let text): messages[last].content += text
+        case .image(let data): messages[last].images.append(data)
+        case .failed, .done: break
+        }
     }
 }

@@ -4,22 +4,32 @@ import Testing
 
 struct StreamLineTests {
     @Test func readsTextDeltas() {
-        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"content":"Hel"}}]}"#) == .text("Hel"))
+        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"content":"Hel"}}]}"#) == [.text("Hel")])
+    }
+
+    @Test func readsImageDeltas() {
+        let line = #"data: {"choices":[{"delta":{"content":"","images":[{"type":"image_url","image_url":{"url":"data:image/png;base64,aGk="}}]}}]}"#
+        #expect(StreamLine.parse(line) == [.image(Data("hi".utf8))])
+    }
+
+    @Test func keepsTextArrivingWithImages() {
+        let line = #"data: {"choices":[{"delta":{"content":"Here","images":[{"type":"image_url","image_url":{"url":"data:image/png;base64,aGk="}}]}}]}"#
+        #expect(StreamLine.parse(line) == [.text("Here"), .image(Data("hi".utf8))])
     }
 
     @Test func recognisesEndOfStream() {
-        #expect(StreamLine.parse("data: [DONE]") == .done)
+        #expect(StreamLine.parse("data: [DONE]") == [.done])
     }
 
     @Test func ignoresCommentsAndEmptyDeltas() {
-        #expect(StreamLine.parse(": OPENROUTER PROCESSING") == nil)
-        #expect(StreamLine.parse("") == nil)
-        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"role":"assistant"}}]}"#) == nil)
+        #expect(StreamLine.parse(": OPENROUTER PROCESSING").isEmpty)
+        #expect(StreamLine.parse("").isEmpty)
+        #expect(StreamLine.parse(#"data: {"choices":[{"delta":{"role":"assistant"}}]}"#).isEmpty)
     }
 
     @Test func surfacesErrorsInStreamAndBody() {
-        #expect(StreamLine.parse(#"data: {"error":{"message":"Rate limited","code":429}}"#) == .failed("Rate limited"))
-        #expect(StreamLine.parse(#"{"error":{"message":"No auth credentials found","code":401}}"#) == .failed("No auth credentials found"))
+        #expect(StreamLine.parse(#"data: {"error":{"message":"Rate limited","code":429}}"#) == [.failed("Rate limited")])
+        #expect(StreamLine.parse(#"{"error":{"message":"No auth credentials found","code":401}}"#) == [.failed("No auth credentials found")])
     }
 }
 

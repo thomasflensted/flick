@@ -1,3 +1,5 @@
+import Foundation
+
 public struct ChatMessage: Codable, Equatable, Identifiable {
     public enum Role: String, Codable {
         case user, assistant
@@ -6,12 +8,15 @@ public struct ChatMessage: Codable, Equatable, Identifiable {
     public let id: Int
     public let role: Role
     public var content: String
+    public var images: [Data] = []
 
     public init(id: Int, role: Role, content: String) {
         self.id = id
         self.role = role
         self.content = content
     }
+
+    public var isEmpty: Bool { content.isEmpty && images.isEmpty }
 
     private enum CodingKeys: String, CodingKey {
         case role, content
