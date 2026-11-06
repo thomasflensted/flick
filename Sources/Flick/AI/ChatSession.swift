@@ -18,7 +18,7 @@ final class ChatSession: ObservableObject {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isAnswering else { return }
         guard let key = settings.key else { error = "Add your OpenRouter key in Settings (⌘,) to start chatting."; return }
-        guard let model = settings.modelID else { error = "Pick a model in Settings (⌘,) to start chatting."; return }
+        guard let model = settings.model else { error = "Pick a model in Settings (⌘,) to start chatting."; return }
         error = nil
         messages.append(ChatMessage(id: messages.count, role: .user, content: text))
         let history = messages
@@ -40,7 +40,7 @@ final class ChatSession: ObservableObject {
     }
 
     @MainActor
-    private func answer(key: String, model: String, history: [ChatMessage]) async {
+    private func answer(key: String, model: AIModel, history: [ChatMessage]) async {
         do {
             for try await text in OpenRouterClient.stream(key: key, model: model, messages: history) {
                 if Task.isCancelled { return }

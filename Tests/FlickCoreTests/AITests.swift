@@ -24,8 +24,10 @@ struct StreamLineTests {
 }
 
 struct OpenRouterTests {
+    let model = AIModel(id: "m", name: "M", created: 0)
+
     @Test func bodyStreamsRolesAndContent() throws {
-        let body = try OpenRouter.chatBody(model: "m", messages: [ChatMessage(id: 1, role: .user, content: "Hi")])
+        let body = try OpenRouter.chatBody(model: model, messages: [ChatMessage(id: 1, role: .user, content: "Hi")])
         let json = try #require(String(data: body, encoding: .utf8))
         #expect(json.contains(#""stream":true"#))
         #expect(json.contains(#""role":"user""#))
@@ -33,13 +35,19 @@ struct OpenRouterTests {
     }
 
     @Test func bodyDisablesReasoning() throws {
-        let body = try OpenRouter.chatBody(model: "m", messages: [])
+        let body = try OpenRouter.chatBody(model: model, messages: [])
         let json = try #require(String(data: body, encoding: .utf8))
         #expect(json.contains(#""reasoning":{"enabled":false}"#))
     }
 
+    @Test func asksImageModelsForImages() throws {
+        let imageModel = AIModel(id: "i", name: "I", created: 0, outputsImages: true)
+        #expect(OpenRouter.modalities(for: imageModel) == ["image", "text"])
+        #expect(OpenRouter.modalities(for: model) == nil)
+    }
+
     @Test func requestCarriesKey() throws {
-        let request = try OpenRouter.chatRequest(key: "sk-test", model: "m", messages: [])
+        let request = try OpenRouter.chatRequest(key: "sk-test", model: model, messages: [])
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer sk-test")
         #expect(request.httpMethod == "POST")
     }
@@ -57,6 +65,11 @@ struct ModelCatalogTests {
         let model = try #require(ModelCatalog.models(fromJSON: Data(json.utf8)).first)
         #expect(model.id == "a/b")
         #expect(model.priceText == "$0.18 / 1M")
+    }
+
+    @Test func decodesImageOutput() throws {
+        let json = #"{"data":[{"id":"a/b","name":"B","created":5,"architecture":{"output_modalities":["image","text"]}}]}"#
+        #expect(try ModelCatalog.models(fromJSON: Data(json.utf8)).first?.outputsImages == true)
     }
 
     @Test func freeModelsSayFree() {

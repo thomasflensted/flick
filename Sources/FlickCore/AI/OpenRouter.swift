@@ -14,13 +14,18 @@ public enum OpenRouter {
         let messages: [ChatMessage]
         let stream = true
         let reasoning = Reasoning()
+        let modalities: [String]?
     }
 
-    public static func chatBody(model: String, messages: [ChatMessage]) throws -> Data {
-        try JSONEncoder().encode(ChatBody(model: model, messages: messages))
+    public static func chatBody(model: AIModel, messages: [ChatMessage]) throws -> Data {
+        try JSONEncoder().encode(ChatBody(model: model.id, messages: messages, modalities: modalities(for: model)))
     }
 
-    public static func chatRequest(key: String, model: String, messages: [ChatMessage]) throws -> URLRequest {
+    static func modalities(for model: AIModel) -> [String]? {
+        model.outputsImages ? ["image", "text"] : nil
+    }
+
+    public static func chatRequest(key: String, model: AIModel, messages: [ChatMessage]) throws -> URLRequest {
         var request = URLRequest(url: chatURL)
         request.httpMethod = "POST"
         request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")

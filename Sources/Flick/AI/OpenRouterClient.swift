@@ -6,7 +6,7 @@ enum OpenRouterClient {
         let errorDescription: String?
     }
 
-    static func stream(key: String, model: String, messages: [ChatMessage]) -> AsyncThrowingStream<String, Error> {
+    static func stream(key: String, model: AIModel, messages: [ChatMessage]) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
