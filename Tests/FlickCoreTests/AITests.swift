@@ -42,6 +42,16 @@ struct ChatMessageTests {
         #expect(message.content == "Here you go")
         #expect(message.images == [Data("hi".utf8)])
     }
+
+    @Test func imageOnlyAnswersAreSentAsPlaceholder() {
+        var message = ChatMessage(id: 0, role: .assistant, content: "")
+        message.append(.image(Data("hi".utf8)))
+        #expect(message.contentForModel == "[image]")
+    }
+
+    @Test func textAnswersAreSentAsIs() {
+        #expect(ChatMessage(id: 0, role: .assistant, content: "Hi").contentForModel == "Hi")
+    }
 }
 
 struct OpenRouterTests {
