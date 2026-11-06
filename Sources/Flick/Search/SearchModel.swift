@@ -64,6 +64,7 @@ final class SearchModel: ObservableObject {
         self.mode = mode
         query = ""
         if mode == .translate { translator.translate("") }
+        if mode == .chat { chat.clearIfIdle(now: Date()) }
         refresh()
         requestFocus(.query)
     }

@@ -8,6 +8,7 @@ final class ChatSession: ObservableObject {
 
     let settings: AISettings
     private var task: Task<Void, Never>?
+    private var lastActivity: Date?
 
     init(settings: AISettings) {
         self.settings = settings
@@ -23,7 +24,12 @@ final class ChatSession: ObservableObject {
         let history = messages
         messages.append(ChatMessage(id: messages.count, role: .assistant, content: ""))
         isAnswering = true
+        lastActivity = Date()
         task = Task { @MainActor in await answer(key: key, model: model, history: history) }
+    }
+
+    func clearIfIdle(now: Date) {
+        if !isAnswering, ChatExpiry.isExpired(lastActivity: lastActivity, now: now) { newChat() }
     }
 
     func newChat() {
@@ -46,6 +52,7 @@ final class ChatSession: ObservableObject {
             if messages.last?.content.isEmpty == true { messages.removeLast() }
         }
         isAnswering = false
+        lastActivity = Date()
     }
 
     private func appendToAnswer(_ text: String) {

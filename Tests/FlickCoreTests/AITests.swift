@@ -101,3 +101,16 @@ struct ModelCatalogTests {
         #expect(ModelCatalog.search("sonnet 5", in: models).first?.id == "anthropic/claude-sonnet-5")
     }
 }
+
+struct ChatExpiryTests {
+    let start = Date(timeIntervalSince1970: 0)
+
+    @Test func chatExpiresAfterHalfAnHourIdle() {
+        #expect(!ChatExpiry.isExpired(lastActivity: start, now: start.addingTimeInterval(29 * 60)))
+        #expect(ChatExpiry.isExpired(lastActivity: start, now: start.addingTimeInterval(31 * 60)))
+    }
+
+    @Test func emptyChatNeverExpires() {
+        #expect(!ChatExpiry.isExpired(lastActivity: nil, now: start))
+    }
+}
