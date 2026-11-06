@@ -81,6 +81,14 @@ public enum Mode: Hashable, CaseIterable {
         }
     }
 
+    public var removeLabel: String? {
+        switch self {
+        case .clipboard: return "Delete"
+        case .servers: return "Stop"
+        case .root, .emoji, .snippets, .chat, .translate: return nil
+        }
+    }
+
     public var symbol: String {
         switch self {
         case .root: return "magnifyingglass"

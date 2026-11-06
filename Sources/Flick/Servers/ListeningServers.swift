@@ -10,6 +10,10 @@ enum ListeningServers {
         return LiveServers.servers(sockets: sockets, directories: directories)
     }
 
+    static func stop(_ server: LiveServer) {
+        kill(server.pid, SIGTERM)
+    }
+
     private static func lsof(_ arguments: [String]) -> String {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")

@@ -153,9 +153,15 @@ final class SearchModel: ObservableObject {
         run(results[i].kind, delivery: delivery)
     }
 
-    func deleteSelectedClip() {
-        guard results.indices.contains(selected), case .clip(let entry) = results[selected].kind else { return }
-        library.clipboard.delete(entry.id)
+    func removeSelected() {
+        guard results.indices.contains(selected) else { return }
+        switch results[selected].kind {
+        case .clip(let entry): library.clipboard.delete(entry.id)
+        case .server(let server):
+            ListeningServers.stop(server)
+            servers.removeAll { $0 == server }
+        default: return
+        }
         let keep = selected
         refresh()
         selected = min(keep, max(results.count - 1, 0))
