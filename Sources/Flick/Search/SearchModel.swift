@@ -140,7 +140,7 @@ final class SearchModel: ObservableObject {
     }
 
     private var showsSuggestions: Bool {
-        argumentTarget.map(GoogleSuggest.supports) ?? false
+        argumentTarget == .googleSearch
     }
 
     private var selectedIsSuggestion: Bool {
@@ -246,7 +246,7 @@ final class SearchModel: ObservableObject {
     }
 
     private var searchResults: SearchResults {
-        SearchResults(links: library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
+        SearchResults(links: [.googleSearch] + library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
                       rates: rates.rates)
     }
 
@@ -264,8 +264,8 @@ final class SearchModel: ObservableObject {
     private func currentResults() -> [ResultItem] {
         switch mode {
         case .root:
-            if let ql = argumentTarget, showsSuggestions {
-                return GoogleSuggest.results(for: ql, suggestions: suggester.suggestions)
+            if showsSuggestions {
+                return GoogleSuggest.results(suggestions: suggester.suggestions)
             }
             let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
             return error + searchResults.results(for: query)

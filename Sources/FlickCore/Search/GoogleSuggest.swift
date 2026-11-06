@@ -5,14 +5,8 @@ public enum GoogleSuggest {
 
     struct Malformed: Error {}
 
-    public static func supports(_ ql: Quicklink) -> Bool {
-        guard ql.takesArgument, let url = URLText.url(from: ql.resolved(argument: "x")),
-              let host = url.host?.lowercased() else { return false }
-        return host.split(separator: ".").contains("google") && url.path == "/search"
-    }
-
-    public static func results(for ql: Quicklink, suggestions: [String]) -> [ResultItem] {
-        [.quicklink(ql)] + suggestions.map { .suggestion($0, for: ql) }
+    public static func results(suggestions: [String]) -> [ResultItem] {
+        [.quicklink(.googleSearch)] + suggestions.map { .suggestion($0, for: .googleSearch) }
     }
 
     public static func requestURL(query: String) -> URL {
