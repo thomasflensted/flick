@@ -6,7 +6,7 @@ enum Field: Hashable { case query, argument }
 final class SearchModel: ObservableObject {
     @Published var query = "" { didSet { if query != oldValue { queryChanged() } } }
     @Published var selected = 0
-    @Published var argument = ""
+    @Published var argument = "" { didSet { if argument != oldValue { argumentChanged() } } }
     @Published private(set) var results: [ResultItem] = []
     @Published private(set) var argumentTarget: Quicklink?
     @Published private(set) var mode: Mode = .root
@@ -35,7 +35,7 @@ final class SearchModel: ObservableObject {
         self.translator = translator
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
         translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
-        suggester.onUpdate = { [weak self] in if self?.mode == .root { self?.refreshKeepingSelection() } }
+        suggester.onUpdate = { [weak self] in if self?.showsSuggestions == true { self?.refreshKeepingSelection() } }
     }
 
     var argumentLink: Quicklink? {
@@ -88,7 +88,7 @@ final class SearchModel: ObservableObject {
 
     func move(_ direction: Direction) {
         guard !results.isEmpty else { return }
-        if argumentTarget != nil { exitArgument() }
+        if argumentTarget != nil, !showsSuggestions { exitArgument() }
         selected = Selection.next(from: selected, direction, count: results.count, columns: mode.gridColumns)
     }
 
@@ -126,13 +126,31 @@ final class SearchModel: ObservableObject {
         if query.isEmpty { query = ql.trigger }
         argumentTarget = ql
         argument = ""
+        if showsSuggestions { refresh() }
         requestFocus(.argument)
     }
 
     func exitArgument() {
+        let wasShowingSuggestions = showsSuggestions
         argumentTarget = nil
         argument = ""
+        suggester.clear()
+        if wasShowingSuggestions { refresh() }
         requestFocus(.query)
+    }
+
+    private var showsSuggestions: Bool {
+        argumentTarget.map(GoogleSuggest.supports) ?? false
+    }
+
+    private var selectedIsSuggestion: Bool {
+        showsSuggestions && selected > 0
+    }
+
+    private func argumentChanged() {
+        guard showsSuggestions else { return }
+        suggester.suggest(argument)
+        refresh()
     }
 
     var selectedProducesText: Bool {
@@ -144,15 +162,16 @@ final class SearchModel: ObservableObject {
             sendChatMessage()
             return
         }
-        if index == nil, let ql = argumentTarget {
+        if index == nil, let ql = argumentTarget, !selectedIsSuggestion {
             activateArgument(of: ql)
             return
         }
-        if argumentTarget != nil { exitArgument() }
         let i = index ?? selected
         guard results.indices.contains(i) else { return }
+        let kind = results[i].kind
+        if argumentTarget != nil { exitArgument() }
         selected = i
-        run(results[i].kind, delivery: delivery)
+        run(kind, delivery: delivery)
     }
 
     func removeSelected() {
@@ -222,22 +241,13 @@ final class SearchModel: ObservableObject {
             enterArgument(ql)
         } else {
             if mode == .translate { translator.translate(query) }
-            updateSuggestions()
             refresh()
         }
     }
 
     private var searchResults: SearchResults {
         SearchResults(links: library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
-                      rates: rates.rates, suggestions: suggester.suggestions(for: query))
-    }
-
-    private func updateSuggestions() {
-        if mode == .root, argumentTarget == nil, searchResults.wantsSuggestions(for: query) {
-            suggester.suggest(query)
-        } else {
-            suggester.clear()
-        }
+                      rates: rates.rates)
     }
 
     private func refresh() {
@@ -254,6 +264,9 @@ final class SearchModel: ObservableObject {
     private func currentResults() -> [ResultItem] {
         switch mode {
         case .root:
+            if let ql = argumentTarget, showsSuggestions {
+                return GoogleSuggest.results(for: ql, suggestions: suggester.suggestions)
+            }
             let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
             return error + searchResults.results(for: query)
         case .emoji:

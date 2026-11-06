@@ -3,23 +3,18 @@ import Foundation
 
 final class Suggester {
     var onUpdate: () -> Void = {}
-    private var query = ""
-    private var suggestions: [String] = []
+    private(set) var suggestions: [String] = []
     private var task: Task<Void, Never>?
 
     private static let debounce = Duration.milliseconds(250)
 
-    func suggestions(for query: String) -> [String] {
-        query.trimmingCharacters(in: .whitespaces) == self.query ? suggestions : []
-    }
-
     func suggest(_ query: String) {
         task?.cancel()
         let text = query.trimmingCharacters(in: .whitespaces)
+        guard !text.isEmpty else { clear(); return }
         task = Task { @MainActor in
             try? await Task.sleep(for: Self.debounce)
             guard !Task.isCancelled, let fetched = try? await fetch(text), !Task.isCancelled else { return }
-            self.query = text
             suggestions = fetched
             onUpdate()
         }
@@ -27,7 +22,6 @@ final class Suggester {
 
     func clear() {
         task?.cancel()
-        query = ""
         suggestions = []
     }
 
