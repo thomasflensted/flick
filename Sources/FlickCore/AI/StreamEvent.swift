@@ -1,8 +1,7 @@
 import Foundation
 
 public enum StreamEvent: Equatable {
-    case text(String)
-    case image(Data)
+    case answer(AnswerPart)
     case failed(String)
     case done
 }
@@ -48,8 +47,8 @@ public enum StreamLine {
         guard let chunk = decode(Chunk.self, payload) else { return [] }
         if let error = chunk.error { return [.failed(error.message)] }
         guard let delta = chunk.choices?.first?.delta else { return [] }
-        let text = [delta.content].compactMap { $0 }.filter { !$0.isEmpty }.map(StreamEvent.text)
-        let images = (delta.images ?? []).compactMap { imageData(fromDataURL: $0.image_url.url) }.map(StreamEvent.image)
+        let text = [delta.content].compactMap { $0 }.filter { !$0.isEmpty }.map { StreamEvent.answer(.text($0)) }
+        let images = (delta.images ?? []).compactMap { imageData(fromDataURL: $0.image_url.url) }.map { StreamEvent.answer(.image($0)) }
         return text + images
     }
 

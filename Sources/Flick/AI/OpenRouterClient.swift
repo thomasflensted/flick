@@ -6,7 +6,7 @@ enum OpenRouterClient {
         let errorDescription: String?
     }
 
-    static func stream(key: String, model: AIModel, messages: [ChatMessage]) -> AsyncThrowingStream<StreamEvent, Error> {
+    static func stream(key: String, model: AIModel, messages: [ChatMessage]) -> AsyncThrowingStream<AnswerPart, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
@@ -15,7 +15,7 @@ enum OpenRouterClient {
                     for try await line in bytes.lines {
                         for event in StreamLine.parse(line) {
                             switch event {
-                            case .text, .image: continuation.yield(event)
+                            case .answer(let part): continuation.yield(part)
                             case .failed(let message): throw Failure(errorDescription: message)
                             case .done: continuation.finish(); return
                             }

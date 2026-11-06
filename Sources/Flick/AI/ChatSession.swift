@@ -42,9 +42,9 @@ final class ChatSession: ObservableObject {
     @MainActor
     private func answer(key: String, model: AIModel, history: [ChatMessage]) async {
         do {
-            for try await event in OpenRouterClient.stream(key: key, model: model, messages: history) {
+            for try await part in OpenRouterClient.stream(key: key, model: model, messages: history) {
                 if Task.isCancelled { return }
-                appendToAnswer(event)
+                appendToAnswer(part)
             }
         } catch {
             if Task.isCancelled { return }
@@ -55,12 +55,8 @@ final class ChatSession: ObservableObject {
         lastActivity = Date()
     }
 
-    private func appendToAnswer(_ event: StreamEvent) {
+    private func appendToAnswer(_ part: AnswerPart) {
         guard let last = messages.indices.last, messages[last].role == .assistant else { return }
-        switch event {
-        case .text(let text): messages[last].content += text
-        case .image(let data): messages[last].images.append(data)
-        case .failed, .done: break
-        }
+        messages[last].append(part)
     }
 }

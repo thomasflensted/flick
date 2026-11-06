@@ -18,6 +18,13 @@ public struct ChatMessage: Codable, Equatable, Identifiable {
 
     public var isEmpty: Bool { content.isEmpty && images.isEmpty }
 
+    public mutating func append(_ part: AnswerPart) {
+        switch part {
+        case .text(let text): content += text
+        case .image(let data): images.append(data)
+        }
+    }
+
     private enum CodingKeys: String, CodingKey {
         case role, content
     }
