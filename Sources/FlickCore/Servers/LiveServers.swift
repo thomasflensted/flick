@@ -33,6 +33,13 @@ public enum LiveServers {
         .sorted { $0.port < $1.port }
     }
 
+    public static func results(for query: String, in servers: [LiveServer]) -> [ResultItem] {
+        if servers.isEmpty { return [.hint("No live servers found")] }
+        return Ranker(usage: [:])
+            .rank(servers, query: query, texts: { [$0.name, $0.process, String($0.port)] }, key: ResultItem.serverID)
+            .map(ResultItem.server)
+    }
+
     static func isStartedFromProject(_ directory: String) -> Bool {
         directory != "/"
     }

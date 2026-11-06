@@ -23,6 +23,7 @@ public enum ResultKind: Equatable {
     case clip(ClipEntry)
     case conversion(Conversion)
     case translation(Translation)
+    case server(LiveServer)
     case hint(String)
     case message(String)
 
@@ -110,6 +111,13 @@ public struct ResultItem: Identifiable, Equatable {
     public static func openGoogleTranslate(_ url: URL) -> ResultItem {
         ResultItem(id: "url", kind: .url(url), title: "Open in Google Translate", subtitle: "translate.google.com")
     }
+
+    public static func server(_ server: LiveServer) -> ResultItem {
+        ResultItem(id: serverID(server), kind: .server(server), title: server.name,
+                   subtitle: "\(server.address) · \(server.process)")
+    }
+
+    public static func serverID(_ server: LiveServer) -> String { "server:\(server.pid):\(server.port)" }
 
     public static func hint(_ text: String) -> ResultItem {
         ResultItem(id: "hint", kind: .hint(text), title: text, subtitle: "")

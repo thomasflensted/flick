@@ -51,6 +51,7 @@ struct ResultRow: View {
         case .clip: return ""
         case .conversion: return "Currency"
         case .translation: return "Google Translate"
+        case .server: return "Server"
         case .hint: return ""
         case .message: return ""
         }

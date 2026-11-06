@@ -22,6 +22,7 @@ final class SearchModel: ObservableObject {
     private let rates: CurrencyRatesStore
     let translator: Translator
     private var apps = AppIndex.scan()
+    private var servers: [LiveServer] = []
 
     init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
          rates: CurrencyRatesStore, translator: Translator) {
@@ -72,6 +73,7 @@ final class SearchModel: ObservableObject {
         query = ""
         if mode == .translate { translator.translate("") }
         if mode == .chat { chat.clearIfIdle(now: Date()) }
+        if mode == .servers { rescanServers() }
         refresh()
         requestFocus(.query)
     }
@@ -242,6 +244,8 @@ final class SearchModel: ObservableObject {
         case .translate:
             return GoogleTranslate.results(for: translator.state, text: query, pair: translator.pair,
                                            languages: translator.languages, locale: .current)
+        case .servers:
+            return LiveServers.results(for: query, in: servers)
         case .chat:
             return []
         }
@@ -250,6 +254,16 @@ final class SearchModel: ObservableObject {
     private func requestFocus(_ field: Field) {
         focus = field
         focusRequest += 1
+    }
+
+    private func rescanServers() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let scanned = ListeningServers.scan()
+            DispatchQueue.main.async {
+                self.servers = scanned
+                if self.mode == .servers { self.refresh() }
+            }
+        }
     }
 
     private func rescanApps() {
