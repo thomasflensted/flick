@@ -20,7 +20,11 @@ public struct AIModel: Decodable, Hashable, Identifiable {
     }
 
     private struct Architecture: Decodable {
-        let output_modalities: [String]?
+        let outputModalities: [String]?
+
+        private enum CodingKeys: String, CodingKey {
+            case outputModalities = "output_modalities"
+        }
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -34,7 +38,7 @@ public struct AIModel: Decodable, Hashable, Identifiable {
         created = try c.decode(Int.self, forKey: .created)
         let perToken = try c.decodeIfPresent(Pricing.self, forKey: .pricing).flatMap { Double($0.completion) }
         outputPricePerMillion = perToken.map { $0 * 1_000_000 }
-        let outputs = try c.decodeIfPresent(Architecture.self, forKey: .architecture)?.output_modalities ?? []
+        let outputs = try c.decodeIfPresent(Architecture.self, forKey: .architecture)?.outputModalities ?? []
         outputsImages = outputs.contains("image")
     }
 

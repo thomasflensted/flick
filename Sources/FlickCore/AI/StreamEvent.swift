@@ -21,7 +21,11 @@ public enum StreamLine {
 
     private struct Image: Decodable {
         struct ImageURL: Decodable { let url: String }
-        let image_url: ImageURL
+        let imageURL: ImageURL
+
+        private enum CodingKeys: String, CodingKey {
+            case imageURL = "image_url"
+        }
     }
 
     private struct ErrorBody: Decodable {
@@ -47,9 +51,12 @@ public enum StreamLine {
         guard let chunk = decode(Chunk.self, payload) else { return [] }
         if let error = chunk.error { return [.failed(error.message)] }
         guard let delta = chunk.choices?.first?.delta else { return [] }
-        let text = [delta.content].compactMap { $0 }.filter { !$0.isEmpty }.map { StreamEvent.answer(.text($0)) }
-        let images = (delta.images ?? []).compactMap { imageData(fromDataURL: $0.image_url.url) }.map { StreamEvent.answer(.image($0)) }
-        return text + images
+        var events: [StreamEvent] = []
+        if let text = delta.content, !text.isEmpty { events.append(.answer(.text(text))) }
+        for image in delta.images ?? [] {
+            if let data = imageData(fromDataURL: image.imageURL.url) { events.append(.answer(.image(data))) }
+        }
+        return events
     }
 
     static func imageData(fromDataURL url: String) -> Data? {

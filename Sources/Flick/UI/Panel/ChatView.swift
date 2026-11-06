@@ -21,14 +21,18 @@ struct ChatView: View {
                 }
                 .padding(16)
             }
-            .onChange(of: chat.messages.last?.content) { _, _ in proxy.scrollTo(Self.bottom, anchor: .bottom) }
-            .onChange(of: chat.messages.last?.images.count) { _, _ in proxy.scrollTo(Self.bottom, anchor: .bottom) }
-            .onAppear { proxy.scrollTo(Self.bottom, anchor: .bottom) }
+            .onChange(of: chat.messages.last?.content) { _, _ in scrollToBottom(proxy) }
+            .onChange(of: chat.messages.last?.images.count) { _, _ in scrollToBottom(proxy) }
+            .onAppear { scrollToBottom(proxy) }
         }
         .onAppear { settings.loadModels() }
     }
 
     private static let bottom = "bottom"
+
+    private func scrollToBottom(_ proxy: ScrollViewProxy) {
+        proxy.scrollTo(Self.bottom, anchor: .bottom)
+    }
 
     private var emptyState: some View {
         VStack(spacing: 8) {
