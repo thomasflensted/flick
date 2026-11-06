@@ -22,6 +22,7 @@ struct ChatView: View {
                 .padding(16)
             }
             .onChange(of: chat.messages.last?.content) { _, _ in proxy.scrollTo(Self.bottom, anchor: .bottom) }
+            .onChange(of: chat.messages.last?.images.count) { _, _ in proxy.scrollTo(Self.bottom, anchor: .bottom) }
             .onAppear { proxy.scrollTo(Self.bottom, anchor: .bottom) }
         }
         .onAppear { settings.loadModels() }
@@ -58,14 +59,17 @@ private struct MessageBubble: View {
     }
 
     @ViewBuilder private var content: some View {
-        if thinking && message.content.isEmpty {
+        if thinking && message.isEmpty {
             HStack(spacing: 6) {
                 ProgressView().controlSize(.small)
                 Text("Thinking…").foregroundStyle(.secondary)
             }
             .font(.system(size: 13))
         } else {
-            Text(Markdown.render(message.content)).font(.system(size: 13))
+            VStack(alignment: .leading, spacing: 8) {
+                if !message.content.isEmpty { Text(Markdown.render(message.content)).font(.system(size: 13)) }
+                ForEach(message.images.indices, id: \.self) { GeneratedImage(data: message.images[$0]) }
+            }
         }
     }
 
