@@ -1,5 +1,4 @@
 import AppKit
-import FlickCore
 import SwiftUI
 
 struct GeneratedImage: View {
@@ -13,7 +12,7 @@ struct GeneratedImage: View {
                     .resizable().scaledToFit()
                     .frame(maxWidth: 360, maxHeight: 360)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                Button(action: save) {
+                Button { saved = ImageDownloads.save(data) } label: {
                     Image(systemName: saved ? "checkmark.circle" : "arrow.down.circle")
                         .font(.system(size: 16))
                 }
@@ -21,11 +20,5 @@ struct GeneratedImage: View {
                 .help("Save to Downloads")
             }
         }
-    }
-
-    private func save() {
-        guard let png = NSBitmapImageRep(data: data)?.representation(using: .png, properties: [:]) else { return }
-        let url = URL.downloadsDirectory.appending(path: "\(NanoID.make()).png")
-        saved = (try? png.write(to: url)) != nil
     }
 }
