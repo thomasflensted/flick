@@ -5,7 +5,12 @@ enum AppIndex {
     private static let roots = [
         "/Applications", "/Applications/Utilities", "/System/Applications",
         "/System/Applications/Utilities", NSHomeDirectory() + "/Applications",
-    ]
+    ] + xcodeRoots
+    private static var xcodeRoots: [String] {
+        let developer = URL(fileURLWithPath: "/var/db/xcode_select_link").resolvingSymlinksInPath()
+        return [developer.appendingPathComponent("Applications").path,
+                developer.deletingLastPathComponent().appendingPathComponent("Applications").path]
+    }
     private static let finder = "/System/Library/CoreServices/Finder.app"
 
     static func scan() -> [AppEntry] {
