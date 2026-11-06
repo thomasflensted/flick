@@ -8,7 +8,7 @@ struct GeneratedImage: View {
 
     var body: some View {
         if let image = NSImage(data: data) {
-            HStack(alignment: .top, spacing: 8) {
+            HStack(spacing: 8) {
                 Image(nsImage: image)
                     .resizable().scaledToFit()
                     .frame(maxWidth: 360, maxHeight: 360)
