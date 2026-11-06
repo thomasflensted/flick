@@ -1,7 +1,7 @@
 import AppKit
 
 final class StatusMenu {
-    private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+    private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
     init(onShow: @escaping () -> Void, onSettings: @escaping () -> Void, onImport: @escaping () -> Void) {
         showKeepingAwake(false)
@@ -18,7 +18,9 @@ final class StatusMenu {
 
     func showKeepingAwake(_ active: Bool) {
         let symbol = active ? "sun.max.fill" : "command"
-        item.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: active ? "Flick (keeping awake)" : "Flick")
+        let configuration = NSImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
+        item.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: active ? "Flick (keeping awake)" : "Flick")?
+            .withSymbolConfiguration(configuration)
     }
 
     private func loginItem() -> NSMenuItem {
