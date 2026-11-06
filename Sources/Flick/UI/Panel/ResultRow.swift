@@ -5,10 +5,13 @@ struct ResultRow: View {
     let item: ResultItem
     let selected: Bool
     var subtitle: String?
+    var running = false
 
     var body: some View {
         HStack(spacing: 12) {
-            ResultIcon(kind: item.kind)
+            ResultIcon(kind: item.kind).overlay(alignment: .bottom) {
+                if running { Circle().fill(.secondary).frame(width: 4, height: 4).offset(y: 6) }
+            }
             VStack(alignment: .leading, spacing: 1) {
                 Text(item.title).font(.system(size: 14, weight: .medium)).lineLimit(titleLines)
                     .fixedSize(horizontal: false, vertical: true)

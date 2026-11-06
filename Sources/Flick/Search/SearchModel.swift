@@ -12,6 +12,7 @@ final class SearchModel: ObservableObject {
     @Published private(set) var mode: Mode = .root
     @Published private(set) var focus: Field = .query
     @Published private(set) var focusRequest = 0
+    @Published private(set) var runningAppPaths: Set<String> = []
 
     var onDone: () -> Void = {}
     private let library: Library
@@ -57,7 +58,13 @@ final class SearchModel: ObservableObject {
         argument = ""
         enter(mode)
         rates.refreshIfStale()
+        runningAppPaths = RunningApps.paths()
         rescanApps()
+    }
+
+    func isRunning(_ kind: ResultKind) -> Bool {
+        guard case .app(let app) = kind else { return false }
+        return runningAppPaths.contains(app.path)
     }
 
     func enter(_ mode: Mode) {

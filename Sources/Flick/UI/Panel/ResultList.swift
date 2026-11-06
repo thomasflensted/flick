@@ -9,7 +9,8 @@ struct ResultList: View {
             ScrollView {
                 LazyVStack(spacing: 2) {
                     ForEach(Array(model.results.enumerated()), id: \.element.id) { index, item in
-                        ResultRow(item: item, selected: index == model.selected, subtitle: model.liveSubtitle(for: item))
+                        ResultRow(item: item, selected: index == model.selected, subtitle: model.liveSubtitle(for: item),
+                                  running: model.isRunning(item.kind))
                             .id(item.id)
                             .onTapGesture { model.activate(index) }
                     }
