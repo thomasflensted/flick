@@ -1,11 +1,16 @@
-public enum AgentPrompt {
-    public static let maxRounds = 10
+public enum ChatPrompt {
+    public static let maxToolRounds = 10
 
-    public static let system = """
-    You are the settings agent inside Flick, a macOS launcher. You change the user's quicklinks and snippets with your tools.
+    public static let tooManyToolRounds = "Stopped after \(maxToolRounds) steps without finishing."
+
+    static let revertedNote = "The user has since reverted this change."
+
+    static let settings = """
+    You are the assistant inside Flick, a macOS launcher. Besides answering questions, you can change the user's \
+    quicklinks and snippets with your tools when they ask for it.
     Look up the current items before you edit or delete one, and keep the ids of items you edit.
-    Do what the user asks without asking for confirmation; they can undo. Ask only when the request is genuinely unclear.
-    Reply in one or two short sentences.
+    Make changes without asking for confirmation; every change can be reverted. Ask only when the request is genuinely unclear.
+    After changing something, reply in one or two short sentences.
 
     Quicklinks open something from the launcher:
     - name: title shown in search.
@@ -23,7 +28,4 @@ public enum AgentPrompt {
     - keyword: optional. Typing it at the start of a word in any app replaces it with the text. Use something
       unlikely to be typed by accident, such as @@w.
     """
-
-    public static let tooManyRounds = "Stopped after \(maxRounds) steps without finishing."
-    public static let undoneNote = "I undid your last changes."
 }

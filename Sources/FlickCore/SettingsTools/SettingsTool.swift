@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AgentTool: String, CaseIterable {
+public enum SettingsTool: String, CaseIterable {
     case listQuicklinks = "list_quicklinks"
     case saveQuicklink = "save_quicklink"
     case deleteQuicklink = "delete_quicklink"
@@ -72,11 +72,11 @@ struct ToolDefinition: Encodable {
     let type = "function"
     let function: Function
 
-    init(_ tool: AgentTool) {
+    init(_ tool: SettingsTool) {
         let properties = Dictionary(uniqueKeysWithValues: tool.parameters.map { ($0.name, Schema.Property(description: $0.description)) })
         let schema = Schema(properties: properties, required: tool.parameters.filter(\.required).map(\.name))
         function = Function(name: tool.rawValue, description: tool.description, parameters: schema)
     }
 
-    static let all = AgentTool.allCases.map(ToolDefinition.init)
+    static let all = SettingsTool.allCases.map(ToolDefinition.init)
 }

@@ -6,10 +6,10 @@ public protocol Listable: Codable, Identifiable where ID == UUID {
 
 extension Array where Element: Listable {
     @discardableResult
-    public mutating func upsert(_ item: Element) -> Bool {
-        guard let i = firstIndex(where: { $0.id == item.id }) else { append(item); return false }
-        self[i] = item
-        return true
+    public mutating func upsert(_ item: Element) -> Element? {
+        guard let i = firstIndex(where: { $0.id == item.id }) else { append(item); return nil }
+        defer { self[i] = item }
+        return self[i]
     }
 
     public mutating func remove(id: UUID) -> Element? {

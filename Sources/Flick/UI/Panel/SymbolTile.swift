@@ -35,7 +35,6 @@ extension Mode {
         case .snippets: return .pink
         case .clipboard: return .blue
         case .chat: return .purple
-        case .agent: return .indigo
         case .translate: return .cyan
         case .servers: return .green
         }

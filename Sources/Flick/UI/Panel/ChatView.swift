@@ -11,15 +11,25 @@ struct ChatView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     if chat.messages.isEmpty { emptyState }
                     ForEach(chat.messages) { message in
-                        MessageBubble(message: message, thinking: chat.isAnswering && message.id == chat.messages.last?.id)
+                        let thinking = chat.isAnswering && message.id == chat.messages.last?.id
+                        if thinking || message.hasAnswer { MessageBubble(message: message, thinking: thinking) }
+                        changes(in: message)
                     }
-                    if let error = chat.error { ErrorLabel(text: error) }
+                    if let error = chat.error {
+                        Label {
+                            Text(error).foregroundStyle(.primary)
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        }
+                        .font(.system(size: 12))
+                    }
                     Color.clear.frame(height: 1).id(Self.bottom)
                 }
                 .padding(16)
             }
             .onChange(of: chat.messages.last?.content) { _, _ in scrollToBottom(proxy) }
             .onChange(of: chat.messages.last?.images.count) { _, _ in scrollToBottom(proxy) }
+            .onChange(of: chat.messages.last?.toolResults.count) { _, _ in scrollToBottom(proxy) }
             .onAppear { scrollToBottom(proxy) }
         }
         .onAppear { settings.loadModels() }
@@ -29,6 +39,17 @@ struct ChatView: View {
 
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
         proxy.scrollTo(Self.bottom, anchor: .bottom)
+    }
+
+    private func changes(in message: ChatMessage) -> some View {
+        ForEach(message.toolResults.indices, id: \.self) { index in
+            let result = message.toolResults[index]
+            if let change = result.change {
+                ChangeRow(change: change, reverted: result.isReverted, canRevert: !chat.isAnswering) {
+                    chat.revert(messageID: message.id, resultIndex: index)
+                }
+            }
+        }
     }
 
     private var emptyState: some View {
@@ -44,7 +65,7 @@ struct ChatView: View {
     }
 }
 
-struct MessageBubble: View {
+private struct MessageBubble: View {
     let message: ChatMessage
     let thinking: Bool
 
@@ -76,19 +97,6 @@ struct MessageBubble: View {
 
     private var background: Color {
         message.role == .user ? Color.accentColor.opacity(0.25) : Color.primary.opacity(0.06)
-    }
-}
-
-struct ErrorLabel: View {
-    let text: String
-
-    var body: some View {
-        Label {
-            Text(text).foregroundStyle(.primary)
-        } icon: {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-        }
-        .font(.system(size: 12))
     }
 }
 

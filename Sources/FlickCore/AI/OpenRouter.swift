@@ -5,27 +5,29 @@ public enum OpenRouter {
     public static let modelsURL = URL(string: "https://openrouter.ai/api/v1/models")!
     public static let keysPage = URL(string: "https://openrouter.ai/settings/keys")!
 
-    struct Reasoning: Encodable {
+    private struct Reasoning: Encodable {
         let enabled = false
     }
 
     private struct ChatBody: Encodable {
         let model: String
-        let messages: [ChatMessage]
+        let messages: [ModelMessage]
         let stream = true
         let reasoning = Reasoning()
         let modalities: [String]?
-    }
-
-    private struct AgentBody: Encodable {
-        let model: String
-        let messages: [AgentMessage]
-        let tools = ToolDefinition.all
-        let reasoning = Reasoning()
+        let tools: [ToolDefinition]?
     }
 
     public static func chatBody(model: AIModel, messages: [ChatMessage]) throws -> Data {
-        try JSONEncoder().encode(ChatBody(model: model.id, messages: messages, modalities: modalities(for: model)))
+        let tools = model.supportsTools ? ToolDefinition.all : nil
+        let body = ChatBody(model: model.id, messages: modelMessages(messages, withTools: tools != nil),
+                            modalities: modalities(for: model), tools: tools)
+        return try JSONEncoder().encode(body)
+    }
+
+    static func modelMessages(_ messages: [ChatMessage], withTools: Bool) -> [ModelMessage] {
+        let system = withTools ? [ModelMessage.system(ChatPrompt.settings)] : []
+        return system + messages.flatMap(\.modelMessages)
     }
 
     static func modalities(for model: AIModel) -> [String]? {
@@ -33,24 +35,12 @@ public enum OpenRouter {
     }
 
     public static func chatRequest(key: String, model: AIModel, messages: [ChatMessage]) throws -> URLRequest {
-        request(key: key, body: try chatBody(model: model, messages: messages))
-    }
-
-    static func agentBody(model: AIModel, messages: [AgentMessage]) throws -> Data {
-        try JSONEncoder().encode(AgentBody(model: model.id, messages: messages))
-    }
-
-    public static func agentRequest(key: String, model: AIModel, messages: [AgentMessage]) throws -> URLRequest {
-        request(key: key, body: try agentBody(model: model, messages: messages))
-    }
-
-    private static func request(key: String, body: Data) -> URLRequest {
         var request = URLRequest(url: chatURL)
         request.httpMethod = "POST"
         request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Flick", forHTTPHeaderField: "X-Title")
-        request.httpBody = body
+        request.httpBody = try chatBody(model: model, messages: messages)
         return request
     }
 }

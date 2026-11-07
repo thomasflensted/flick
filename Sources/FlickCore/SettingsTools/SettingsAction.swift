@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AgentAction: Equatable {
+public enum SettingsAction: Equatable {
     case listQuicklinks
     case saveQuicklink(Quicklink)
     case deleteQuicklink(UUID)
@@ -17,8 +17,8 @@ public enum AgentAction: Equatable {
         let id: UUID
     }
 
-    public static func parse(_ call: AgentToolCall) throws -> AgentAction {
-        guard let tool = AgentTool(rawValue: call.function.name) else { throw UnknownTool(name: call.function.name) }
+    public static func parse(_ call: ToolCall) throws -> SettingsAction {
+        guard let tool = SettingsTool(rawValue: call.function.name) else { throw UnknownTool(name: call.function.name) }
         let arguments = Data(call.function.arguments.utf8)
         let decoder = JSONDecoder()
         switch tool {

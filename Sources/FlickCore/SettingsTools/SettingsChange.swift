@@ -1,4 +1,4 @@
-public struct AgentChange: Equatable {
+public struct SettingsChange: Equatable {
     public enum Kind: Equatable {
         case added, updated, removed
     }
@@ -7,6 +7,7 @@ public struct AgentChange: Equatable {
     public let item: String
     public let name: String
     public let detail: String
+    public let undo: SettingsAction
 
     public var title: String {
         "\(verb) \(item) \(name)"
@@ -21,13 +22,13 @@ public struct AgentChange: Equatable {
     }
 }
 
-extension AgentChange {
-    static func quicklink(_ kind: Kind, _ link: Quicklink) -> AgentChange {
-        AgentChange(kind: kind, item: "quicklink", name: link.name, detail: detail(keyword: link.keyword, link.link))
+extension SettingsChange {
+    static func quicklink(_ kind: Kind, _ link: Quicklink, undo: SettingsAction) -> SettingsChange {
+        SettingsChange(kind: kind, item: "quicklink", name: link.name, detail: detail(keyword: link.keyword, link.link), undo: undo)
     }
 
-    static func snippet(_ kind: Kind, _ snippet: Snippet) -> AgentChange {
-        AgentChange(kind: kind, item: "snippet", name: snippet.name, detail: detail(keyword: snippet.keyword, snippet.text))
+    static func snippet(_ kind: Kind, _ snippet: Snippet, undo: SettingsAction) -> SettingsChange {
+        SettingsChange(kind: kind, item: "snippet", name: snippet.name, detail: detail(keyword: snippet.keyword, snippet.text), undo: undo)
     }
 
     private static func detail(keyword: String?, _ value: String) -> String {
