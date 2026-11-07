@@ -13,14 +13,7 @@ struct ChatView: View {
                     ForEach(chat.messages) { message in
                         MessageBubble(message: message, thinking: chat.isAnswering && message.id == chat.messages.last?.id)
                     }
-                    if let error = chat.error {
-                        Label {
-                            Text(error).foregroundStyle(.primary)
-                        } icon: {
-                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                        }
-                        .font(.system(size: 12))
-                    }
+                    if let error = chat.error { ErrorLabel(text: error) }
                     Color.clear.frame(height: 1).id(Self.bottom)
                 }
                 .padding(16)
@@ -51,7 +44,7 @@ struct ChatView: View {
     }
 }
 
-private struct MessageBubble: View {
+struct MessageBubble: View {
     let message: ChatMessage
     let thinking: Bool
 
@@ -83,6 +76,19 @@ private struct MessageBubble: View {
 
     private var background: Color {
         message.role == .user ? Color.accentColor.opacity(0.25) : Color.primary.opacity(0.06)
+    }
+}
+
+struct ErrorLabel: View {
+    let text: String
+
+    var body: some View {
+        Label {
+            Text(text).foregroundStyle(.primary)
+        } icon: {
+            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+        }
+        .font(.system(size: 12))
     }
 }
 

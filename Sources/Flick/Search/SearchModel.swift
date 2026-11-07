@@ -19,18 +19,20 @@ final class SearchModel: ObservableObject {
     private let usage: UsageStore
     private let runner: ResultRunner
     let chat: ChatSession
+    let agent: AgentSession
     private let rates: CurrencyRatesStore
     let translator: Translator
     private let suggester = Suggester()
     private var apps = AppIndex.scan()
     private var servers: [LiveServer] = []
 
-    init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
+    init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession, agent: AgentSession,
          rates: CurrencyRatesStore, translator: Translator) {
         self.library = library
         self.usage = usage
         self.runner = runner
         self.chat = chat
+        self.agent = agent
         self.rates = rates
         self.translator = translator
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
@@ -75,6 +77,7 @@ final class SearchModel: ObservableObject {
         query = ""
         if mode == .translate { translator.translate("") }
         if mode == .chat { chat.clearIfIdle(now: Date()) }
+        if mode == .agent { agent.clearIfIdle(now: Date()) }
         if mode == .servers { rescanServers() }
         refresh()
         requestFocus(.query)
@@ -158,8 +161,8 @@ final class SearchModel: ObservableObject {
     }
 
     func activate(_ index: Int? = nil, delivery: Delivery = .paste) {
-        if mode == .chat {
-            sendChatMessage()
+        if mode.isConversation {
+            sendMessage()
             return
         }
         if index == nil, let ql = argumentTarget, !selectedIsSuggestion {
@@ -198,12 +201,12 @@ final class SearchModel: ObservableObject {
     }
 
     func newChat() {
-        chat.newChat()
+        if mode == .agent { agent.newConversation() } else { chat.newChat() }
         requestFocus(.query)
     }
 
-    private func sendChatMessage() {
-        chat.send(query)
+    private func sendMessage() {
+        if mode == .agent { agent.send(query) } else { chat.send(query) }
         query = ""
     }
 
@@ -280,7 +283,7 @@ final class SearchModel: ObservableObject {
                                            languages: translator.languages, locale: .current)
         case .servers:
             return LiveServers.results(for: query, in: servers)
-        case .chat:
+        case .chat, .agent:
             return []
         }
     }

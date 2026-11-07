@@ -53,6 +53,8 @@ struct SearchView: View {
     @ViewBuilder private var results: some View {
         if model.mode == .chat {
             ChatView(chat: model.chat, settings: model.chat.settings)
+        } else if model.mode == .agent {
+            AgentView(agent: model.agent, settings: model.agent.settings)
         } else if let columns = model.mode.gridColumns {
             EmojiGrid(model: model, columns: columns)
         } else {
@@ -65,13 +67,14 @@ struct SearchView: View {
             if model.movesInGrid, let title = model.selectedTitle {
                 Text(title).font(.system(size: 12, weight: .medium)).lineLimit(1)
             }
-            if model.mode == .chat {
+            if model.mode.isConversation {
                 Text(model.chat.settings.modelName).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer()
-            if model.mode == .chat {
+            if model.mode.isConversation {
                 KeyHint(key: "↵", label: "Send")
                 KeyHint(key: "⌘N", label: "New chat")
+                if model.mode == .agent { UndoHint(agent: model.agent) }
             } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
                 KeyHint(key: "⌘↵", label: "Copy")
@@ -108,6 +111,14 @@ struct ModeChip: View {
             .font(.system(size: 13, weight: .semibold))
             .padding(.horizontal, 8).padding(.vertical, 3)
             .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(0.2)))
+    }
+}
+
+private struct UndoHint: View {
+    @ObservedObject var agent: AgentSession
+
+    var body: some View {
+        if agent.canUndo { KeyHint(key: "⌘Z", label: "Undo changes") }
     }
 }
 

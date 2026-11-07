@@ -29,7 +29,12 @@ final class ListStore<Item: Listable>: ObservableObject {
     }
 
     func upsert(_ item: Item) {
-        if let i = items.firstIndex(where: { $0.id == item.id }) { items[i] = item } else { items.append(item) }
+        items.upsert(item)
+        save()
+    }
+
+    func replace(with items: [Item]) {
+        self.items = items
         save()
     }
 

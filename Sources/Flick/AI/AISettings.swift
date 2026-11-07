@@ -19,6 +19,12 @@ final class AISettings: ObservableObject {
         return models.first { $0.id == modelID } ?? AIModel(id: modelID, name: modelID, created: 0)
     }
 
+    var setupProblem: String? {
+        if key == nil { return "Add your OpenRouter key in Settings (⌘,) to start." }
+        if model == nil { return "Pick a model in Settings (⌘,) to start." }
+        return nil
+    }
+
     var modelName: String {
         model?.name ?? "No model"
     }

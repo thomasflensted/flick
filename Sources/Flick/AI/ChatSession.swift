@@ -17,8 +17,7 @@ final class ChatSession: ObservableObject {
     func send(_ text: String) {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isAnswering else { return }
-        guard let key = settings.key else { error = "Add your OpenRouter key in Settings (⌘,) to start chatting."; return }
-        guard let model = settings.model else { error = "Pick a model in Settings (⌘,) to start chatting."; return }
+        guard let key = settings.key, let model = settings.model else { error = settings.setupProblem; return }
         error = nil
         messages.append(ChatMessage(id: messages.count, role: .user, content: text))
         let history = messages
