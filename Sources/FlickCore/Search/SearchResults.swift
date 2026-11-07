@@ -8,6 +8,8 @@ public struct SearchResults {
     public let commands: [Command]
     public let rates: CurrencyRates?
     public let locale: Locale
+    public let timeZone: TimeZone
+    public let now: Date
 
     static let recentsLimit = 8
     static let resultLimit = 30
@@ -17,13 +19,16 @@ public struct SearchResults {
     static let keepAwakeTriggers = ["keep awake", "awake", "caffeinate"]
     static let minimumTriggerPrefix = 3
 
-    public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = [], rates: CurrencyRates? = nil, locale: Locale = .current) {
+    public init(links: [Quicklink], apps: [AppEntry], usage: [String: Int], commands: [Command] = [], rates: CurrencyRates? = nil, locale: Locale = .current,
+                timeZone: TimeZone = .current, now: Date = Date()) {
         self.links = links
         self.apps = apps
         self.usage = usage
         self.commands = commands
         self.rates = rates
         self.locale = locale
+        self.timeZone = timeZone
+        self.now = now
     }
 
     public func results(for query: String) -> [ResultItem] {
@@ -37,7 +42,7 @@ public struct SearchResults {
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
             .map(\.item)
-        return conversions(trimmed) + ranked + webResults(trimmed)
+        return conversions(trimmed) + zoneTimes(trimmed) + ranked + webResults(trimmed)
     }
 
     public func linkTriggered(by text: String) -> Quicklink? {
@@ -124,6 +129,10 @@ public struct SearchResults {
         guard let rates else { return [] }
         let local = locale.currency?.identifier ?? "USD"
         return CurrencyConverter.conversions(for: query, rates: rates, local: local).map { .conversion($0, locale: locale) }
+    }
+
+    private func zoneTimes(_ query: String) -> [ResultItem] {
+        ZoneTime.answer(for: query, now: now, local: timeZone).map { [.time($0, locale: locale)] } ?? []
     }
 
     private func webResults(_ query: String) -> [ResultItem] {

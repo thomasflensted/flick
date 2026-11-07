@@ -38,6 +38,7 @@ final class ResultRunner {
         case .snippet(let snippet): return .done(delivered: Paster.deliver(snippet.expanded(), delivery))
         case .clip(let entry): return .done(delivered: Paster.deliver(entry.text, delivery))
         case .conversion(let conversion): return .done(delivered: Paster.deliver(conversion.plainValue(.current), delivery))
+        case .time(let time): return .done(delivered: Paster.deliver(time.time(.current), delivery))
         case .translation(let translation): return .done(delivered: Paster.deliver(translation.text, delivery))
         case .server(let server): if let url = server.url { Launcher.open(url) }
         case .drive(let drive): Launcher.open(drive.url)

@@ -50,6 +50,7 @@ struct ResultRow: View {
         case .snippet: return "Snippet"
         case .clip: return ""
         case .conversion: return "Currency"
+        case .time: return "Time Zone"
         case .translation: return "Google Translate"
         case .server: return "Server"
         case .drive: return "Drive"
