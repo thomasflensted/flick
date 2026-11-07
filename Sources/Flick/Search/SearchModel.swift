@@ -21,7 +21,7 @@ final class SearchModel: ObservableObject {
     let chat: ChatSession
     private let rates: CurrencyRatesStore
     let translator: Translator
-    private let suggester = Suggester()
+    private let suggesters: [Quicklink: Suggesting] = [.googleSearch: Suggester(), .googleMaps: PlaceSuggester()]
     private let weather = WeatherSearch()
     private var apps = AppIndex.scan()
     private var servers: [LiveServer] = []
@@ -39,7 +39,9 @@ final class SearchModel: ObservableObject {
         translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
         chat.settings.onModelsLoaded = { [weak self] in if self?.mode == .models { self?.refreshKeepingSelection() } }
         weather.onUpdate = { [weak self] in if self?.mode == .weather { self?.refreshKeepingSelection() } }
-        suggester.onUpdate = { [weak self] in if self?.showsSuggestions == true { self?.refreshKeepingSelection() } }
+        for (ql, suggester) in suggesters {
+            suggester.onUpdate = { [weak self] in if self?.argumentTarget == ql { self?.refreshKeepingSelection() } }
+        }
     }
 
     var argumentLink: Quicklink? {
@@ -139,15 +141,19 @@ final class SearchModel: ObservableObject {
 
     func exitArgument() {
         let wasShowingSuggestions = showsSuggestions
+        suggester?.clear()
         argumentTarget = nil
         argument = ""
-        suggester.clear()
         if wasShowingSuggestions { refresh() }
         requestFocus(.query)
     }
 
+    private var suggester: Suggesting? {
+        argumentTarget.flatMap { suggesters[$0] }
+    }
+
     private var showsSuggestions: Bool {
-        argumentTarget == .googleSearch
+        suggester != nil
     }
 
     private var selectedIsSuggestion: Bool {
@@ -155,7 +161,7 @@ final class SearchModel: ObservableObject {
     }
 
     private func argumentChanged() {
-        guard showsSuggestions else { return }
+        guard let suggester else { return }
         suggester.suggest(argument)
         refresh()
     }
@@ -265,7 +271,7 @@ final class SearchModel: ObservableObject {
     }
 
     private var searchResults: SearchResults {
-        SearchResults(links: [.googleSearch] + library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
+        SearchResults(links: Quicklink.builtIns + library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
                       rates: rates.rates)
     }
 
@@ -283,8 +289,8 @@ final class SearchModel: ObservableObject {
     private func currentResults() -> [ResultItem] {
         switch mode {
         case .root:
-            if showsSuggestions {
-                return GoogleSuggest.results(suggestions: suggester.suggestions)
+            if let suggester, let argumentTarget {
+                return Suggestions.results(suggester.suggestions, for: argumentTarget)
             }
             let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
             return error + searchResults.results(for: query)

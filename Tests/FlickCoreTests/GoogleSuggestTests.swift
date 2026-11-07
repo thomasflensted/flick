@@ -18,9 +18,19 @@ struct GoogleSuggestTests {
     }
 }
 
-struct GoogleSuggestResultsTests {
-    @Test func suggestionsRunGoogleSearchWithTheSuggestion() {
-        let results = GoogleSuggest.results(suggestions: ["swift async await"])
+struct SuggestionsTests {
+    @Test func suggestionsRunTheQuicklinkWithTheSuggestion() {
+        let results = Suggestions.results(["swift async await"], for: .googleSearch)
         #expect(results.map(\.kind) == [.quicklink(.googleSearch, argument: nil), .quicklink(.googleSearch, argument: "swift async await")])
+    }
+
+    @Test func placeSuggestionsIncludeTheirAddress() {
+        #expect(Suggestions.placeText(title: "Tivoli", subtitle: "Vesterbrogade 3, Copenhagen") == "Tivoli, Vesterbrogade 3, Copenhagen")
+        #expect(Suggestions.placeText(title: "Copenhagen", subtitle: "") == "Copenhagen")
+    }
+
+    @Test func googleMapsShipsWithAKeyword() {
+        #expect(Quicklink.googleMaps.resolved(argument: "tivoli copenhagen") == "https://www.google.com/maps/search/?api=1&query=tivoli%20copenhagen")
+        #expect(Quicklink.googleMaps.isTriggered(by: "gm"))
     }
 }

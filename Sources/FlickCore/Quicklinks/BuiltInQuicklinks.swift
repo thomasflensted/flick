@@ -7,4 +7,13 @@ extension Quicklink {
         link: "https://www.google.com/search?q={argument}",
         keyword: "g"
     )
+
+    public static let googleMaps = Quicklink(
+        id: UUID(uuidString: "5C0B5F0E-6D1A-4E7B-9C2F-3A8D41E7B6C9")!,
+        name: "Search Google Maps",
+        link: "https://www.google.com/maps/search/?api=1&query={argument}",
+        keyword: "gm"
+    )
+
+    public static let builtIns: [Quicklink] = [.googleSearch, .googleMaps]
 }

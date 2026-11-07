@@ -1,13 +1,9 @@
 import Foundation
 
 public enum GoogleSuggest {
-    static let limit = 5
+    public static let limit = 5
 
     struct Malformed: Error {}
-
-    public static func results(suggestions: [String]) -> [ResultItem] {
-        [.quicklink(.googleSearch)] + suggestions.map { .suggestion($0, for: .googleSearch) }
-    }
 
     public static func requestURL(query: String) -> URL {
         var components = URLComponents(string: "https://suggestqueries.google.com/complete/search")!

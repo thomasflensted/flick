@@ -1,7 +1,7 @@
 import FlickCore
 import Foundation
 
-final class Suggester {
+final class Suggester: Suggesting {
     var onUpdate: () -> Void = {}
     private(set) var suggestions: [String] = []
     private var task: Task<Void, Never>?
