@@ -10,7 +10,7 @@ public struct SettingsChange: Equatable {
     public let undo: SettingsAction
 
     public var title: String {
-        "\(verb) \(item) \(name)"
+        [verb, item, name].filter { !$0.isEmpty }.joined(separator: " ")
     }
 
     private var verb: String {
@@ -29,6 +29,10 @@ extension SettingsChange {
 
     static func snippet(_ kind: Kind, _ snippet: Snippet, undo: SettingsAction) -> SettingsChange {
         SettingsChange(kind: kind, item: "snippet", name: snippet.name, detail: detail(keyword: snippet.keyword, snippet.text), undo: undo)
+    }
+
+    static func setting(_ name: String, _ value: String, undo: SettingsAction) -> SettingsChange {
+        SettingsChange(kind: .updated, item: "", name: name, detail: value, undo: undo)
     }
 
     private static func detail(keyword: String?, _ value: String) -> String {

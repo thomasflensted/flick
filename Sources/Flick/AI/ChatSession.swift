@@ -7,13 +7,13 @@ final class ChatSession: ObservableObject {
     @Published private(set) var error: String?
 
     let settings: AISettings
-    private let library: Library
+    private let editable: EditableSettings
     private var task: Task<Void, Never>?
     private var lastActivity: Date?
 
-    init(settings: AISettings, library: Library) {
+    init(settings: AISettings, editable: EditableSettings) {
         self.settings = settings
-        self.library = library
+        self.editable = editable
     }
 
     func send(_ text: String) {
@@ -31,11 +31,10 @@ final class ChatSession: ObservableObject {
         guard !isAnswering, messages.indices.contains(messageID) else { return }
         let result = messages[messageID].toolResults[resultIndex]
         guard let change = result.change, !result.isReverted else { return }
-        library.reloadIfChanged()
-        if let problem = libraryProblem { error = problem; return }
-        var workspace = currentWorkspace
+        if let problem = editable.reloadProblem() { error = problem; return }
+        var workspace = editable.current
         workspace.revert(change)
-        save(workspace)
+        editable.save(workspace)
         messages[messageID].toolResults[resultIndex].isReverted = true
     }
 
@@ -91,28 +90,14 @@ final class ChatSession: ObservableObject {
     }
 
     private func runTools(_ calls: [ToolCall]) {
-        library.reloadIfChanged()
-        if let problem = libraryProblem {
+        if let problem = editable.reloadProblem() {
             updateAnswer { $0.toolCalls = calls; $0.toolResults = calls.map { ToolResult(callID: $0.id, output: "Error: \(problem)") } }
             return
         }
-        var workspace = currentWorkspace
+        var workspace = editable.current
         let results = calls.map { workspace.perform($0) }
-        save(workspace)
+        editable.save(workspace)
         updateAnswer { $0.toolCalls = calls; $0.toolResults = results }
-    }
-
-    private var libraryProblem: String? {
-        (library.quicklinks.loadError ?? library.snippets.loadError).map { "\($0) Fix the file before changing settings." }
-    }
-
-    private var currentWorkspace: SettingsWorkspace {
-        SettingsWorkspace(quicklinks: library.quicklinks.items, snippets: library.snippets.items)
-    }
-
-    private func save(_ workspace: SettingsWorkspace) {
-        if workspace.quicklinks != library.quicklinks.items { library.quicklinks.replace(with: workspace.quicklinks) }
-        if workspace.snippets != library.snippets.items { library.snippets.replace(with: workspace.snippets) }
     }
 
     private func updateAnswer(_ update: (inout ChatMessage) -> Void) {

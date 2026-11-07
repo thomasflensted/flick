@@ -1,10 +1,11 @@
 import Foundation
 
 public enum Language {
+    static let codes = ["ar", "zh-CN", "cs", "da", "nl", "en", "fi", "fr", "de", "el", "hi", "it", "ja", "ko", "no", "pl", "pt",
+                        "ru", "es", "sv", "th", "tr", "uk", "vi"]
+
     public static func choices(in locale: Locale) -> [String] {
-        ["ar", "zh-CN", "cs", "da", "nl", "en", "fi", "fr", "de", "el", "hi", "it", "ja", "ko", "no", "pl", "pt", "ru",
-         "es", "sv", "th", "tr", "uk", "vi"]
-            .sorted { name(of: $0, in: locale) < name(of: $1, in: locale) }
+        codes.sorted { name(of: $0, in: locale) < name(of: $1, in: locale) }
     }
 
     public static func name(of code: String, in locale: Locale) -> String {

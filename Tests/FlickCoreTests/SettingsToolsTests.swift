@@ -84,6 +84,83 @@ struct SettingsWorkspaceTests {
     }
 }
 
+struct AppSettingsToolTests {
+    private let sonnet = AIModel(id: "anthropic/claude-sonnet-5", name: "Claude Sonnet 5", created: 0, supportsTools: true)
+    private let gpt = AIModel(id: "openai/gpt-x", name: "GPT X", created: 0)
+
+    private var workspace: SettingsWorkspace {
+        SettingsWorkspace(quicklinks: [], snippets: [], modelID: gpt.id, models: [sonnet, gpt])
+    }
+
+    private func call(_ tool: SettingsTool, _ arguments: String = "{}") -> ToolCall {
+        ToolCall(id: "call_1", name: tool.rawValue, arguments: arguments)
+    }
+
+    @Test func findsModelsByName() {
+        var workspace = workspace
+        let output = workspace.perform(call(.findModels, #"{"query":"sonnet"}"#)).output
+        #expect(output.contains(sonnet.id))
+        #expect(!output.contains(gpt.id))
+    }
+
+    @Test func switchesModelAndRevertsToThePreviousOne() throws {
+        var workspace = workspace
+        let change = try #require(workspace.perform(call(.setModel, #"{"id":"\#(sonnet.id)"}"#)).change)
+        #expect(workspace.modelID == sonnet.id)
+        #expect(change.title == "Updated AI model")
+        #expect(change.detail == "Claude Sonnet 5")
+        workspace.revert(change)
+        #expect(workspace.modelID == gpt.id)
+    }
+
+    @Test func rejectsUnknownModels() {
+        var workspace = workspace
+        let result = workspace.perform(call(.setModel, #"{"id":"made/up"}"#))
+        #expect(workspace.modelID == gpt.id)
+        #expect(result.output.hasPrefix("Error:"))
+    }
+
+    @Test func setsTranslateLanguagesLeavingSourceAutomatic() throws {
+        var workspace = workspace
+        let change = try #require(workspace.perform(call(.setTranslateLanguages, #"{"target":"es"}"#)).change)
+        #expect(workspace.translatePair == TranslatePair(source: nil, target: "es"))
+        #expect(change.detail == "Detected language → Spanish")
+        workspace.revert(change)
+        #expect(workspace.translatePair == TranslatePair())
+    }
+
+    @Test func rejectsUnsupportedLanguages() {
+        var workspace = workspace
+        let result = workspace.perform(call(.setTranslateLanguages, #"{"source":"xx","target":"es"}"#))
+        #expect(workspace.translatePair == TranslatePair())
+        #expect(result.output.hasPrefix("Error: unsupported language xx."))
+    }
+
+    @Test func togglesLaunchAtLogin() throws {
+        var workspace = workspace
+        let change = try #require(workspace.perform(call(.setLaunchAtLogin, #"{"enabled":true}"#)).change)
+        #expect(workspace.launchAtLogin)
+        #expect(change.title == "Updated Launch at login")
+        workspace.revert(change)
+        #expect(!workspace.launchAtLogin)
+    }
+
+    private struct Current: Decodable {
+        let model: String?
+        let translate: TranslatePair
+        let launchAtLogin: Bool
+    }
+
+    @Test func reportsCurrentSettings() throws {
+        var workspace = workspace
+        let output = workspace.perform(call(.getSettings)).output
+        let current = try JSONDecoder().decode(Current.self, from: Data(output.utf8))
+        #expect(current.model == gpt.id)
+        #expect(current.translate == TranslatePair())
+        #expect(!current.launchAtLogin)
+    }
+}
+
 struct ToolCallStreamTests {
     @Test func readsToolCallDeltas() {
         let line = #"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call_1","type":"function","function":{"name":"list_quicklinks","arguments":""}}]}}]}"#
