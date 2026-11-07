@@ -49,6 +49,10 @@ struct ChatMessageTests {
         #expect(message.contentForModel == "[image]")
     }
 
+    @Test func whitespaceBeforeToolCallsIsNotAnAnswer() {
+        #expect(!ChatMessage(id: 0, role: .assistant, content: "\n\n").hasAnswer)
+    }
+
     @Test func textAnswersAreSentAsIs() {
         #expect(ChatMessage(id: 0, role: .assistant, content: "Hi").contentForModel == "Hi")
     }
