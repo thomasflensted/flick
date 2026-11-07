@@ -24,7 +24,11 @@ public struct ZoneTime: Equatable {
     }
 
     public func time(_ locale: Locale) -> String {
-        date.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: place.timeZone))
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = place.timeZone
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 
     public func title(_ locale: Locale) -> String {

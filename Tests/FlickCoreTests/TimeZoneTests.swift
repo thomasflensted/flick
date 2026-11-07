@@ -43,7 +43,7 @@ struct TimeZoneTests {
 
     @Test func convertsBetweenZones() throws {
         let time = try #require(answer("3pm london to tokyo"))
-        #expect(time.time(english) == "0:00")
+        #expect(time.time(english) == "00:00")
         #expect(time.summary(english) == "Sat 8 Nov · 9 h ahead of London")
     }
 
