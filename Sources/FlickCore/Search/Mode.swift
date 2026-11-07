@@ -77,7 +77,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "Switch AI Model"
         case .translate: return "Translate"
         case .servers: return "Live Servers"
-        case .drives: return "Eject Drive"
+        case .drives: return "Connected Drives"
         }
     }
 
@@ -91,7 +91,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "Pick the model AI Chat uses"
         case .translate: return "Translate text with Google Translate"
         case .servers: return "Open a local server in the browser"
-        case .drives: return "Safely eject an external drive or disk image"
+        case .drives: return "See your drives and eject them"
         }
     }
 
@@ -101,6 +101,10 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "Stop"
         case .root, .emoji, .snippets, .chat, .models, .translate, .drives: return nil
         }
+    }
+
+    public var aliases: [String] {
+        self == .drives ? ["Eject"] : []
     }
 
     public var enterLabel: String? {

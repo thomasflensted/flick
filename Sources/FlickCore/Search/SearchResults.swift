@@ -104,7 +104,7 @@ public struct SearchResults {
 
     private func modeMatches(_ query: String) -> [Scored] {
         Mode.openable.compactMap { mode in
-            MatchScore.score(query, against: mode.commandTitle).map { ($0 + boost(UsageKey.mode(mode)), .mode(mode)) }
+            bestScore(query, [mode.commandTitle] + mode.aliases).map { ($0 + boost(UsageKey.mode(mode)), .mode(mode)) }
         }
     }
 
