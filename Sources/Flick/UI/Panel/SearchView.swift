@@ -66,12 +66,19 @@ struct SearchView: View {
                 Text(title).font(.system(size: 12, weight: .medium)).lineLimit(1)
             }
             if model.mode == .chat {
-                Text(model.chat.settings.modelName).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+                Button { model.enter(.models) } label: {
+                    Text(model.chat.settings.modelName).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+                }
+                .buttonStyle(.plain)
+                .help("Switch model (⌘M)")
             }
             Spacer()
             if model.mode == .chat {
                 KeyHint(key: "↵", label: "Send")
                 KeyHint(key: "⌘N", label: "New chat")
+                KeyHint(key: "⌘M", label: "Model")
+            } else if model.mode == .models {
+                KeyHint(key: "↵", label: "Use model")
             } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
                 KeyHint(key: "⌘↵", label: "Copy")

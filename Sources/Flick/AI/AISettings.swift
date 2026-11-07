@@ -11,6 +11,7 @@ final class AISettings: ObservableObject {
     @Published private(set) var models: [AIModel] = []
     @Published private(set) var popularModels: [AIModel] = []
     @Published private(set) var modelsError: String?
+    var onModelsLoaded: () -> Void = {}
 
     var key: String? { Keychain.read() }
 
@@ -51,6 +52,7 @@ final class AISettings: ObservableObject {
                 popularModels = ModelCatalog.merged(try await Self.fetchPopular())
                 modelsError = nil
                 if modelID == nil { modelID = ModelCatalog.preferredDefault(in: models)?.id }
+                onModelsLoaded()
             } catch {
                 modelsError = "Couldn't load models from OpenRouter: \(error.localizedDescription)"
             }

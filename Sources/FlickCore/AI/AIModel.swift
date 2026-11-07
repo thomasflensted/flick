@@ -86,6 +86,10 @@ public enum ModelCatalog {
         return missing + popular
     }
 
+    public static func results(for query: String, popular: [AIModel], all: [AIModel], currentID: String?) -> [ResultItem] {
+        visible(query: query, popular: popular, all: all, includingID: currentID).map { .model($0, isCurrent: $0.id == currentID) }
+    }
+
     public static func search(_ query: String, in models: [AIModel]) -> [AIModel] {
         Ranker(usage: [:]).rank(models, query: query, texts: { [$0.name, $0.id] }, key: \.id)
     }

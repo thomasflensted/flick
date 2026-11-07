@@ -35,6 +35,7 @@ final class SearchModel: ObservableObject {
         self.translator = translator
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
         translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
+        chat.settings.onModelsLoaded = { [weak self] in if self?.mode == .models { self?.refreshKeepingSelection() } }
         suggester.onUpdate = { [weak self] in if self?.showsSuggestions == true { self?.refreshKeepingSelection() } }
     }
 
@@ -76,6 +77,7 @@ final class SearchModel: ObservableObject {
         if mode == .translate { translator.translate("") }
         if mode == .chat { chat.clearIfIdle(now: Date()) }
         if mode == .servers { rescanServers() }
+        if mode == .models { chat.settings.loadModels() }
         refresh()
         requestFocus(.query)
     }
@@ -112,13 +114,13 @@ final class SearchModel: ObservableObject {
     func escape() -> Bool {
         if argumentTarget != nil { exitArgument(); return true }
         if !query.isEmpty { query = ""; return true }
-        if mode != .root { enter(.root); return true }
+        if mode != .root { enter(mode.parent); return true }
         return false
     }
 
     func deleteBackwardWhenEmpty() -> Bool {
         if argumentTarget != nil, argument.isEmpty { exitArgument(); return true }
-        if argumentTarget == nil, mode != .root, query.isEmpty { enter(.root); return true }
+        if argumentTarget == nil, mode != .root, query.isEmpty { enter(mode.parent); return true }
         return false
     }
 
@@ -225,6 +227,9 @@ final class SearchModel: ObservableObject {
             enter(mode)
         case .ask(let question):
             askAI(question)
+        case .useModel(let model):
+            chat.settings.modelID = model.id
+            enter(.chat)
         case .stay:
             break
         }
@@ -282,6 +287,9 @@ final class SearchModel: ObservableObject {
             return LiveServers.results(for: query, in: servers)
         case .chat:
             return []
+        case .models:
+            let settings = chat.settings
+            return ModelCatalog.results(for: query, popular: settings.popularModels, all: settings.models, currentID: settings.modelID)
         }
     }
 
