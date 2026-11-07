@@ -77,8 +77,8 @@ struct SearchView: View {
                 KeyHint(key: "↵", label: "Send")
                 KeyHint(key: "⌘N", label: "New chat")
                 KeyHint(key: "⌘M", label: "Model")
-            } else if model.mode == .models {
-                KeyHint(key: "↵", label: "Use model")
+            } else if let label = model.mode.enterLabel {
+                KeyHint(key: "↵", label: label)
             } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
                 KeyHint(key: "⌘↵", label: "Copy")

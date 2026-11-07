@@ -90,6 +90,10 @@ struct CommandSearchTests {
         #expect(search("emoji").first?.kind == .mode(.emoji))
     }
 
+    @Test func findsConnectedDrivesByEject() {
+        #expect(search("eject").first?.kind == .mode(.drives))
+    }
+
     @Test func noTimedKeepAwakeWithoutDuration() {
         #expect(SearchResults.keepAwakeMinutes(in: "awake later") == nil)
         #expect(SearchResults.keepAwakeMinutes(in: "aw 20") == nil)
