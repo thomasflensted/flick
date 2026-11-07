@@ -57,7 +57,7 @@ struct ChatView: View {
             Image(systemName: "sparkles").font(.system(size: 28)).foregroundStyle(.purple)
             Text(settings.hasKey ? "Ask anything" : "Add your OpenRouter key to start")
                 .font(.system(size: 15, weight: .semibold))
-            Text(settings.hasKey ? "It can also add or change your quicklinks and snippets." : "Press ⌘, and open the AI tab.")
+            Text(settings.hasKey ? "Quick questions, or changes to your Flick settings." : "Press ⌘, and open the AI tab.")
                 .font(.system(size: 12)).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
