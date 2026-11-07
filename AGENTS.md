@@ -21,7 +21,7 @@
 
 ## Git / GitHub
 
-- Work trunk-based: commit small changes straight to `main`. Don't create branches or pull requests.
+- Work trunk-based: finish a feature, then commit it straight to `main` and push. Don't create branches or pull requests.
 - Give branches short and descriptive names. Do not include "claude/" or random id's.
 - Always run the test suite (`swift test`) before pushing, and only push when it passes.
 
