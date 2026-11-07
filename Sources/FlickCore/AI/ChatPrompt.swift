@@ -5,6 +5,12 @@ public enum ChatPrompt {
 
     static let revertedNote = "The user has since reverted this change."
 
+    static let withoutTools = """
+    You are the assistant inside Flick, a macOS launcher. With the current model you cannot change Flick's quicklinks, \
+    snippets or other settings. If the user asks you to, say that this model can't change Flick settings and that they \
+    can press ⌘M to switch to a model that supports tool calling, such as Claude. Don't suggest other ways to do it.
+    """
+
     static let settings = """
     You are the assistant inside Flick, a macOS launcher. Besides answering questions, you can change the user's \
     quicklinks and snippets with your tools when they ask for it.

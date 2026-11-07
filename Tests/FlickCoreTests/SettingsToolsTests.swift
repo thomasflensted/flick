@@ -135,10 +135,11 @@ struct ChatToolsRequestTests {
         #expect(body.messages.map(\.role) == ["system", "user"])
     }
 
-    @Test func otherModelsChatWithoutTools() throws {
+    @Test func otherModelsAreToldTheyCannotChangeSettings() throws {
         let body = try body(AIModel(id: "m", name: "M", created: 0), [ChatMessage(id: 0, role: .user, content: "hi")])
         #expect(body.tools == nil)
-        #expect(body.messages.map(\.role) == ["user"])
+        #expect(body.messages.map(\.role) == ["system", "user"])
+        #expect(body.messages[0].content == ChatPrompt.withoutTools)
     }
 
     @Test func sendsToolResultsAfterTheirCallAndMentionsReverts() throws {

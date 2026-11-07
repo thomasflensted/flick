@@ -26,8 +26,8 @@ public enum OpenRouter {
     }
 
     static func modelMessages(_ messages: [ChatMessage], withTools: Bool) -> [ModelMessage] {
-        let system = withTools ? [ModelMessage.system(ChatPrompt.settings)] : []
-        return system + messages.flatMap(\.modelMessages)
+        let system = ModelMessage.system(withTools ? ChatPrompt.settings : ChatPrompt.withoutTools)
+        return [system] + messages.flatMap(\.modelMessages)
     }
 
     static func modalities(for model: AIModel) -> [String]? {
