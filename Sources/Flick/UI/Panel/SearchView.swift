@@ -74,7 +74,6 @@ struct SearchView: View {
             if model.mode.isConversation {
                 KeyHint(key: "↵", label: "Send")
                 KeyHint(key: "⌘N", label: "New chat")
-                if model.mode == .agent { UndoHint(agent: model.agent) }
             } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
                 KeyHint(key: "⌘↵", label: "Copy")
@@ -111,14 +110,6 @@ struct ModeChip: View {
             .font(.system(size: 13, weight: .semibold))
             .padding(.horizontal, 8).padding(.vertical, 3)
             .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(0.2)))
-    }
-}
-
-private struct UndoHint: View {
-    @ObservedObject var agent: AgentSession
-
-    var body: some View {
-        if agent.canUndo { KeyHint(key: "⌘Z", label: "Undo changes") }
     }
 }
 

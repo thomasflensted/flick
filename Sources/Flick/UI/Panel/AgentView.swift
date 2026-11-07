@@ -13,6 +13,7 @@ struct AgentView: View {
                     ForEach(agent.entries) { entry in
                         row(entry.kind)
                     }
+                    if agent.canUndo { undoButton }
                     if agent.isWorking { MessageBubble(message: ChatMessage(id: 0, role: .assistant, content: ""), thinking: true) }
                     if let error = agent.error { ErrorLabel(text: error) }
                     Color.clear.frame(height: 1).id(Self.bottom)
@@ -20,6 +21,7 @@ struct AgentView: View {
                 .padding(16)
             }
             .onChange(of: agent.entries.count) { _, _ in proxy.scrollTo(Self.bottom, anchor: .bottom) }
+            .onChange(of: agent.canUndo) { _, _ in proxy.scrollTo(Self.bottom, anchor: .bottom) }
         }
         .onAppear { settings.loadModels() }
     }
@@ -33,6 +35,14 @@ struct AgentView: View {
         case .change(let change): ChangeRow(change: change)
         case .note(let text): Text(text).font(.system(size: 12)).foregroundStyle(.secondary)
         }
+    }
+
+    private var undoButton: some View {
+        Button(action: agent.undo) {
+            Label("Undo these changes  ⌘Z", systemImage: "arrow.uturn.backward")
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
     }
 
     private var emptyState: some View {
