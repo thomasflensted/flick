@@ -24,6 +24,7 @@ final class SearchModel: ObservableObject {
     private let suggester = Suggester()
     private var apps = AppIndex.scan()
     private var servers: [LiveServer] = []
+    private var drives: [Drive] = []
 
     init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
          rates: CurrencyRatesStore, translator: Translator) {
@@ -77,6 +78,7 @@ final class SearchModel: ObservableObject {
         if mode == .translate { translator.translate("") }
         if mode == .chat { chat.clearIfIdle(now: Date()) }
         if mode == .servers { rescanServers() }
+        if mode == .drives { drives = MountedDrives.scan() }
         if mode == .models { chat.settings.loadModels() }
         refresh()
         requestFocus(.query)
@@ -285,6 +287,8 @@ final class SearchModel: ObservableObject {
                                            languages: translator.languages, locale: .current)
         case .servers:
             return LiveServers.results(for: query, in: servers)
+        case .drives:
+            return Drives.results(for: query, in: drives)
         case .chat:
             return []
         case .models:

@@ -38,6 +38,7 @@ extension Mode {
         case .models: return .purple
         case .translate: return .cyan
         case .servers: return .green
+        case .drives: return .gray
         }
     }
 }

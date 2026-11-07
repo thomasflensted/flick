@@ -25,6 +25,7 @@ public enum ResultKind: Equatable {
     case translation(Translation)
     case server(LiveServer)
     case model(AIModel)
+    case drive(Drive)
     case hint(String)
     case message(String)
 
@@ -128,6 +129,12 @@ public struct ResultItem: Identifiable, Equatable {
         let details = [isCurrent ? "Current" : nil, model.id, model.priceText].compactMap { $0 }.joined(separator: " · ")
         return ResultItem(id: "model:\(model.id)", kind: .model(model), title: model.name, subtitle: details)
     }
+
+    public static func drive(_ drive: Drive) -> ResultItem {
+        ResultItem(id: driveID(drive), kind: .drive(drive), title: drive.name, subtitle: drive.details)
+    }
+
+    public static func driveID(_ drive: Drive) -> String { "drive:\(drive.url.path)" }
 
     public static func hint(_ text: String) -> ResultItem {
         ResultItem(id: "hint", kind: .hint(text), title: text, subtitle: "")

@@ -7,6 +7,7 @@ public enum Mode: Hashable, CaseIterable {
     case models
     case translate
     case servers
+    case drives
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
@@ -20,6 +21,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return nil
         case .translate: return nil
         case .servers: return nil
+        case .drives: return nil
         }
     }
 
@@ -33,6 +35,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "models"
         case .translate: return "translate"
         case .servers: return "servers"
+        case .drives: return "drives"
         }
     }
 
@@ -46,6 +49,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "Model"
         case .translate: return "Translate"
         case .servers: return "Servers"
+        case .drives: return "Drives"
         }
     }
 
@@ -59,6 +63,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "Search models…"
         case .translate: return "Type text to translate…"
         case .servers: return "Search live servers…"
+        case .drives: return "Search drives…"
         }
     }
 
@@ -72,6 +77,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "Switch AI Model"
         case .translate: return "Translate"
         case .servers: return "Live Servers"
+        case .drives: return "Eject Drive"
         }
     }
 
@@ -85,6 +91,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "Pick the model AI Chat uses"
         case .translate: return "Translate text with Google Translate"
         case .servers: return "Open a local server in the browser"
+        case .drives: return "Safely eject an external drive or disk image"
         }
     }
 
@@ -92,7 +99,15 @@ public enum Mode: Hashable, CaseIterable {
         switch self {
         case .clipboard: return "Delete"
         case .servers: return "Stop"
-        case .root, .emoji, .snippets, .chat, .models, .translate: return nil
+        case .root, .emoji, .snippets, .chat, .models, .translate, .drives: return nil
+        }
+    }
+
+    public var enterLabel: String? {
+        switch self {
+        case .models: return "Use model"
+        case .drives: return "Eject"
+        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers: return nil
         }
     }
 
@@ -110,6 +125,7 @@ public enum Mode: Hashable, CaseIterable {
         case .models: return "cpu"
         case .translate: return "character.bubble"
         case .servers: return "server.rack"
+        case .drives: return "eject.fill"
         }
     }
 }
