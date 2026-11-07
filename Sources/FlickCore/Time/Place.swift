@@ -13,11 +13,15 @@ public struct Place: Equatable {
         return all.first { $0.name.lowercased() == key }
     }
 
-    public static let all: [Place] = cities + abbreviations
+    public static let all: [Place] = cities + aliases + abbreviations
 
     static let cities: [Place] = TimeZone.knownTimeZoneIdentifiers.compactMap { identifier in
         TimeZone(identifier: identifier).map { Place(name: cityName(identifier), timeZone: $0) }
     }
+
+    static let aliases: [Place] = PlaceAliases.cities.merging(PlaceAliases.countries) { city, _ in city }
+        .sorted { $0.key < $1.key }
+        .compactMap { name, identifier in TimeZone(identifier: identifier).map { Place(name: name, timeZone: $0) } }
 
     static let abbreviations: [Place] = TimeZone.abbreviationDictionary.sorted { $0.key < $1.key }.compactMap { abbreviation, identifier in
         TimeZone(identifier: identifier).map { Place(name: abbreviation, timeZone: $0) }

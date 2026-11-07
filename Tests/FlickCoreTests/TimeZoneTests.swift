@@ -19,6 +19,17 @@ struct TimeZoneTests {
         #expect(Place.find("apples") == nil)
     }
 
+    @Test func findsCitiesAndCountriesWithoutTheirOwnZone() {
+        #expect(Place.find("mumbai")?.timeZone.identifier == "Asia/Kolkata")
+        #expect(Place.find("san francisco")?.timeZone.identifier == "America/Los_Angeles")
+        #expect(Place.find("japan")?.timeZone.identifier == "Asia/Tokyo")
+    }
+
+    @Test func everyAliasPointsToARealZone() {
+        let names = Array(PlaceAliases.cities.keys) + Array(PlaceAliases.countries.keys)
+        #expect(names.allSatisfy { Place.find($0) != nil })
+    }
+
     @Test func parsesCurrentTimeQueries() {
         #expect(TimeQuery.parse("time in tokyo")?.to?.name == "Tokyo")
         #expect(TimeQuery.parse("new york time")?.to?.name == "New York")
