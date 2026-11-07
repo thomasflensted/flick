@@ -52,6 +52,12 @@ struct ChatView: View {
         }
     }
 
+    private var settingsHint: String {
+        settings.model?.supportsTools == true
+            ? "It can also add or change your quicklinks and snippets."
+            : "Switch to a model with tool calling (⌘M) to change your quicklinks and snippets."
+    }
+
     private var emptyState: some View {
         VStack(spacing: 8) {
             Image(systemName: "sparkles").font(.system(size: 28)).foregroundStyle(.purple)
@@ -59,6 +65,7 @@ struct ChatView: View {
                 .font(.system(size: 15, weight: .semibold))
             Text(settings.hasKey ? "Answers come from \(settings.modelName)." : "Press ⌘, and open the AI tab.")
                 .font(.system(size: 12)).foregroundStyle(.secondary)
+            if settings.hasKey { Text(settingsHint).font(.system(size: 12)).foregroundStyle(.secondary) }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 90)
