@@ -147,16 +147,16 @@ struct AppSettingsToolTests {
 
     private struct Current: Decodable {
         let model: String?
-        let translate: TranslatePair
+        let translate: String
         let launchAtLogin: Bool
     }
 
-    @Test func reportsCurrentSettings() throws {
-        var workspace = workspace
+    @Test func reportsCurrentSettingsSpellingOutDetectedSource() throws {
+        var workspace = SettingsWorkspace(quicklinks: [], snippets: [], modelID: gpt.id, translatePair: TranslatePair(target: "en"))
         let output = workspace.perform(call(.getSettings)).output
         let current = try JSONDecoder().decode(Current.self, from: Data(output.utf8))
         #expect(current.model == gpt.id)
-        #expect(current.translate == TranslatePair())
+        #expect(current.translate == "Detected language → English")
         #expect(!current.launchAtLogin)
     }
 }

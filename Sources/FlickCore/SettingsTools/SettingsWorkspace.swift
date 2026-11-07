@@ -96,7 +96,7 @@ public struct SettingsWorkspace: Equatable {
         return SettingsOutcome(output: "Translate now goes \(Self.describe(pair)).", change: change)
     }
 
-    private static func describe(_ pair: TranslatePair) -> String {
+    static func describe(_ pair: TranslatePair) -> String {
         let source = pair.source.map { Language.name(of: $0, in: languageNames) } ?? "Detected language"
         let target = pair.target.map { Language.name(of: $0, in: languageNames) } ?? "your languages"
         return "\(source) → \(target)"
@@ -115,12 +115,12 @@ public struct SettingsWorkspace: Equatable {
 
 private struct CurrentSettings: Encodable {
     let model: String?
-    let translate: TranslatePair
+    let translate: String
     let launchAtLogin: Bool
 
     init(_ workspace: SettingsWorkspace) {
         model = workspace.modelID
-        translate = workspace.translatePair
+        translate = SettingsWorkspace.describe(workspace.translatePair)
         launchAtLogin = workspace.launchAtLogin
     }
 }
