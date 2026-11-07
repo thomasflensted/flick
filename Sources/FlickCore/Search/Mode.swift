@@ -4,6 +4,7 @@ public enum Mode: Hashable, CaseIterable {
     case snippets
     case clipboard
     case chat
+    case models
     case translate
     case servers
 
@@ -16,6 +17,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return nil
         case .clipboard: return nil
         case .chat: return nil
+        case .models: return nil
         case .translate: return nil
         case .servers: return nil
         }
@@ -28,6 +30,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "snippets"
         case .clipboard: return "clipboard"
         case .chat: return "chat"
+        case .models: return "models"
         case .translate: return "translate"
         case .servers: return "servers"
         }
@@ -40,6 +43,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Snippets"
         case .clipboard: return "Clipboard"
         case .chat: return "AI"
+        case .models: return "Model"
         case .translate: return "Translate"
         case .servers: return "Servers"
         }
@@ -52,6 +56,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Search snippets…"
         case .clipboard: return "Search clipboard history…"
         case .chat: return "Ask anything…"
+        case .models: return "Search models…"
         case .translate: return "Type text to translate…"
         case .servers: return "Search live servers…"
         }
@@ -64,6 +69,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Search Snippets"
         case .clipboard: return "Clipboard History"
         case .chat: return "AI Chat"
+        case .models: return "Switch AI Model"
         case .translate: return "Translate"
         case .servers: return "Live Servers"
         }
@@ -76,6 +82,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "Paste saved text"
         case .clipboard: return "Paste something you copied earlier"
         case .chat: return "Chat with AI through OpenRouter"
+        case .models: return "Pick the model AI Chat uses"
         case .translate: return "Translate text with Google Translate"
         case .servers: return "Open a local server in the browser"
         }
@@ -85,8 +92,12 @@ public enum Mode: Hashable, CaseIterable {
         switch self {
         case .clipboard: return "Delete"
         case .servers: return "Stop"
-        case .root, .emoji, .snippets, .chat, .translate: return nil
+        case .root, .emoji, .snippets, .chat, .models, .translate: return nil
         }
+    }
+
+    public var parent: Mode {
+        self == .models ? .chat : .root
     }
 
     public var symbol: String {
@@ -96,6 +107,7 @@ public enum Mode: Hashable, CaseIterable {
         case .snippets: return "text.quote"
         case .clipboard: return "doc.on.clipboard"
         case .chat: return "sparkles"
+        case .models: return "cpu"
         case .translate: return "character.bubble"
         case .servers: return "server.rack"
         }

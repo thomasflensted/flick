@@ -1,7 +1,7 @@
 import Foundation
 
-public struct ChatMessage: Codable, Equatable, Identifiable {
-    public enum Role: String, Codable {
+public struct ChatMessage: Equatable, Identifiable {
+    public enum Role {
         case user, assistant
     }
 
@@ -9,6 +9,8 @@ public struct ChatMessage: Codable, Equatable, Identifiable {
     public let role: Role
     public var content: String
     public var images: [Data] = []
+    public var toolCalls: [ToolCall] = []
+    public var toolResults: [ToolResult] = []
 
     public init(id: Int, role: Role, content: String) {
         self.id = id
@@ -18,10 +20,22 @@ public struct ChatMessage: Codable, Equatable, Identifiable {
 
     static let imagePlaceholder = "[image]"
 
-    public var isEmpty: Bool { content.isEmpty && images.isEmpty }
+    public var isEmpty: Bool { !hasAnswer && !hasChanges }
 
-    var contentForModel: String {
-        content.isEmpty && !images.isEmpty ? Self.imagePlaceholder : content
+    public var hasAnswer: Bool { !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty }
+
+    public var hasChanges: Bool { toolResults.contains { $0.change != nil } }
+
+    var contentForModel: String? {
+        guard content.isEmpty else { return content }
+        if !images.isEmpty { return Self.imagePlaceholder }
+        return toolCalls.isEmpty ? content : nil
+    }
+
+    var modelMessages: [ModelMessage] {
+        let message = ModelMessage(role: role == .user ? .user : .assistant, content: contentForModel,
+                                   toolCalls: toolCalls.isEmpty ? nil : toolCalls)
+        return [message] + toolResults.map(ModelMessage.tool)
     }
 
     public mutating func append(_ part: AnswerPart) {
@@ -29,22 +43,5 @@ public struct ChatMessage: Codable, Equatable, Identifiable {
         case .text(let text): content += text
         case .image(let data): images.append(data)
         }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case role, content
-    }
-
-    public init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        id = 0
-        role = try c.decode(Role.self, forKey: .role)
-        content = try c.decode(String.self, forKey: .content)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(role, forKey: .role)
-        try c.encode(contentForModel, forKey: .content)
     }
 }

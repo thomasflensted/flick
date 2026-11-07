@@ -11,7 +11,9 @@ struct ChatView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     if chat.messages.isEmpty { emptyState }
                     ForEach(chat.messages) { message in
-                        MessageBubble(message: message, thinking: chat.isAnswering && message.id == chat.messages.last?.id)
+                        let thinking = chat.isAnswering && message.id == chat.messages.last?.id
+                        if thinking || message.hasAnswer { MessageBubble(message: message, thinking: thinking) }
+                        changes(in: message)
                     }
                     if let error = chat.error {
                         Label {
@@ -27,6 +29,7 @@ struct ChatView: View {
             }
             .onChange(of: chat.messages.last?.content) { _, _ in scrollToBottom(proxy) }
             .onChange(of: chat.messages.last?.images.count) { _, _ in scrollToBottom(proxy) }
+            .onChange(of: chat.messages.last?.toolResults.count) { _, _ in scrollToBottom(proxy) }
             .onAppear { scrollToBottom(proxy) }
         }
         .onAppear { settings.loadModels() }
@@ -38,12 +41,23 @@ struct ChatView: View {
         proxy.scrollTo(Self.bottom, anchor: .bottom)
     }
 
+    private func changes(in message: ChatMessage) -> some View {
+        ForEach(message.toolResults.indices, id: \.self) { index in
+            let result = message.toolResults[index]
+            if let change = result.change {
+                ChangeRow(change: change, reverted: result.isReverted, canRevert: !chat.isAnswering) {
+                    chat.revert(messageID: message.id, resultIndex: index)
+                }
+            }
+        }
+    }
+
     private var emptyState: some View {
         VStack(spacing: 8) {
             Image(systemName: "sparkles").font(.system(size: 28)).foregroundStyle(.purple)
             Text(settings.hasKey ? "Ask anything" : "Add your OpenRouter key to start")
                 .font(.system(size: 15, weight: .semibold))
-            Text(settings.hasKey ? "Answers come from \(settings.modelName)." : "Press ⌘, and open the AI tab.")
+            Text(settings.hasKey ? "It can also add or change your quicklinks and snippets." : "Press ⌘, and open the AI tab.")
                 .font(.system(size: 12)).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)

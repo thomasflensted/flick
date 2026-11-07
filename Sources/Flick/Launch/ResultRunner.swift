@@ -5,6 +5,7 @@ enum RunOutcome {
     case enter(Mode)
     case askArgument(Quicklink)
     case ask(String)
+    case useModel(AIModel)
     case stay
 }
 
@@ -39,6 +40,7 @@ final class ResultRunner {
         case .conversion(let conversion): return .done(delivered: Paster.deliver(conversion.plainValue(.current), delivery))
         case .translation(let translation): return .done(delivered: Paster.deliver(translation.text, delivery))
         case .server(let server): if let url = server.url { Launcher.open(url) }
+        case .model(let model): return .useModel(model)
         case .hint: return .stay
         case .message: Launcher.revealQuicklinksFile()
         }

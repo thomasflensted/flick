@@ -2,6 +2,7 @@ import Foundation
 
 public enum StreamEvent: Equatable {
     case answer(AnswerPart)
+    case toolCall(ToolCallDelta)
     case failed(String)
     case done
 }
@@ -12,6 +13,12 @@ public enum StreamLine {
             struct Delta: Decodable {
                 let content: String?
                 let images: [Image]?
+                let toolCalls: [ToolCallDelta]?
+
+                private enum CodingKeys: String, CodingKey {
+                    case content, images
+                    case toolCalls = "tool_calls"
+                }
             }
             let delta: Delta?
         }
@@ -56,6 +63,7 @@ public enum StreamLine {
         for image in delta.images ?? [] {
             if let data = imageData(fromDataURL: image.imageURL.url) { events.append(.answer(.image(data))) }
         }
+        events += (delta.toolCalls ?? []).map(StreamEvent.toolCall)
         return events
     }
 

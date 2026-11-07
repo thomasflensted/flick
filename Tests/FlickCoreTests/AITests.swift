@@ -49,6 +49,10 @@ struct ChatMessageTests {
         #expect(message.contentForModel == "[image]")
     }
 
+    @Test func whitespaceBeforeToolCallsIsNotAnAnswer() {
+        #expect(!ChatMessage(id: 0, role: .assistant, content: "\n\n").hasAnswer)
+    }
+
     @Test func textAnswersAreSentAsIs() {
         #expect(ChatMessage(id: 0, role: .assistant, content: "Hi").contentForModel == "Hi")
     }
@@ -162,5 +166,20 @@ struct ChatExpiryTests {
 
     @Test func emptyChatNeverExpires() {
         #expect(!ChatExpiry.isExpired(lastActivity: nil, now: start))
+    }
+}
+
+struct ModelSwitcherTests {
+    private let sonnet = AIModel(id: "anthropic/claude-sonnet-5", name: "Claude Sonnet 5", created: 0, outputPricePerMillion: 15)
+    private let gpt = AIModel(id: "openai/gpt-x", name: "GPT X", created: 0)
+
+    @Test func marksTheCurrentModel() {
+        let results = ModelCatalog.results(for: "", popular: [sonnet, gpt], all: [sonnet, gpt], currentID: sonnet.id)
+        #expect(results.map(\.subtitle) == ["Current · anthropic/claude-sonnet-5 · $15.00 / 1M", "openai/gpt-x"])
+    }
+
+    @Test func leavingTheSwitcherReturnsToChat() {
+        #expect(Mode.models.parent == .chat)
+        #expect(Mode.chat.parent == .root)
     }
 }
