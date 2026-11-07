@@ -112,6 +112,46 @@ kbd {
   border-radius: 4px;
 }
 
+.install {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 120px 0 48px;
+}
+
+.install h2 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: -0.03em;
+}
+
+.install h3 {
+  margin-top: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.install p {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.button {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.button:hover {
+  opacity: 0.85;
+}
+
 footer {
   padding: 48px 0 64px;
   text-align: center;
@@ -144,6 +184,10 @@ footer a:hover {
 
   .features {
     grid-template-columns: 1fr;
+  }
+
+  .install {
+    padding-top: 80px;
   }
 
   article {
