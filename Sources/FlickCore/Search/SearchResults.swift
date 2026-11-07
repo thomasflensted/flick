@@ -14,6 +14,7 @@ public struct SearchResults {
     static let recentsLimit = 8
     static let resultLimit = 30
     static let quicklinkBonus = 50
+    static let modeBonus = 50
     static let keywordScore = 1100
     static let argumentScore = 5000
     static let keepAwakeTriggers = ["keep awake", "awake", "caffeinate"]
@@ -109,7 +110,7 @@ public struct SearchResults {
 
     private func modeMatches(_ query: String) -> [Scored] {
         Mode.openable.compactMap { mode in
-            bestScore(query, [mode.commandTitle] + mode.aliases).map { ($0 + boost(UsageKey.mode(mode)), .mode(mode)) }
+            bestScore(query, [mode.commandTitle] + mode.aliases).map { ($0 + Self.modeBonus + boost(UsageKey.mode(mode)), .mode(mode)) }
         }
     }
 

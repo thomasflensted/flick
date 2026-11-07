@@ -26,6 +26,13 @@ struct SearchResultsTests {
         #expect(results.first?.title == "Slack status")
     }
 
+    @Test func modesBeatAppsOnEqualMatch() {
+        let weatherApp = AppEntry(name: "Weather", path: "/System/Applications/Weather.app")
+        let results = SearchResults(links: [], apps: [weatherApp], usage: [:])
+        #expect(results.results(for: "weather").first?.kind == .mode(.weather))
+        #expect(results.results(for: "weath").first?.kind == .mode(.weather))
+    }
+
     @Test func usageLiftsResults() {
         let results = search("s", usage: [UsageKey.app(safari): 20])
         #expect(results.first?.kind == .app(safari))
