@@ -22,7 +22,9 @@ public struct ChatMessage: Equatable, Identifiable {
 
     public var isEmpty: Bool { !hasAnswer && !hasChanges }
 
-    public var hasAnswer: Bool { !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty }
+    public var hasAnswer: Bool { !displayText.isEmpty || !images.isEmpty }
+
+    public var displayText: String { content.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     public var hasChanges: Bool { toolResults.contains { $0.change != nil } }
 

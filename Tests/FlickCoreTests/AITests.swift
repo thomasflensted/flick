@@ -53,6 +53,10 @@ struct ChatMessageTests {
         #expect(!ChatMessage(id: 0, role: .assistant, content: "\n\n").hasAnswer)
     }
 
+    @Test func showsAnswersWithoutSurroundingBlankLines() {
+        #expect(ChatMessage(id: 0, role: .assistant, content: "I'll look it up.\n\n").displayText == "I'll look it up.")
+    }
+
     @Test func textAnswersAreSentAsIs() {
         #expect(ChatMessage(id: 0, role: .assistant, content: "Hi").contentForModel == "Hi")
     }

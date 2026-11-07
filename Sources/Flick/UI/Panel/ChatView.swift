@@ -89,7 +89,7 @@ private struct MessageBubble: View {
             .font(.system(size: 13))
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                if !message.content.isEmpty { Text(Markdown.render(message.content)).font(.system(size: 13)) }
+                if !message.displayText.isEmpty { Text(Markdown.render(message.displayText)).font(.system(size: 13)) }
                 ForEach(message.images.indices, id: \.self) { GeneratedImage(data: message.images[$0]) }
             }
         }
