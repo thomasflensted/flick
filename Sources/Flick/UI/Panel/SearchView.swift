@@ -67,7 +67,7 @@ struct SearchView: View {
             }
             if model.mode == .chat {
                 Button { model.enter(.models) } label: {
-                    Text(model.chat.settings.modelName).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+                    ModelName(settings: model.chat.settings)
                 }
                 .buttonStyle(.plain)
                 .help("Switch model (⌘M)")
@@ -115,6 +115,14 @@ struct ModeChip: View {
             .font(.system(size: 13, weight: .semibold))
             .padding(.horizontal, 8).padding(.vertical, 3)
             .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(0.2)))
+    }
+}
+
+private struct ModelName: View {
+    @ObservedObject var settings: AISettings
+
+    var body: some View {
+        Text(settings.modelName).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
     }
 }
 
