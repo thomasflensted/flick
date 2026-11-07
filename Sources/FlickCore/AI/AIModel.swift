@@ -6,13 +6,16 @@ public struct AIModel: Decodable, Hashable, Identifiable {
     public let created: Int
     public let outputPricePerMillion: Double?
     public let outputsImages: Bool
+    public let supportsTools: Bool
 
-    public init(id: String, name: String, created: Int, outputPricePerMillion: Double? = nil, outputsImages: Bool = false) {
+    public init(id: String, name: String, created: Int, outputPricePerMillion: Double? = nil, outputsImages: Bool = false,
+                supportsTools: Bool = false) {
         self.id = id
         self.name = name
         self.created = created
         self.outputPricePerMillion = outputPricePerMillion
         self.outputsImages = outputsImages
+        self.supportsTools = supportsTools
     }
 
     private struct Pricing: Decodable {
@@ -29,6 +32,7 @@ public struct AIModel: Decodable, Hashable, Identifiable {
 
     private enum CodingKeys: String, CodingKey {
         case id, name, created, pricing, architecture
+        case supportedParameters = "supported_parameters"
     }
 
     public init(from decoder: Decoder) throws {
@@ -40,6 +44,7 @@ public struct AIModel: Decodable, Hashable, Identifiable {
         outputPricePerMillion = perToken.map { $0 * 1_000_000 }
         let outputs = try c.decodeIfPresent(Architecture.self, forKey: .architecture)?.outputModalities ?? []
         outputsImages = outputs.contains("image")
+        supportsTools = try c.decodeIfPresent([String].self, forKey: .supportedParameters)?.contains("tools") ?? false
     }
 
     public var isVariant: Bool { id.contains(":") }
@@ -79,6 +84,10 @@ public enum ModelCatalog {
         if !query.trimmingCharacters(in: .whitespaces).isEmpty { return search(query, in: all) }
         let missing = all.filter { $0.id == includingID && !popular.contains($0) }
         return missing + popular
+    }
+
+    public static func results(for query: String, popular: [AIModel], all: [AIModel], currentID: String?) -> [ResultItem] {
+        visible(query: query, popular: popular, all: all, includingID: currentID).map { .model($0, isCurrent: $0.id == currentID) }
     }
 
     public static func search(_ query: String, in models: [AIModel]) -> [AIModel] {

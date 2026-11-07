@@ -11,12 +11,19 @@ final class AISettings: ObservableObject {
     @Published private(set) var models: [AIModel] = []
     @Published private(set) var popularModels: [AIModel] = []
     @Published private(set) var modelsError: String?
+    var onModelsLoaded: () -> Void = {}
 
     var key: String? { Keychain.read() }
 
     var model: AIModel? {
         guard let modelID else { return nil }
         return models.first { $0.id == modelID } ?? AIModel(id: modelID, name: modelID, created: 0)
+    }
+
+    var setupProblem: String? {
+        if key == nil { return "Add your OpenRouter key in Settings (⌘,) to start." }
+        if model == nil { return "Pick a model in Settings (⌘,) to start." }
+        return nil
     }
 
     var modelName: String {
@@ -45,6 +52,7 @@ final class AISettings: ObservableObject {
                 popularModels = ModelCatalog.merged(try await Self.fetchPopular())
                 modelsError = nil
                 if modelID == nil { modelID = ModelCatalog.preferredDefault(in: models)?.id }
+                onModelsLoaded()
             } catch {
                 modelsError = "Couldn't load models from OpenRouter: \(error.localizedDescription)"
             }

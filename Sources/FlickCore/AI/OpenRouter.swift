@@ -11,14 +11,23 @@ public enum OpenRouter {
 
     private struct ChatBody: Encodable {
         let model: String
-        let messages: [ChatMessage]
+        let messages: [ModelMessage]
         let stream = true
         let reasoning = Reasoning()
         let modalities: [String]?
+        let tools: [ToolDefinition]?
     }
 
     public static func chatBody(model: AIModel, messages: [ChatMessage]) throws -> Data {
-        try JSONEncoder().encode(ChatBody(model: model.id, messages: messages, modalities: modalities(for: model)))
+        let tools = model.supportsTools ? ToolDefinition.all : nil
+        let body = ChatBody(model: model.id, messages: modelMessages(messages, withTools: tools != nil),
+                            modalities: modalities(for: model), tools: tools)
+        return try JSONEncoder().encode(body)
+    }
+
+    static func modelMessages(_ messages: [ChatMessage], withTools: Bool) -> [ModelMessage] {
+        let system = ModelMessage.system(withTools ? ChatPrompt.settings : ChatPrompt.withoutTools)
+        return [system] + messages.flatMap(\.modelMessages)
     }
 
     static func modalities(for model: AIModel) -> [String]? {

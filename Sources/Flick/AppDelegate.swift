@@ -8,11 +8,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let settings = SettingsWindow()
     private let commands = CommandRunner()
     private let ai = AISettings()
+    private let translator = Translator()
     private lazy var expander = SnippetExpander(store: library.snippets)
     private lazy var clipboardMonitor = ClipboardMonitor(store: library.clipboard)
     private lazy var model = SearchModel(library: library, usage: usage, runner: ResultRunner(commands: commands),
-                                         chat: ChatSession(settings: ai),
-                                         rates: CurrencyRatesStore(), translator: Translator())
+                                         chat: ChatSession(settings: ai, editable: EditableSettings(library: library, ai: ai, translator: translator)),
+                                         rates: CurrencyRatesStore(), translator: translator)
     private lazy var panel = PanelController(model: model, onOpenSettings: { [weak self] in self?.showSettings() })
     private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?

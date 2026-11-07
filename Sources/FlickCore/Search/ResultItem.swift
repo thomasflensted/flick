@@ -24,6 +24,7 @@ public enum ResultKind: Equatable {
     case conversion(Conversion)
     case translation(Translation)
     case server(LiveServer)
+    case model(AIModel)
     case hint(String)
     case message(String)
 
@@ -122,6 +123,11 @@ public struct ResultItem: Identifiable, Equatable {
     }
 
     public static func serverID(_ server: LiveServer) -> String { "server:\(server.pid):\(server.port)" }
+
+    public static func model(_ model: AIModel, isCurrent: Bool) -> ResultItem {
+        let details = [isCurrent ? "Current" : nil, model.id, model.priceText].compactMap { $0 }.joined(separator: " · ")
+        return ResultItem(id: "model:\(model.id)", kind: .model(model), title: model.name, subtitle: details)
+    }
 
     public static func hint(_ text: String) -> ResultItem {
         ResultItem(id: "hint", kind: .hint(text), title: text, subtitle: "")
