@@ -112,7 +112,7 @@ public struct ResultItem: Identifiable, Equatable {
     }
 
     public static func time(_ time: ZoneTime, locale: Locale) -> ResultItem {
-        ResultItem(id: "time", kind: .time(time), title: time.title(locale), subtitle: time.summary(locale))
+        ResultItem(id: "time:\(time.place.name)", kind: .time(time), title: time.title(locale), subtitle: time.summary(locale))
     }
 
     public static func translation(_ translation: Translation, locale: Locale) -> ResultItem {

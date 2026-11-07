@@ -10,16 +10,18 @@ public struct Place: Equatable {
 
     public static func find(_ text: String) -> Place? {
         let key = text.trimmingCharacters(in: .whitespaces).lowercased()
-        if let identifier = cities[key], let zone = TimeZone(identifier: identifier) {
-            return Place(name: cityName(identifier), timeZone: zone)
-        }
-        let abbreviation = key.uppercased()
-        guard let identifier = TimeZone.abbreviationDictionary[abbreviation], let zone = TimeZone(identifier: identifier) else { return nil }
-        return Place(name: abbreviation, timeZone: zone)
+        return all.first { $0.name.lowercased() == key }
     }
 
-    static let cities: [String: String] = Dictionary(
-        TimeZone.knownTimeZoneIdentifiers.map { (cityName($0).lowercased(), $0) }, uniquingKeysWith: { first, _ in first })
+    public static let all: [Place] = cities + abbreviations
+
+    static let cities: [Place] = TimeZone.knownTimeZoneIdentifiers.compactMap { identifier in
+        TimeZone(identifier: identifier).map { Place(name: cityName(identifier), timeZone: $0) }
+    }
+
+    static let abbreviations: [Place] = TimeZone.abbreviationDictionary.sorted { $0.key < $1.key }.compactMap { abbreviation, identifier in
+        TimeZone(identifier: identifier).map { Place(name: abbreviation, timeZone: $0) }
+    }
 
     static func cityName(_ identifier: String) -> String {
         String(identifier.split(separator: "/").last ?? Substring(identifier)).replacingOccurrences(of: "_", with: " ")

@@ -8,6 +8,7 @@ public enum Mode: Hashable, CaseIterable {
     case translate
     case servers
     case drives
+    case timeZones
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
@@ -22,6 +23,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return nil
         case .servers: return nil
         case .drives: return nil
+        case .timeZones: return nil
         }
     }
 
@@ -36,6 +38,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return "translate"
         case .servers: return "servers"
         case .drives: return "drives"
+        case .timeZones: return "timeZones"
         }
     }
 
@@ -50,6 +53,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return "Translate"
         case .servers: return "Servers"
         case .drives: return "Drives"
+        case .timeZones: return "Time"
         }
     }
 
@@ -64,6 +68,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return "Type text to translate…"
         case .servers: return "Search live servers…"
         case .drives: return "Search drives…"
+        case .timeZones: return "Search cities and time zones…"
         }
     }
 
@@ -78,6 +83,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return "Translate"
         case .servers: return "Live Servers"
         case .drives: return "Connected Drives"
+        case .timeZones: return "Time Zones"
         }
     }
 
@@ -92,6 +98,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return "Translate text with Google Translate"
         case .servers: return "Open a local server in the browser"
         case .drives: return "See your drives and eject them"
+        case .timeZones: return "See the time anywhere in the world"
         }
     }
 
@@ -100,18 +107,22 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "Delete"
         case .servers: return "Stop"
         case .drives: return "Eject"
-        case .root, .emoji, .snippets, .chat, .models, .translate: return nil
+        case .root, .emoji, .snippets, .chat, .models, .translate, .timeZones: return nil
         }
     }
 
     public var aliases: [String] {
-        self == .drives ? ["Eject"] : []
+        switch self {
+        case .drives: return ["Eject"]
+        case .timeZones: return ["World Clock"]
+        default: return []
+        }
     }
 
     public var enterLabel: String? {
         switch self {
         case .models: return "Use model"
-        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers, .drives: return nil
+        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers, .drives, .timeZones: return nil
         }
     }
 
@@ -130,6 +141,7 @@ public enum Mode: Hashable, CaseIterable {
         case .translate: return "character.bubble"
         case .servers: return "server.rack"
         case .drives: return "eject.fill"
+        case .timeZones: return "globe"
         }
     }
 }

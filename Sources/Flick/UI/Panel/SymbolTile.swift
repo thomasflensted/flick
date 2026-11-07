@@ -39,6 +39,7 @@ extension Mode {
         case .translate: return .cyan
         case .servers: return .green
         case .drives: return .gray
+        case .timeZones: return .teal
         }
     }
 }

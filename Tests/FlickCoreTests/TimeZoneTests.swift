@@ -59,8 +59,17 @@ struct TimeZoneTests {
         #expect(time.offsetText == "4 h 30 min ahead of Copenhagen")
     }
 
+    @Test func worldClockFindsCitiesByPrefix() {
+        let results = WorldClock.results(for: "tok", now: noonUTC, local: copenhagen, locale: english)
+        #expect(results.first?.title == "21:00 in Tokyo")
+    }
+
+    @Test func worldClockAsksForAPlaceWhenEmpty() {
+        #expect(WorldClock.results(for: " ", now: noonUTC, local: copenhagen, locale: english) == [.hint("Type a city or time zone")])
+    }
+
     @Test func showsTimeInSearch() {
         let results = SearchResults(links: [], apps: [], usage: [:], timeZone: copenhagen, now: noonUTC).results(for: "time in tokyo")
-        #expect(results.first?.id == "time")
+        #expect(results.first?.id == "time:Tokyo")
     }
 }

@@ -22,7 +22,7 @@ struct ResultIcon: View {
         case .snippet: SymbolTile(symbol: Mode.snippets.symbol, color: Mode.snippets.tint)
         case .clip(let entry): clipIcon(entry)
         case .conversion: SymbolTile(symbol: "dollarsign.arrow.circlepath", color: .green)
-        case .time: SymbolTile(symbol: "globe", color: .teal)
+        case .time: SymbolTile(symbol: Mode.timeZones.symbol, color: Mode.timeZones.tint)
         case .translation: SymbolTile(symbol: Mode.translate.symbol, color: Mode.translate.tint)
         case .server: SymbolTile(symbol: Mode.servers.symbol, color: Mode.servers.tint)
         case .drive(let drive): fileIcon(drive.url.path)

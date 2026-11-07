@@ -297,6 +297,8 @@ final class SearchModel: ObservableObject {
             return LiveServers.results(for: query, in: servers)
         case .drives:
             return Drives.results(for: query, in: drives)
+        case .timeZones:
+            return WorldClock.results(for: query, now: Date(), local: .current, locale: .current)
         case .chat:
             return []
         case .models:
