@@ -40,6 +40,7 @@ extension Mode {
         case .servers: return .green
         case .drives: return .gray
         case .timeZones: return .teal
+        case .weather: return .orange
         }
     }
 }

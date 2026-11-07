@@ -8,7 +8,7 @@ extension ResultKind {
         switch self {
         case .command(let command): return command.producesText
         case .emoji, .snippet, .clip, .conversion, .time, .translation: return true
-        case .quicklink, .app, .url, .google, .askAI, .mode, .server, .model, .drive, .hint, .message: return false
+        case .quicklink, .app, .url, .google, .askAI, .mode, .server, .model, .drive, .weather, .hint, .message: return false
         }
     }
 }

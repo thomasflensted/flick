@@ -22,6 +22,7 @@ final class SearchModel: ObservableObject {
     private let rates: CurrencyRatesStore
     let translator: Translator
     private let suggester = Suggester()
+    private let weather = WeatherSearch()
     private var apps = AppIndex.scan()
     private var servers: [LiveServer] = []
     private var drives: [Drive] = []
@@ -37,6 +38,7 @@ final class SearchModel: ObservableObject {
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
         translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
         chat.settings.onModelsLoaded = { [weak self] in if self?.mode == .models { self?.refreshKeepingSelection() } }
+        weather.onUpdate = { [weak self] in if self?.mode == .weather { self?.refreshKeepingSelection() } }
         suggester.onUpdate = { [weak self] in if self?.showsSuggestions == true { self?.refreshKeepingSelection() } }
     }
 
@@ -79,6 +81,7 @@ final class SearchModel: ObservableObject {
         if mode == .chat { chat.clearIfIdle(now: Date()) }
         if mode == .servers { rescanServers() }
         if mode == .drives { drives = MountedDrives.scan() }
+        if mode == .weather { weather.clear() }
         if mode == .models { chat.settings.loadModels() }
         refresh()
         requestFocus(.query)
@@ -256,6 +259,7 @@ final class SearchModel: ObservableObject {
             enterArgument(ql)
         } else {
             if mode == .translate { translator.translate(query) }
+            if mode == .weather { weather.search(query) }
             refresh()
         }
     }
@@ -299,6 +303,8 @@ final class SearchModel: ObservableObject {
             return Drives.results(for: query, in: drives)
         case .timeZones:
             return WorldClock.results(for: query, now: Date(), local: .current, locale: .current)
+        case .weather:
+            return WeatherResults.results(for: query, reports: weather.reports)
         case .chat:
             return []
         case .models:

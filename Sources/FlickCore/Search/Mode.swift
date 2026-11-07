@@ -9,6 +9,7 @@ public enum Mode: Hashable, CaseIterable {
     case servers
     case drives
     case timeZones
+    case weather
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
@@ -24,6 +25,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return nil
         case .drives: return nil
         case .timeZones: return nil
+        case .weather: return nil
         }
     }
 
@@ -39,6 +41,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "servers"
         case .drives: return "drives"
         case .timeZones: return "timeZones"
+        case .weather: return "weather"
         }
     }
 
@@ -54,6 +57,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "Servers"
         case .drives: return "Drives"
         case .timeZones: return "Time"
+        case .weather: return "Weather"
         }
     }
 
@@ -69,6 +73,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "Search live servers…"
         case .drives: return "Search drives…"
         case .timeZones: return "Search cities and time zones…"
+        case .weather: return "Search places…"
         }
     }
 
@@ -84,6 +89,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "Live Servers"
         case .drives: return "Connected Drives"
         case .timeZones: return "Time Zones"
+        case .weather: return "Weather"
         }
     }
 
@@ -99,6 +105,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "Open a local server in the browser"
         case .drives: return "See your drives and eject them"
         case .timeZones: return "See the time anywhere in the world"
+        case .weather: return "See the weather anywhere from yr.no"
         }
     }
 
@@ -107,7 +114,7 @@ public enum Mode: Hashable, CaseIterable {
         case .clipboard: return "Delete"
         case .servers: return "Stop"
         case .drives: return "Eject"
-        case .root, .emoji, .snippets, .chat, .models, .translate, .timeZones: return nil
+        case .root, .emoji, .snippets, .chat, .models, .translate, .timeZones, .weather: return nil
         }
     }
 
@@ -122,7 +129,7 @@ public enum Mode: Hashable, CaseIterable {
     public var enterLabel: String? {
         switch self {
         case .models: return "Use model"
-        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers, .drives, .timeZones: return nil
+        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers, .drives, .timeZones, .weather: return nil
         }
     }
 
@@ -142,6 +149,7 @@ public enum Mode: Hashable, CaseIterable {
         case .servers: return "server.rack"
         case .drives: return "eject.fill"
         case .timeZones: return "globe"
+        case .weather: return "cloud.sun.fill"
         }
     }
 }
