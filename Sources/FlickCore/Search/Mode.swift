@@ -99,7 +99,8 @@ public enum Mode: Hashable, CaseIterable {
         switch self {
         case .clipboard: return "Delete"
         case .servers: return "Stop"
-        case .root, .emoji, .snippets, .chat, .models, .translate, .drives: return nil
+        case .drives: return "Eject"
+        case .root, .emoji, .snippets, .chat, .models, .translate: return nil
         }
     }
 
@@ -110,8 +111,7 @@ public enum Mode: Hashable, CaseIterable {
     public var enterLabel: String? {
         switch self {
         case .models: return "Use model"
-        case .drives: return "Eject"
-        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers: return nil
+        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers, .drives: return nil
         }
     }
 

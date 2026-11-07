@@ -29,8 +29,8 @@ struct DrivesTests {
         #expect(Drives.results(for: "", in: []) == [.hint("No drives to eject")])
     }
 
-    @Test func eachModeNamesItsEnterAction() {
-        #expect(Mode.drives.enterLabel == "Eject")
-        #expect(Mode.servers.enterLabel == nil)
+    @Test func ejectsWithTheRemoveShortcut() {
+        #expect(Mode.drives.removeLabel == "Eject")
+        #expect(Mode.drives.enterLabel == nil)
     }
 }

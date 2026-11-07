@@ -10,10 +10,13 @@ enum MountedDrives {
         return urls.compactMap(drive)
     }
 
-    static func eject(_ drive: Drive) {
+    static func eject(_ drive: Drive, onEjected: @escaping () -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             let ejected = (try? NSWorkspace.shared.unmountAndEjectDevice(at: drive.url)) != nil
-            DispatchQueue.main.async { Toast.shared.show(ejected ? .ejected(drive) : .ejectFailed(drive)) }
+            DispatchQueue.main.async {
+                Toast.shared.show(ejected ? .ejected(drive) : .ejectFailed(drive))
+                if ejected { onEjected() }
+            }
         }
     }
 

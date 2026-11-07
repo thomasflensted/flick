@@ -185,9 +185,17 @@ final class SearchModel: ObservableObject {
         case .server(let server):
             ListeningServers.stop(server)
             servers.removeAll { $0 == server }
+        case .drive(let drive):
+            MountedDrives.eject(drive) { [weak self] in self?.driveEjected(drive) }
+            return
         default: return
         }
         refreshKeepingSelection()
+    }
+
+    private func driveEjected(_ drive: Drive) {
+        drives.removeAll { $0 == drive }
+        if mode == .drives { refreshKeepingSelection() }
     }
 
     func translateAgain() {
