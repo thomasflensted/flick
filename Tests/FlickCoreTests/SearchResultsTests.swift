@@ -93,6 +93,11 @@ struct CommandSearchTests {
         #expect(search("caf 45").first?.kind == .command(.keepAwakeFor(minutes: 45)))
     }
 
+    @Test func findsWindowTiles() {
+        #expect(search("left half").first?.kind == .command(.tile(.leftHalf)))
+        #expect(search("maximize").first?.kind == .command(.tile(.fullScreen)))
+    }
+
     @Test func findsEmojiMode() {
         #expect(search("emoji").first?.kind == .mode(.emoji))
     }

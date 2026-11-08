@@ -17,7 +17,7 @@ extension Command {
     public var producesText: Bool {
         switch self {
         case .loremSentence, .loremParagraph: return true
-        case .keepAwake, .keepAwakeFor, .allowSleep: return false
+        case .keepAwake, .keepAwakeFor, .allowSleep, .tile: return false
         }
     }
 }

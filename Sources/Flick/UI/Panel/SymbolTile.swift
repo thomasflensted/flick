@@ -23,6 +23,7 @@ extension Command {
         case .keepAwake, .keepAwakeFor: return .orange
         case .allowSleep: return .indigo
         case .loremSentence, .loremParagraph: return .teal
+        case .tile: return .blue
         }
     }
 }

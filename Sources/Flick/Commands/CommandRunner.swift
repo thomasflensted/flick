@@ -12,6 +12,7 @@ final class CommandRunner {
         case .allowSleep: keepAwake.stop()
         case .loremSentence: return Paster.deliver(LoremIpsum.sentence(), delivery)
         case .loremParagraph: return Paster.deliver(LoremIpsum.paragraph(), delivery)
+        case .tile(let tile): WindowTiler.tile(tile)
         }
         return nil
     }

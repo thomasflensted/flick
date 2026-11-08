@@ -30,16 +30,12 @@ final class PanelController {
 
     func show(_ mode: Mode = .root) {
         model.prepareForShow(in: mode)
-        panel.setFrameOrigin(origin(on: screenUnderMouse()))
+        panel.setFrameOrigin(origin(on: .underMouse))
         panel.makeKeyAndOrderFront(nil)
     }
 
     func hide() {
         panel.orderOut(nil)
-    }
-
-    private func screenUnderMouse() -> NSScreen? {
-        NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) } ?? NSScreen.main
     }
 
     private func origin(on screen: NSScreen?) -> NSPoint {

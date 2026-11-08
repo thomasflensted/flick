@@ -4,9 +4,10 @@ public enum Command: Hashable {
     case keepAwakeFor(minutes: Int)
     case loremSentence
     case loremParagraph
+    case tile(WindowTile)
 
     public static func available(isKeepingAwake: Bool) -> [Command] {
-        [isKeepingAwake ? .allowSleep : .keepAwake, .loremSentence, .loremParagraph]
+        [isKeepingAwake ? .allowSleep : .keepAwake, .loremSentence, .loremParagraph] + WindowTile.allCases.map(Command.tile)
     }
 
     public var id: String {
@@ -16,6 +17,7 @@ public enum Command: Hashable {
         case .keepAwakeFor: return "keepAwakeFor"
         case .loremSentence: return "loremSentence"
         case .loremParagraph: return "loremParagraph"
+        case .tile(let tile): return "tile.\(tile.id)"
         }
     }
 
@@ -26,6 +28,7 @@ public enum Command: Hashable {
         case .keepAwakeFor(let minutes): return "Keep Awake for \(DurationText.format(minutes: minutes))"
         case .loremSentence: return "Lorem Ipsum: Generate Sentence"
         case .loremParagraph: return "Lorem Ipsum: Generate Paragraph"
+        case .tile(let tile): return tile.title
         }
     }
 
@@ -34,6 +37,7 @@ public enum Command: Hashable {
         case .keepAwake, .keepAwakeFor: return ["Caffeinate"]
         case .allowSleep: return ["Decaffeinate"]
         case .loremSentence, .loremParagraph: return []
+        case .tile(let tile): return tile.aliases
         }
     }
 
@@ -43,6 +47,7 @@ public enum Command: Hashable {
         case .allowSleep: return "Let your Mac sleep again"
         case .keepAwakeFor: return "Stop your Mac from sleeping, then let it sleep"
         case .loremSentence, .loremParagraph: return "Paste placeholder text"
+        case .tile(let tile): return tile.subtitle
         }
     }
 
@@ -52,6 +57,7 @@ public enum Command: Hashable {
         case .allowSleep: return "moon.zzz.fill"
         case .loremSentence: return "text.alignleft"
         case .loremParagraph: return "text.justify.left"
+        case .tile(let tile): return tile.symbol
         }
     }
 }

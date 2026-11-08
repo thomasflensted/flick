@@ -12,13 +12,13 @@ enum Paster {
     @discardableResult
     static func deliver(_ text: String, _ delivery: Delivery) -> Delivery {
         setClipboard(text)
-        guard delivery == .paste, isTrusted() else { return .copy }
+        guard delivery == .paste, Accessibility.isTrusted() else { return .copy }
         DispatchQueue.main.asyncAfter(deadline: .now() + delayForPanelToClose) { press(kVK_ANSI_V, flags: .maskCommand) }
         return .paste
     }
 
     static func replaceTyped(characters count: Int, with text: String) {
-        guard isTrusted() else { return }
+        guard Accessibility.isTrusted() else { return }
         let saved = savedClipboard()
         setClipboard(text, transient: true)
         for _ in 0..<count { press(kVK_Delete) }
@@ -60,14 +60,5 @@ enum Paster {
             event?.setIntegerValueField(.eventSourceUserData, value: syntheticMarker)
             event?.post(tap: .cghidEventTap)
         }
-    }
-
-    // The options dictionary is built with CFDictionaryCreate to avoid a bridging cast.
-    private static func isTrusted() -> Bool {
-        guard let yes = kCFBooleanTrue else { return AXIsProcessTrusted() }
-        var keys: [UnsafeRawPointer?] = [UnsafeRawPointer(Unmanaged.passUnretained(kAXTrustedCheckOptionPrompt.takeUnretainedValue()).toOpaque())]
-        var values: [UnsafeRawPointer?] = [UnsafeRawPointer(Unmanaged.passUnretained(yes).toOpaque())]
-        let options = CFDictionaryCreate(nil, &keys, &values, 1, nil, nil)
-        return AXIsProcessTrustedWithOptions(options)
     }
 }

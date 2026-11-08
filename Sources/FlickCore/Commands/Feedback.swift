@@ -21,7 +21,7 @@ public struct Feedback: Equatable {
         case .keepAwakeFor(let minutes):
             return Feedback(text: "Your Mac will stay awake for \(DurationText.format(minutes: minutes))", symbol: "sun.max.fill")
         case .allowSleep: return .sleepAllowed
-        case .loremSentence, .loremParagraph: return nil
+        case .loremSentence, .loremParagraph, .tile: return nil
         }
     }
 }
