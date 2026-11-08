@@ -13,7 +13,7 @@ final class FaviconCache {
             found = await fetch(candidate)
             if found != nil { break }
         }
-        icons[host] = found
+        if !Task.isCancelled { icons[host] = found }
         return found
     }
 
