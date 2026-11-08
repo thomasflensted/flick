@@ -15,11 +15,15 @@ enum WindowTiler {
         set(kAXSizeAttribute, AXValueCreate(.cgSize, &size), on: window)
     }
 
+    // AXFullScreen has no public constant, and pressing the full screen button reports success but does nothing.
+    private static let fullScreenAttribute = "AXFullScreen" as CFString
+
     static func toggleFullScreen() {
-        guard Accessibility.isTrusted(),
-              let window = focusedWindow(),
-              let button = element(kAXFullScreenButtonAttribute, of: window) else { return }
-        AXUIElementPerformAction(button, kAXPressAction as CFString)
+        guard Accessibility.isTrusted(), let window = focusedWindow() else { return }
+        var value: CFTypeRef?
+        AXUIElementCopyAttributeValue(window, fullScreenAttribute, &value)
+        let isFullScreen = value.map { CFEqual($0, kCFBooleanTrue) } ?? false
+        AXUIElementSetAttributeValue(window, fullScreenAttribute, isFullScreen ? kCFBooleanFalse : kCFBooleanTrue)
     }
 
     private static func focusedWindow() -> AXUIElement? {
