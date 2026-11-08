@@ -30,6 +30,8 @@
 A small native macOS launcher (Raycast replacement): ⌘Space opens a search panel for
 quicklinks, apps and Google search. SwiftPM project; `./build.sh` builds and installs to
 /Applications (`--no-install` to only build into `build/Flick.app`). `swift test` runs the tests.
+The app icon artwork is the square `Icon/flick-icon.jpg`; `Icon/make_icon.sh` rounds it into
+`Icon/Flick.icns` and writes `docs/icon.png`.
 
 Pure logic (templates, URL handling, matching, ranking, Raycast parsing) lives in `Sources/FlickCore`
 and is unit tested in `Tests/FlickCoreTests`. `Sources/Flick` is the AppKit/SwiftUI app.
