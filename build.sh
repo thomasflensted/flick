@@ -31,5 +31,6 @@ if [[ "${1:-}" != "--no-install" ]]; then
   pkill -x Flick 2>/dev/null || true
   rm -rf /Applications/Flick.app
   cp -R "$APP" /Applications/Flick.app
+  open /Applications/Flick.app
   echo "Installed /Applications/Flick.app"
 fi
