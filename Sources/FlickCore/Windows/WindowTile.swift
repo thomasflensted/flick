@@ -1,13 +1,13 @@
 import CoreGraphics
 
 public enum WindowTile: CaseIterable, Hashable {
-    case fullScreen
+    case maximize
     case leftHalf
     case rightHalf
 
     public var id: String {
         switch self {
-        case .fullScreen: return "fullScreen"
+        case .maximize: return "maximize"
         case .leftHalf: return "leftHalf"
         case .rightHalf: return "rightHalf"
         }
@@ -15,7 +15,7 @@ public enum WindowTile: CaseIterable, Hashable {
 
     public var title: String {
         switch self {
-        case .fullScreen: return "Full Screen"
+        case .maximize: return "Maximize"
         case .leftHalf: return "Left Half"
         case .rightHalf: return "Right Half"
         }
@@ -23,7 +23,7 @@ public enum WindowTile: CaseIterable, Hashable {
 
     public var aliases: [String] {
         switch self {
-        case .fullScreen: return ["Maximize Window", "Window Full Screen"]
+        case .maximize: return ["Maximize Window", "Fill Screen"]
         case .leftHalf: return ["Window Left Half"]
         case .rightHalf: return ["Window Right Half"]
         }
@@ -31,7 +31,7 @@ public enum WindowTile: CaseIterable, Hashable {
 
     public var subtitle: String {
         switch self {
-        case .fullScreen: return "Make the front window fill the screen"
+        case .maximize: return "Make the front window fill the screen"
         case .leftHalf: return "Move the front window to the left half"
         case .rightHalf: return "Move the front window to the right half"
         }
@@ -39,7 +39,7 @@ public enum WindowTile: CaseIterable, Hashable {
 
     public var symbol: String {
         switch self {
-        case .fullScreen: return "rectangle.inset.filled"
+        case .maximize: return "rectangle.inset.filled"
         case .leftHalf: return "rectangle.lefthalf.filled"
         case .rightHalf: return "rectangle.righthalf.filled"
         }
@@ -48,7 +48,7 @@ public enum WindowTile: CaseIterable, Hashable {
     public func frame(in screen: CGRect) -> CGRect {
         let half = CGSize(width: screen.width / 2, height: screen.height)
         switch self {
-        case .fullScreen: return screen
+        case .maximize: return screen
         case .leftHalf: return CGRect(origin: screen.origin, size: half)
         case .rightHalf: return CGRect(origin: CGPoint(x: screen.midX, y: screen.minY), size: half)
         }

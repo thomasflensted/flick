@@ -15,12 +15,22 @@ enum WindowTiler {
         set(kAXSizeAttribute, AXValueCreate(.cgSize, &size), on: window)
     }
 
-    // The Accessibility API hands back an untyped CFTypeRef, so the window has to be cast after checking its type.
+    static func toggleFullScreen() {
+        guard Accessibility.isTrusted(),
+              let window = focusedWindow(),
+              let button = element(kAXFullScreenButtonAttribute, of: window) else { return }
+        AXUIElementPerformAction(button, kAXPressAction as CFString)
+    }
+
     private static func focusedWindow() -> AXUIElement? {
         guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
+        return element(kAXFocusedWindowAttribute, of: AXUIElementCreateApplication(app.processIdentifier))
+    }
+
+    // The Accessibility API hands back an untyped CFTypeRef, so the element has to be cast after checking its type.
+    private static func element(_ attribute: String, of parent: AXUIElement) -> AXUIElement? {
         var value: CFTypeRef?
-        let element = AXUIElementCreateApplication(app.processIdentifier)
-        guard AXUIElementCopyAttributeValue(element, kAXFocusedWindowAttribute as CFString, &value) == .success,
+        guard AXUIElementCopyAttributeValue(parent, attribute as CFString, &value) == .success,
               let value, CFGetTypeID(value) == AXUIElementGetTypeID() else { return nil }
         return (value as! AXUIElement)
     }

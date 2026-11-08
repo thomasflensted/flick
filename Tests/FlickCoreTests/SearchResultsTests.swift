@@ -95,7 +95,8 @@ struct CommandSearchTests {
 
     @Test func findsWindowTiles() {
         #expect(search("left half").first?.kind == .command(.tile(.leftHalf)))
-        #expect(search("maximize").first?.kind == .command(.tile(.fullScreen)))
+        #expect(search("maximize").first?.kind == .command(.tile(.maximize)))
+        #expect(search("full screen").first?.kind == .command(.toggleFullScreen))
     }
 
     @Test func findsEmojiMode() {

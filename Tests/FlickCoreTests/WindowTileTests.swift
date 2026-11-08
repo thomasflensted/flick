@@ -5,8 +5,8 @@ import Testing
 struct WindowTileTests {
     let screen = CGRect(x: 100, y: 0, width: 1600, height: 1000)
 
-    @Test func fullScreenFillsTheScreen() {
-        #expect(WindowTile.fullScreen.frame(in: screen) == screen)
+    @Test func maximizeFillsTheScreen() {
+        #expect(WindowTile.maximize.frame(in: screen) == screen)
     }
 
     @Test func halvesSplitTheScreenDownTheMiddle() {

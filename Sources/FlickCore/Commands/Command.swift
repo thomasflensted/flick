@@ -5,9 +5,10 @@ public enum Command: Hashable {
     case loremSentence
     case loremParagraph
     case tile(WindowTile)
+    case toggleFullScreen
 
     public static func available(isKeepingAwake: Bool) -> [Command] {
-        [isKeepingAwake ? .allowSleep : .keepAwake, .loremSentence, .loremParagraph] + WindowTile.allCases.map(Command.tile)
+        [isKeepingAwake ? .allowSleep : .keepAwake, .loremSentence, .loremParagraph] + WindowTile.allCases.map(Command.tile) + [.toggleFullScreen]
     }
 
     public var id: String {
@@ -18,6 +19,7 @@ public enum Command: Hashable {
         case .loremSentence: return "loremSentence"
         case .loremParagraph: return "loremParagraph"
         case .tile(let tile): return "tile.\(tile.id)"
+        case .toggleFullScreen: return "toggleFullScreen"
         }
     }
 
@@ -29,6 +31,7 @@ public enum Command: Hashable {
         case .loremSentence: return "Lorem Ipsum: Generate Sentence"
         case .loremParagraph: return "Lorem Ipsum: Generate Paragraph"
         case .tile(let tile): return tile.title
+        case .toggleFullScreen: return "Toggle Full Screen"
         }
     }
 
@@ -38,6 +41,7 @@ public enum Command: Hashable {
         case .allowSleep: return ["Decaffeinate"]
         case .loremSentence, .loremParagraph: return []
         case .tile(let tile): return tile.aliases
+        case .toggleFullScreen: return ["Full Screen", "Enter Full Screen", "Exit Full Screen"]
         }
     }
 
@@ -48,6 +52,7 @@ public enum Command: Hashable {
         case .keepAwakeFor: return "Stop your Mac from sleeping, then let it sleep"
         case .loremSentence, .loremParagraph: return "Paste placeholder text"
         case .tile(let tile): return tile.subtitle
+        case .toggleFullScreen: return "Enter or leave full screen for the front window"
         }
     }
 
@@ -58,6 +63,7 @@ public enum Command: Hashable {
         case .loremSentence: return "text.alignleft"
         case .loremParagraph: return "text.justify.left"
         case .tile(let tile): return tile.symbol
+        case .toggleFullScreen: return "arrow.up.left.and.arrow.down.right"
         }
     }
 }
