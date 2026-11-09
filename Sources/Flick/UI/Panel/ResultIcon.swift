@@ -31,7 +31,7 @@ struct ResultIcon: View {
         case .pullRequest(let pullRequest): SymbolTile(symbol: Mode.pullRequests.symbol, color: pullRequest.isDraft ? .gray : Mode.pullRequests.tint)
         case .model: SymbolTile(symbol: Mode.models.symbol, color: Mode.models.tint)
         case .hint: symbol("info.circle", padding: 3)
-        case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
+        case .quicklinksError: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
         }
     }
 

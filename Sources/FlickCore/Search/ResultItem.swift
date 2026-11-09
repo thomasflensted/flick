@@ -30,7 +30,7 @@ public enum ResultKind: Equatable {
     case drive(Drive)
     case pullRequest(PullRequest)
     case hint(String)
-    case message(String)
+    case quicklinksError(String)
 
     public var usageKey: String? {
         switch self {
@@ -158,8 +158,8 @@ public struct ResultItem: Identifiable, Equatable {
         ResultItem(id: "hint", kind: .hint(text), title: text, subtitle: "")
     }
 
-    public static func message(_ text: String) -> ResultItem {
-        ResultItem(id: "message", kind: .message(text), title: "Quicklinks file has an error", subtitle: text)
+    public static func quicklinksError(_ text: String) -> ResultItem {
+        ResultItem(id: "quicklinksError", kind: .quicklinksError(text), title: "Quicklinks file has an error", subtitle: text)
     }
 
     private static func subtitle(for ql: Quicklink, argument: String?) -> String {

@@ -42,7 +42,7 @@ final class ResultRunner {
         case .pullRequest(let pullRequest): Launcher.open(pullRequest.url)
         case .model(let model): return .useModel(model)
         case .hint: return .stay
-        case .message: Launcher.revealQuicklinksFile()
+        case .quicklinksError: Launcher.revealQuicklinksFile()
         }
         return .done(delivered: nil)
     }

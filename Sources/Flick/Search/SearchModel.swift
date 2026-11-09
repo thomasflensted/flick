@@ -294,7 +294,7 @@ final class SearchModel: ObservableObject {
         if let suggester, let argumentTarget {
             return Suggestions.results(suggester.suggestions, for: argumentTarget)
         }
-        let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
+        let error = library.quicklinks.loadError.map { [ResultItem.quicklinksError($0)] } ?? []
         return error + searchResults.results(for: query)
     }
 

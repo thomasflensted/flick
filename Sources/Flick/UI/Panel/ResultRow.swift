@@ -58,7 +58,7 @@ struct ResultRow: View {
         case .pullRequest: return "GitHub"
         case .model: return ""
         case .hint: return ""
-        case .message: return ""
+        case .quicklinksError: return ""
         }
     }
 }
