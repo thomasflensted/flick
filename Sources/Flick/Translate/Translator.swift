@@ -6,9 +6,8 @@ final class Translator: ObservableObject {
     @Published var pair: TranslatePair { didSet { savePair() } }
     var onUpdate: () -> Void = {}
     let languages = TranslateLanguages(preferred: Locale.preferredLanguages)
-    private var task: Task<Void, Never>?
+    private let debouncer = Debouncer(delay: .milliseconds(300))
 
-    private static let debounce = Duration.milliseconds(300)
     private static let pairKey = "translatePair"
 
     init() {
@@ -26,14 +25,13 @@ final class Translator: ObservableObject {
     }
 
     func translate(_ query: String) {
-        task?.cancel()
+        debouncer.cancel()
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { update(.idle); return }
         if translation == nil { update(.loading) }
         let pair = pair
-        task = Task { @MainActor in
-            try? await Task.sleep(for: Self.debounce)
-            if Task.isCancelled { return }
+        debouncer.run { [weak self] in
+            guard let self else { return }
             let result: TranslationState
             do {
                 result = .done(try await translation(of: text, pair: pair))
