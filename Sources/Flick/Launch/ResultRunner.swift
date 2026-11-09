@@ -25,6 +25,7 @@ final class ResultRunner {
     }
 
     private func perform(_ kind: ResultKind, delivery: Delivery) -> RunOutcome {
+        if let text = kind.text(locale: .current) { return .done(delivered: Paster.deliver(text, delivery)) }
         switch kind {
         case .quicklink(let ql, nil) where ql.takesArgument: return .askArgument(ql)
         case .quicklink(let ql, let argument): Launcher.open(ql, argument: argument ?? "")
@@ -32,15 +33,10 @@ final class ResultRunner {
         case .url(let url): Launcher.open(url)
         case .google(let query): Launcher.open(URLText.googleSearch(query))
         case .askAI(let question): return .ask(question)
-        case .command(let command): return .done(delivered: commands.run(command, delivery: delivery))
+        case .command(let command): commands.run(command)
         case .mode(let mode): return .enter(mode)
-        case .emoji(let emoji): return .done(delivered: Paster.deliver(emoji.character, delivery))
-        case .snippet(let snippet): return .done(delivered: Paster.deliver(snippet.expanded(), delivery))
-        case .clip(let entry): return .done(delivered: Paster.deliver(entry.text, delivery))
-        case .conversion(let conversion): return .done(delivered: Paster.deliver(conversion.plainValue(.current), delivery))
-        case .time(let time): return .done(delivered: Paster.deliver(time.time(.current), delivery))
+        case .emoji, .snippet, .clip, .conversion, .time, .translation: break
         case .weather(let report): Launcher.open(YrAPI.pageURL(report.place))
-        case .translation(let translation): return .done(delivered: Paster.deliver(translation.text, delivery))
         case .server(let server): if let url = server.url { Launcher.open(url) }
         case .drive(let drive): Launcher.open(drive.url)
         case .pullRequest(let pullRequest): Launcher.open(pullRequest.url)
