@@ -76,11 +76,7 @@ struct SearchView: View {
                 .help("Switch model (⌘M)")
             }
             Spacer()
-            if model.mode == .chat {
-                KeyHint(key: "↵", label: "Send")
-                KeyHint(key: "⌘N", label: "New chat")
-                KeyHint(key: "⌘M", label: "Model")
-            } else if let label = model.mode.enterLabel {
+            if let label = model.mode.enterLabel {
                 KeyHint(key: "↵", label: label)
             } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
@@ -88,8 +84,8 @@ struct SearchView: View {
             } else {
                 KeyHint(key: "↵", label: "Open")
             }
-            if model.mode == .translate {
-                KeyHint(key: "⌘S", label: "Swap")
+            ForEach(model.mode.shortcuts, id: \.key) { shortcut in
+                KeyHint(key: shortcut.hint, label: shortcut.label)
             }
             if let label = model.mode.removeLabel {
                 KeyHint(key: "⌘⌫", label: label)

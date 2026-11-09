@@ -44,6 +44,10 @@ final class PanelController {
     }
 
     private func handle(_ event: NSEvent) -> Bool {
+        if event.modifierFlags.contains(.command), let shortcut = model.mode.shortcut(forKey: event.charactersIgnoringModifiers ?? "") {
+            model.perform(shortcut.action)
+            return true
+        }
         switch Int(event.keyCode) {
         case kVK_DownArrow: model.move(.down)
         case kVK_UpArrow: model.move(.up)
@@ -55,9 +59,6 @@ final class PanelController {
         case kVK_Escape: if !model.escape() { hide() }
         case kVK_Delete where event.modifierFlags.contains(.command) && model.mode.removeLabel != nil: model.removeSelected()
         case kVK_Delete: return model.deleteBackwardWhenEmpty()
-        case kVK_ANSI_S where event.modifierFlags.contains(.command) && model.mode == .translate: model.swapTranslateLanguages()
-        case kVK_ANSI_N where event.modifierFlags.contains(.command) && model.mode == .chat: model.newChat()
-        case kVK_ANSI_M where event.modifierFlags.contains(.command) && model.mode == .chat: model.enter(.models)
         case kVK_ANSI_Comma where event.modifierFlags.contains(.command):
             hide()
             onOpenSettings()

@@ -31,3 +31,10 @@ struct SelectionTests {
         #expect(Selection.next(from: 0, .down, count: 0, columns: 9) == 0)
     }
 }
+
+struct ModeShortcutTests {
+    @Test func findsShortcutsOfTheCurrentModeOnly() {
+        #expect(Mode.translate.shortcut(forKey: "S")?.action == .swapLanguages)
+        #expect(Mode.chat.shortcut(forKey: "s") == nil)
+    }
+}

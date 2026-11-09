@@ -19,6 +19,10 @@ public enum Mode: String, Hashable, CaseIterable {
 
     public var parent: Mode { self == .models ? .chat : .root }
 
+    public func shortcut(forKey key: String) -> ModeShortcut? {
+        info.shortcuts.first { $0.key == key.lowercased() }
+    }
+
     public subscript<T>(dynamicMember keyPath: KeyPath<ModeInfo, T>) -> T {
         info[keyPath: keyPath]
     }
@@ -39,13 +43,16 @@ public enum Mode: String, Hashable, CaseIterable {
                             commandSubtitle: "Paste something you copied earlier", symbol: "doc.on.clipboard", removeLabel: "Delete")
         case .chat:
             return ModeInfo(chip: "AI", placeholder: "Ask anything…", commandTitle: "AI Chat",
-                            commandSubtitle: "Chat with AI through OpenRouter", symbol: "sparkles")
+                            commandSubtitle: "Chat with AI through OpenRouter", symbol: "sparkles", enterLabel: "Send",
+                            shortcuts: [ModeShortcut(key: "n", label: "New chat", action: .newChat),
+                                        ModeShortcut(key: "m", label: "Model", action: .switchModel)])
         case .models:
             return ModeInfo(chip: "Model", placeholder: "Search models…", commandTitle: "Switch AI Model",
                             commandSubtitle: "Pick the model AI Chat uses", symbol: "cpu", enterLabel: "Use model")
         case .translate:
             return ModeInfo(chip: "Translate", placeholder: "Type text to translate…", commandTitle: "Translate",
-                            commandSubtitle: "Translate text with Google Translate", symbol: "character.bubble")
+                            commandSubtitle: "Translate text with Google Translate", symbol: "character.bubble",
+                            shortcuts: [ModeShortcut(key: "s", label: "Swap", action: .swapLanguages)])
         case .servers:
             return ModeInfo(chip: "Servers", placeholder: "Search live servers…", commandTitle: "Live Servers",
                             commandSubtitle: "Open a local server in the browser", symbol: "server.rack", removeLabel: "Stop")
@@ -75,4 +82,5 @@ public struct ModeInfo {
     public var removeLabel: String?
     public var enterLabel: String?
     public var gridColumns: Int?
+    public var shortcuts: [ModeShortcut] = []
 }

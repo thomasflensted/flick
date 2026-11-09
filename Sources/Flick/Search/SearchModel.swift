@@ -208,12 +208,20 @@ final class SearchModel: ObservableObject {
         requestFocus(.query)
     }
 
-    func swapTranslateLanguages() {
+    func perform(_ action: ModeShortcut.Action) {
+        switch action {
+        case .swapLanguages: swapTranslateLanguages()
+        case .newChat: newChat()
+        case .switchModel: enter(.models)
+        }
+    }
+
+    private func swapTranslateLanguages() {
         translator.swap()
         translateAgain()
     }
 
-    func newChat() {
+    private func newChat() {
         chat.newChat()
         requestFocus(.query)
     }
