@@ -4,7 +4,7 @@ import Foundation
 final class ListStore<Item: Listable>: ObservableObject {
     @Published private(set) var items: [Item] = []
     @Published private(set) var loadError: String?
-    private let file: JSONFile<[Item]>
+    private var file: JSONFile<[Item]>
     private var loadedVersion: Date?
 
     init(file url: URL, starter: [Item] = []) {
@@ -15,6 +15,8 @@ final class ListStore<Item: Listable>: ObservableObject {
         }
         reloadIfChanged()
     }
+
+    var fileURL: URL { file.url }
 
     func reloadIfChanged() {
         let version = file.modificationDate
@@ -48,6 +50,20 @@ final class ListStore<Item: Listable>: ObservableObject {
         items += new
         save()
         return new.count
+    }
+
+    func relocate(to url: URL, targetIsLocal: Bool) {
+        let carried = items
+        file = JSONFile(url: url)
+        loadedVersion = nil
+        switch RelocationStrategy.moving(toExisting: file.exists, targetIsLocal: targetIsLocal) {
+        case .overwrite:
+            replace(with: carried)
+        case .merge:
+            reloadIfChanged()
+            guard loadError == nil else { return }
+            _ = merge(carried)
+        }
     }
 
     private func save() {

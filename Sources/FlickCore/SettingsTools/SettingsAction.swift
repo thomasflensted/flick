@@ -12,6 +12,7 @@ public enum SettingsAction: Equatable {
     case setModel(String?)
     case setTranslateLanguages(TranslatePair)
     case setLaunchAtLogin(Bool)
+    case setSyncFolder(String?)
 
     struct UnknownTool: LocalizedError {
         let name: String
@@ -34,6 +35,10 @@ public enum SettingsAction: Equatable {
         let enabled: Bool
     }
 
+    private struct PathArgument: Decodable {
+        let path: String?
+    }
+
     public static func parse(_ call: ToolCall) throws -> SettingsAction {
         guard let tool = SettingsTool(rawValue: call.function.name) else { throw UnknownTool(name: call.function.name) }
         let arguments = Data(call.function.arguments.utf8)
@@ -50,6 +55,7 @@ public enum SettingsAction: Equatable {
         case .setModel: return .setModel(try decoder.decode(ModelArgument.self, from: arguments).id)
         case .setTranslateLanguages: return .setTranslateLanguages(try decoder.decode(TranslatePair.self, from: arguments))
         case .setLaunchAtLogin: return .setLaunchAtLogin(try decoder.decode(EnabledArgument.self, from: arguments).enabled)
+        case .setSyncFolder: return .setSyncFolder(try decoder.decode(PathArgument.self, from: arguments).path)
         }
     }
 }

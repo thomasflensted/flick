@@ -45,7 +45,7 @@ struct QuicklinksView: View {
             Text("\(store.items.count) quicklinks").foregroundStyle(.secondary).font(.caption)
             Spacer()
             Button("Import from Raycast…", action: onImport)
-            Button("Show JSON File") { NSWorkspace.shared.activateFileViewerSelecting([AppSupport.quicklinksFile]) }
+            Button("Show JSON File") { NSWorkspace.shared.activateFileViewerSelecting([store.fileURL]) }
         }
     }
 

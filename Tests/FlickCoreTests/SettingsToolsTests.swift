@@ -145,19 +145,40 @@ struct AppSettingsToolTests {
         #expect(!workspace.launchAtLogin)
     }
 
+    @Test func setsSyncFolderAndRevertsToLocal() throws {
+        var workspace = workspace
+        let change = try #require(workspace.perform(call(.setSyncFolder, #"{"path":"/Users/me/iCloud/Flick"}"#)).change)
+        #expect(workspace.syncFolder == "/Users/me/iCloud/Flick")
+        #expect(change.title == "Updated Sync folder")
+        workspace.revert(change)
+        #expect(workspace.syncFolder == nil)
+    }
+
+    @Test func rejectsRelativeSyncFolders() {
+        var workspace = workspace
+        let result = workspace.perform(call(.setSyncFolder, #"{"path":"Flick"}"#))
+        #expect(workspace.syncFolder == nil)
+        #expect(result.output.hasPrefix("Error:"))
+    }
+
     private struct Current: Decodable {
         let model: String?
         let translate: String
         let launchAtLogin: Bool
+        let syncFolder: String?
+        let cloudFolders: [String]
     }
 
     @Test func reportsCurrentSettingsSpellingOutDetectedSource() throws {
-        var workspace = SettingsWorkspace(quicklinks: [], snippets: [], modelID: gpt.id, translatePair: TranslatePair(target: "en"))
+        var workspace = SettingsWorkspace(quicklinks: [], snippets: [], modelID: gpt.id, translatePair: TranslatePair(target: "en"),
+                                          cloudFolders: ["/Users/me/Dropbox"])
         let output = workspace.perform(call(.getSettings)).output
         let current = try JSONDecoder().decode(Current.self, from: Data(output.utf8))
         #expect(current.model == gpt.id)
         #expect(current.translate == "Detected language → English")
         #expect(!current.launchAtLogin)
+        #expect(current.syncFolder == nil)
+        #expect(current.cloudFolders == ["/Users/me/Dropbox"])
     }
 }
 

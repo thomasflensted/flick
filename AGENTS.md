@@ -42,6 +42,9 @@ Quicklinks are a plain JSON array at:
 
     ~/Library/Application Support/Flick/quicklinks.json
 
+If a sync folder is set (`defaults read com.thomasflensted.flick syncFolder`, set from the AI chat), `quicklinks.json` and
+`snippets.json` live in that folder instead; usage, clipboard history and currency rates always stay local.
+
 Flick re-reads the file every time the panel opens, so edits apply immediately with no restart.
 Only `name` and `link` are required; `id` is generated if missing (keep existing ids so usage ranking survives).
 

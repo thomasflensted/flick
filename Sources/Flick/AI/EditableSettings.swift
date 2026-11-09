@@ -18,7 +18,8 @@ final class EditableSettings {
 
     var current: SettingsWorkspace {
         SettingsWorkspace(quicklinks: library.quicklinks.items, snippets: library.snippets.items, modelID: ai.modelID,
-                          translatePair: translator.pair, launchAtLogin: LoginItem.isEnabled, models: ai.models)
+                          translatePair: translator.pair, launchAtLogin: LoginItem.isEnabled, syncFolder: AppSupport.syncFolder,
+                          models: ai.models, cloudFolders: CloudFolders.available())
     }
 
     func save(_ workspace: SettingsWorkspace) {
@@ -27,5 +28,6 @@ final class EditableSettings {
         if workspace.modelID != ai.modelID { ai.modelID = workspace.modelID }
         if workspace.translatePair != translator.pair { translator.pair = workspace.translatePair }
         if workspace.launchAtLogin != LoginItem.isEnabled { LoginItem.toggle() }
+        if workspace.syncFolder != AppSupport.syncFolder { library.useSyncFolder(workspace.syncFolder) }
     }
 }

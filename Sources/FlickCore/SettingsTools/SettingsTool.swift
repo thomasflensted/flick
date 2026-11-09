@@ -12,6 +12,7 @@ public enum SettingsTool: String, CaseIterable {
     case setModel = "set_model"
     case setTranslateLanguages = "set_translate_languages"
     case setLaunchAtLogin = "set_launch_at_login"
+    case setSyncFolder = "set_sync_folder"
 
     private static let idParameter = Parameter(name: "id", description: "Id of an existing item.", required: true)
     private static let editIDParameter = Parameter(name: "id", description: "Id of the item to edit. Omit to add a new one.", required: false)
@@ -24,11 +25,12 @@ public enum SettingsTool: String, CaseIterable {
         case .listSnippets: return "List all snippets with their ids."
         case .saveSnippet: return "Add a snippet, or replace an existing one when id is given. Pass every field you want to keep."
         case .deleteSnippet: return "Delete a snippet."
-        case .getSettings: return "Get the current AI model, translate languages and launch-at-login setting."
+        case .getSettings: return "Get the current AI model, translate languages, launch-at-login setting, sync folder and the cloud folders on this Mac."
         case .findModels: return "Search the AI models available on OpenRouter by name or id."
         case .setModel: return "Change the AI model used by the chat. Takes effect from the next message."
         case .setTranslateLanguages: return "Set the default languages for Translate. Omit a language to let Flick pick it automatically."
         case .setLaunchAtLogin: return "Turn starting Flick when the user logs in on or off."
+        case .setSyncFolder: return "Store quicklinks and snippets in a folder that a cloud service syncs between the user's Macs. Omit path to store them on this Mac only."
         }
     }
 
@@ -43,6 +45,7 @@ public enum SettingsTool: String, CaseIterable {
                 Parameter(name: "target", description: "Language code to translate to. Omit to use the user's languages.", required: false),
             ]
         case .setLaunchAtLogin: return [Parameter(name: "enabled", type: "boolean", description: "Whether Flick starts at login.", required: true)]
+        case .setSyncFolder: return [Parameter(name: "path", description: "Absolute path of the folder, e.g. a Flick folder inside a cloud folder from get_settings.", required: false)]
         case .deleteQuicklink, .deleteSnippet: return [Self.idParameter]
         case .saveQuicklink:
             return [

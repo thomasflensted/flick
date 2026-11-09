@@ -11,19 +11,23 @@ public struct SettingsWorkspace: Equatable {
     public var modelID: String?
     public var translatePair: TranslatePair
     public var launchAtLogin: Bool
+    public var syncFolder: String?
     let models: [AIModel]
+    let cloudFolders: [String]
 
     static let maxModelMatches = 10
     private static let languageNames = Locale(identifier: "en")
 
     public init(quicklinks: [Quicklink], snippets: [Snippet], modelID: String? = nil, translatePair: TranslatePair = TranslatePair(),
-                launchAtLogin: Bool = false, models: [AIModel] = []) {
+                launchAtLogin: Bool = false, syncFolder: String? = nil, models: [AIModel] = [], cloudFolders: [String] = []) {
         self.quicklinks = quicklinks
         self.snippets = snippets
         self.modelID = modelID
         self.translatePair = translatePair
         self.launchAtLogin = launchAtLogin
+        self.syncFolder = syncFolder
         self.models = models
+        self.cloudFolders = cloudFolders
     }
 
     public mutating func perform(_ call: ToolCall) -> ToolResult {
@@ -71,7 +75,17 @@ public struct SettingsWorkspace: Equatable {
             let change = SettingsChange.setting("Launch at login", enabled ? "On" : "Off", undo: .setLaunchAtLogin(launchAtLogin))
             launchAtLogin = enabled
             return SettingsOutcome(output: "Launch at login is \(enabled ? "on" : "off").", change: change)
+        case .setSyncFolder(let path):
+            return setSyncFolder(path.map(URLText.expandingTilde))
         }
+    }
+
+    private mutating func setSyncFolder(_ path: String?) -> SettingsOutcome {
+        guard path?.hasPrefix("/") ?? true else { return Self.failure("the sync folder must be an absolute path.") }
+        let change = SettingsChange.setting("Sync folder", path ?? "Off", undo: .setSyncFolder(syncFolder))
+        syncFolder = path
+        let output = path.map { "Quicklinks and snippets are now stored in \($0)." } ?? "Quicklinks and snippets are now stored on this Mac only."
+        return SettingsOutcome(output: output, change: change)
     }
 
     private func matchingModels(_ query: String) -> [ModelMatch] {
@@ -117,11 +131,15 @@ private struct CurrentSettings: Encodable {
     let model: String?
     let translate: String
     let launchAtLogin: Bool
+    let syncFolder: String?
+    let cloudFolders: [String]
 
     init(_ workspace: SettingsWorkspace) {
         model = workspace.modelID
         translate = SettingsWorkspace.describe(workspace.translatePair)
         launchAtLogin = workspace.launchAtLogin
+        syncFolder = workspace.syncFolder
+        cloudFolders = workspace.cloudFolders
     }
 }
 

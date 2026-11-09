@@ -28,7 +28,7 @@ struct SnippetsView: View {
                     .disabled(selection.isEmpty)
                 Text("\(store.items.count) snippets").foregroundStyle(.secondary).font(.caption)
                 Spacer()
-                Button("Show JSON File") { NSWorkspace.shared.activateFileViewerSelecting([AppSupport.snippetsFile]) }
+                Button("Show JSON File") { NSWorkspace.shared.activateFileViewerSelecting([store.fileURL]) }
             }
         }
         .padding()
