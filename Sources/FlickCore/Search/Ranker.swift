@@ -8,14 +8,16 @@ public struct Ranker {
     public func rank<T>(_ items: [T], query: String, texts: (T) -> [String], key: (T) -> String) -> [T] {
         let query = query.trimmingCharacters(in: .whitespaces)
         let scored = items.enumerated().compactMap { index, item in
-            bestScore(query, texts(item)).map { (score: $0 + boost(key(item)), index: index, item: item) }
+            score(item, query: query, texts: texts, key: key).map { (score: $0, index: index, item: item) }
         }
         return scored.sorted { ($0.score, -$0.index) > ($1.score, -$1.index) }.map(\.item)
     }
 
-    private func bestScore(_ query: String, _ texts: [String]) -> Int? {
-        texts.compactMap { MatchScore.score(query, against: $0) }.max()
+    func score<T>(_ item: T, query: String, texts: (T) -> [String], key: (T) -> String) -> Int? {
+        texts(item).compactMap { MatchScore.score(query, against: $0) }.max().map { $0 + boost(key(item)) }
     }
 
-    private func boost(_ key: String) -> Int { SearchResults.usageBoost(usage[key] ?? 0) }
+    func boost(_ key: String) -> Int { Self.usageBoost(usage[key] ?? 0) }
+
+    static func usageBoost(_ count: Int) -> Int { min(count * 30, 300) }
 }

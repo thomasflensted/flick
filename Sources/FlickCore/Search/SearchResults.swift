@@ -1,6 +1,5 @@
 import Foundation
 
-
 public struct SearchResults {
     public let links: [Quicklink]
     public let apps: [AppEntry]
@@ -50,8 +49,6 @@ public struct SearchResults {
         links.first { $0.takesArgument && $0.isTriggered(by: text) }
     }
 
-    static func usageBoost(_ count: Int) -> Int { min(count * 30, 300) }
-
     static func quicklinkScore(_ query: String, _ ql: Quicklink) -> Int? {
         if let keyword = ql.keyword, keyword.lowercased() == query.lowercased() { return keywordScore }
         let nameScore = MatchScore.score(query, against: ql.name)
@@ -92,25 +89,25 @@ public struct SearchResults {
     private func quicklinkMatches(_ query: String, excluding fullQuery: String) -> [Scored] {
         links.compactMap { ql in
             guard Self.argument(in: fullQuery, for: ql) == nil, let score = Self.quicklinkScore(query, ql) else { return nil }
-            return (score + Self.quicklinkBonus + boost(UsageKey.quicklink(ql)), .quicklink(ql))
+            return (score + Self.quicklinkBonus + ranker.boost(UsageKey.quicklink(ql)), .quicklink(ql))
         }
     }
 
     private func appMatches(_ query: String) -> [Scored] {
         apps.compactMap { app in
-            MatchScore.score(query, against: app.name).map { ($0 + boost(UsageKey.app(app)), .app(app)) }
+            ranker.score(app, query: query, texts: { [$0.name] }, key: UsageKey.app).map { ($0, .app(app)) }
         }
     }
 
     private func commandMatches(_ query: String) -> [Scored] {
         commands.compactMap { command in
-            bestScore(query, [command.title] + command.aliases).map { ($0 + boost(UsageKey.command(command)), .command(command)) }
+            ranker.score(command, query: query, texts: { [$0.title] + $0.aliases }, key: UsageKey.command).map { ($0, .command(command)) }
         }
     }
 
     private func modeMatches(_ query: String) -> [Scored] {
         Mode.openable.compactMap { mode in
-            bestScore(query, [mode.commandTitle] + mode.aliases).map { ($0 + Self.modeBonus + boost(UsageKey.mode(mode)), .mode(mode)) }
+            ranker.score(mode, query: query, texts: { [$0.commandTitle] + $0.aliases }, key: UsageKey.mode).map { ($0 + Self.modeBonus, .mode(mode)) }
         }
     }
 
@@ -141,9 +138,5 @@ public struct SearchResults {
         return [open, .google(query), .askAI(query)].compactMap { $0 }
     }
 
-    private func bestScore(_ query: String, _ texts: [String]) -> Int? {
-        texts.compactMap { MatchScore.score(query, against: $0) }.max()
-    }
-
-    private func boost(_ key: String) -> Int { Self.usageBoost(usage[key] ?? 0) }
+    private var ranker: Ranker { Ranker(usage: usage) }
 }

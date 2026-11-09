@@ -57,7 +57,7 @@ struct SearchResultsTests {
     }
 
     @Test func usageBoostIsCapped() {
-        #expect(SearchResults.usageBoost(1000) == SearchResults.usageBoost(20))
+        #expect(Ranker.usageBoost(1000) == Ranker.usageBoost(20))
     }
 
     @Test func findsLinkTriggeredByKeywordOrName() {
