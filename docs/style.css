@@ -59,8 +59,10 @@ h1 {
 
 header p {
   margin-top: 16px;
+  max-width: 34em;
   font-size: 18px;
   color: var(--muted);
+  text-wrap: balance;
 }
 
 .features {
