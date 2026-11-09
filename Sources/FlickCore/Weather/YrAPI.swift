@@ -2,6 +2,7 @@ import Foundation
 
 public enum YrAPI {
     public static let userAgent = "Flick github.com/thomasflensted/flick"
+    static let cacheLifetime: TimeInterval = 10 * 60
 
     struct Malformed: Error {}
 
@@ -38,6 +39,10 @@ public enum YrAPI {
         guard let now = response.properties.timeseries.first?.data,
               let symbol = (now.next_1_hours ?? now.next_6_hours)?.summary.symbol_code else { throw Malformed() }
         return Weather(temperature: now.instant.details.air_temperature, windSpeed: now.instant.details.wind_speed, symbolCode: symbol)
+    }
+
+    public static func isFresh(fetchedAt: Date, now: Date) -> Bool {
+        now.timeIntervalSince(fetchedAt) < cacheLifetime
     }
 
     static func coordinate(_ value: Double) -> String {

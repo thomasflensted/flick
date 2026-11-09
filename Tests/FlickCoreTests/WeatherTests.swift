@@ -5,6 +5,12 @@ import Testing
 struct WeatherTests {
     let copenhagen = WeatherPlace(name: "Copenhagen", region: "Denmark", latitude: 55.676098, longitude: 12.568337)
 
+    @Test func cachedWeatherExpiresAfterTenMinutes() {
+        let fetched = Date(timeIntervalSince1970: 0)
+        #expect(YrAPI.isFresh(fetchedAt: fetched, now: fetched.addingTimeInterval(9 * 60)))
+        #expect(!YrAPI.isFresh(fetchedAt: fetched, now: fetched.addingTimeInterval(10 * 60)))
+    }
+
     @Test func describesSymbolCodes() {
         #expect(WeatherSymbol.description("partlycloudy_day") == "Partly cloudy")
         #expect(WeatherSymbol.description("lightrainshowers_night") == "Light rain showers")

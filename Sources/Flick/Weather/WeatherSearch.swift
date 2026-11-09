@@ -10,7 +10,6 @@ final class WeatherSearch: NSObject, MKLocalSearchCompleterDelegate {
     private var cache: [URL: (weather: Weather, fetched: Date)] = [:]
 
     private static let limit = 5
-    private static let maxAge: TimeInterval = 10 * 60
 
     override init() {
         super.init()
@@ -68,7 +67,7 @@ final class WeatherSearch: NSObject, MKLocalSearchCompleterDelegate {
 
     @MainActor private func weather(at place: WeatherPlace) async -> Weather? {
         let url = YrAPI.forecastURL(place)
-        if let cached = cache[url], Date().timeIntervalSince(cached.fetched) < Self.maxAge { return cached.weather }
+        if let cached = cache[url], YrAPI.isFresh(fetchedAt: cached.fetched, now: Date()) { return cached.weather }
         var request = URLRequest(url: url)
         request.setValue(YrAPI.userAgent, forHTTPHeaderField: "User-Agent")
         guard let (data, _) = try? await URLSession.shared.data(for: request), let weather = try? YrAPI.parse(data) else { return nil }
