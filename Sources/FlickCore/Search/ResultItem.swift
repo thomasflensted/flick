@@ -28,6 +28,7 @@ public enum ResultKind: Equatable {
     case server(LiveServer)
     case model(AIModel)
     case drive(Drive)
+    case pullRequest(PullRequest)
     case hint(String)
     case message(String)
 
@@ -146,6 +147,12 @@ public struct ResultItem: Identifiable, Equatable {
     }
 
     public static func driveID(_ drive: Drive) -> String { "drive:\(drive.url.path)" }
+
+    public static func pullRequest(_ pullRequest: PullRequest) -> ResultItem {
+        ResultItem(id: pullRequestID(pullRequest), kind: .pullRequest(pullRequest), title: pullRequest.title, subtitle: pullRequest.details)
+    }
+
+    public static func pullRequestID(_ pullRequest: PullRequest) -> String { "pr:\(pullRequest.url.absoluteString)" }
 
     public static func hint(_ text: String) -> ResultItem {
         ResultItem(id: "hint", kind: .hint(text), title: text, subtitle: "")

@@ -55,6 +55,7 @@ struct ResultRow: View {
         case .translation: return "Google Translate"
         case .server: return "Server"
         case .drive: return "Drive"
+        case .pullRequest: return "GitHub"
         case .model: return ""
         case .hint: return ""
         case .message: return ""

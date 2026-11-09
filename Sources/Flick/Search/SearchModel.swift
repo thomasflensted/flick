@@ -26,6 +26,7 @@ final class SearchModel: ObservableObject {
     private var apps = AppIndex.scan()
     private var servers: [LiveServer] = []
     private var drives: [Drive] = []
+    private var pullRequests: PullRequestsState = .loading
 
     init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
          rates: CurrencyRatesStore, translator: Translator) {
@@ -83,6 +84,7 @@ final class SearchModel: ObservableObject {
         if mode == .translate { translator.translate("") }
         if mode == .servers { rescanServers() }
         if mode == .drives { drives = MountedDrives.scan() }
+        if mode == .pullRequests { reloadPullRequests() }
         if mode == .weather { weather.clear() }
         if mode == .models { chat.settings.loadModels() }
         refresh()
@@ -308,6 +310,8 @@ final class SearchModel: ObservableObject {
             return LiveServers.results(for: query, in: servers)
         case .drives:
             return Drives.results(for: query, in: drives)
+        case .pullRequests:
+            return PullRequests.results(for: query, in: pullRequests)
         case .timeZones:
             return WorldClock.results(for: query, now: Date(), local: .current, locale: .current)
         case .weather:
@@ -331,6 +335,16 @@ final class SearchModel: ObservableObject {
             DispatchQueue.main.async {
                 self.servers = scanned
                 if self.mode == .servers { self.refresh() }
+            }
+        }
+    }
+
+    private func reloadPullRequests() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let fetched = OpenPullRequests.fetch()
+            DispatchQueue.main.async {
+                self.pullRequests = fetched
+                if self.mode == .pullRequests { self.refreshKeepingSelection() }
             }
         }
     }

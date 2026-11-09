@@ -43,6 +43,7 @@ final class ResultRunner {
         case .translation(let translation): return .done(delivered: Paster.deliver(translation.text, delivery))
         case .server(let server): if let url = server.url { Launcher.open(url) }
         case .drive(let drive): Launcher.open(drive.url)
+        case .pullRequest(let pullRequest): Launcher.open(pullRequest.url)
         case .model(let model): return .useModel(model)
         case .hint: return .stay
         case .message: Launcher.revealQuicklinksFile()

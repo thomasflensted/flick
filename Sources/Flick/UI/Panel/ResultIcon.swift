@@ -28,6 +28,7 @@ struct ResultIcon: View {
         case .translation: SymbolTile(symbol: Mode.translate.symbol, color: Mode.translate.tint)
         case .server: SymbolTile(symbol: Mode.servers.symbol, color: Mode.servers.tint)
         case .drive(let drive): fileIcon(drive.url.path)
+        case .pullRequest(let pullRequest): SymbolTile(symbol: Mode.pullRequests.symbol, color: pullRequest.isDraft ? .gray : Mode.pullRequests.tint)
         case .model: SymbolTile(symbol: Mode.models.symbol, color: Mode.models.tint)
         case .hint: symbol("info.circle", padding: 3)
         case .message: symbol("exclamationmark.triangle.fill", padding: 3).foregroundStyle(.orange)
