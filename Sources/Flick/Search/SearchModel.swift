@@ -13,6 +13,7 @@ final class SearchModel: ObservableObject {
     @Published private(set) var focus: Field = .query
     @Published private(set) var focusRequest = 0
     @Published private(set) var runningAppPaths: Set<String> = []
+    @Published private(set) var isLoadingPullRequests = false
 
     var onDone: () -> Void = {}
     private let library: Library
@@ -340,10 +341,12 @@ final class SearchModel: ObservableObject {
     }
 
     private func reloadPullRequests() {
+        isLoadingPullRequests = true
         DispatchQueue.global(qos: .userInitiated).async {
             let fetched = OpenPullRequests.fetch()
             DispatchQueue.main.async {
                 self.pullRequests = fetched
+                self.isLoadingPullRequests = false
                 if self.mode == .pullRequests { self.refreshKeepingSelection() }
             }
         }
