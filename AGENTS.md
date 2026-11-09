@@ -5,6 +5,7 @@
 - Always look and opt for the simplest solution.
 - Respect DRY - extract duplicated code.
 - Respect SOLID principles.
+- Keep components orthogonal: changing one should not require changing another unrelated one.
 - Write functions that do exactly one thing.
 - Extract pure functions that can be easily tested.
 - Extract business rules to separate functions. The naming of the function alone justifies the extraction.
