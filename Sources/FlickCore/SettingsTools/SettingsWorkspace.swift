@@ -32,7 +32,7 @@ public struct SettingsWorkspace: Equatable {
 
     public mutating func perform(_ call: ToolCall) -> ToolResult {
         do {
-            let outcome = try perform(SettingsAction.parse(call))
+            let outcome = try perform(SettingsTool.action(for: call))
             return ToolResult(callID: call.id, output: outcome.output, change: outcome.change)
         } catch {
             return ToolResult(callID: call.id, output: "Error: \(error.localizedDescription)")

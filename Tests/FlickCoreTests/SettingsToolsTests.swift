@@ -9,7 +9,7 @@ struct SettingsWorkspaceTests {
     private var workspace: SettingsWorkspace { SettingsWorkspace(quicklinks: [github], snippets: [email]) }
 
     private func call(_ tool: SettingsTool, _ arguments: String = "{}") -> ToolCall {
-        ToolCall(id: "call_1", name: tool.rawValue, arguments: arguments)
+        ToolCall(id: "call_1", name: tool.name, arguments: arguments)
     }
 
     @Test func addsQuicklinkWithoutID() {
@@ -93,7 +93,7 @@ struct AppSettingsToolTests {
     }
 
     private func call(_ tool: SettingsTool, _ arguments: String = "{}") -> ToolCall {
-        ToolCall(id: "call_1", name: tool.rawValue, arguments: arguments)
+        ToolCall(id: "call_1", name: tool.name, arguments: arguments)
     }
 
     @Test func findsModelsByName() {
@@ -228,7 +228,7 @@ struct ChatToolsRequestTests {
     @Test func toolModelsGetEveryToolAndTheSettingsPrompt() throws {
         let body = try body(toolModel, [ChatMessage(id: 0, role: .user, content: "hi")])
         let functions = try #require(body.tools).map(\.function)
-        #expect(functions.map(\.name) == SettingsTool.allCases.map(\.rawValue))
+        #expect(functions.map(\.name) == SettingsTool.all.map(\.name))
         #expect(functions.first { $0.name == "save_quicklink" }?.parameters.required == ["name", "link"])
         #expect(body.messages.map(\.role) == ["system", "user"])
     }
