@@ -27,10 +27,4 @@ struct QuicklinkTests {
         #expect(Quicklink(name: "", link: "slack://open").webHost == nil)
         #expect(Quicklink(name: "", link: "~/Developer").webHost == nil)
     }
-
-    @Test func builtInsReplaceUserQuicklinksWithTheSameID() {
-        let oldGoogle = Quicklink(id: Quicklink.googleSearch.id, name: "Search Google", link: "https://google.com/search?q={argument}")
-        let github = Quicklink(name: "GitHub", link: "https://github.com")
-        #expect(Quicklink.withBuiltIns([oldGoogle, github]) == Quicklink.builtIns + [github])
-    }
 }

@@ -271,7 +271,7 @@ final class SearchModel: ObservableObject {
     }
 
     private var searchResults: SearchResults {
-        SearchResults(links: Quicklink.withBuiltIns(library.quicklinks.items), apps: apps, usage: usage.counts, commands: runner.commands.available,
+        SearchResults(links: Quicklink.builtIns + library.quicklinks.items, apps: apps, usage: usage.counts, commands: runner.commands.available,
                       rates: rates.rates)
     }
 

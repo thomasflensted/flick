@@ -16,9 +16,4 @@ extension Quicklink {
     )
 
     public static let builtIns: [Quicklink] = [.googleSearch, .googleMaps]
-
-    public static func withBuiltIns(_ links: [Quicklink]) -> [Quicklink] {
-        let builtInIDs = Set(builtIns.map(\.id))
-        return builtIns + links.filter { !builtInIDs.contains($0.id) }
-    }
 }
