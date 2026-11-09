@@ -50,7 +50,7 @@ public struct SearchResults {
         links.first { $0.takesArgument && $0.isTriggered(by: text) }
     }
 
-    static func usageBoost(_ count: Int) -> Int { min(count * 15, 300) }
+    static func usageBoost(_ count: Int) -> Int { min(count * 30, 300) }
 
     static func quicklinkScore(_ query: String, _ ql: Quicklink) -> Int? {
         if let keyword = ql.keyword, keyword.lowercased() == query.lowercased() { return keywordScore }
