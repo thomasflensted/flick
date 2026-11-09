@@ -1,4 +1,5 @@
-public enum Mode: Hashable, CaseIterable {
+@dynamicMemberLookup
+public enum Mode: String, Hashable, CaseIterable {
     case root
     case emoji
     case snippets
@@ -14,151 +15,64 @@ public enum Mode: Hashable, CaseIterable {
 
     public static var openable: [Mode] { allCases.filter { $0 != .root } }
 
-    public var gridColumns: Int? {
-        switch self {
-        case .root: return nil
-        case .emoji: return 9
-        case .snippets: return nil
-        case .clipboard: return nil
-        case .chat: return nil
-        case .models: return nil
-        case .translate: return nil
-        case .servers: return nil
-        case .drives: return nil
-        case .pullRequests: return nil
-        case .timeZones: return nil
-        case .weather: return nil
-        }
+    public var id: String { rawValue }
+
+    public var parent: Mode { self == .models ? .chat : .root }
+
+    public subscript<T>(dynamicMember keyPath: KeyPath<ModeInfo, T>) -> T {
+        info[keyPath: keyPath]
     }
 
-    public var id: String {
+    private var info: ModeInfo {
         switch self {
-        case .root: return "root"
-        case .emoji: return "emoji"
-        case .snippets: return "snippets"
-        case .clipboard: return "clipboard"
-        case .chat: return "chat"
-        case .models: return "models"
-        case .translate: return "translate"
-        case .servers: return "servers"
-        case .drives: return "drives"
-        case .pullRequests: return "pullRequests"
-        case .timeZones: return "timeZones"
-        case .weather: return "weather"
+        case .root:
+            return ModeInfo(chip: "", placeholder: "Search apps, quicklinks, or Google…", commandTitle: "", commandSubtitle: "",
+                            symbol: "magnifyingglass")
+        case .emoji:
+            return ModeInfo(chip: "Emoji", placeholder: "Search emoji…", commandTitle: "Search Emoji & Symbols",
+                            commandSubtitle: "Paste an emoji", symbol: "face.smiling", gridColumns: 9)
+        case .snippets:
+            return ModeInfo(chip: "Snippets", placeholder: "Search snippets…", commandTitle: "Search Snippets",
+                            commandSubtitle: "Paste saved text", symbol: "text.quote")
+        case .clipboard:
+            return ModeInfo(chip: "Clipboard", placeholder: "Search clipboard history…", commandTitle: "Clipboard History",
+                            commandSubtitle: "Paste something you copied earlier", symbol: "doc.on.clipboard", removeLabel: "Delete")
+        case .chat:
+            return ModeInfo(chip: "AI", placeholder: "Ask anything…", commandTitle: "AI Chat",
+                            commandSubtitle: "Chat with AI through OpenRouter", symbol: "sparkles")
+        case .models:
+            return ModeInfo(chip: "Model", placeholder: "Search models…", commandTitle: "Switch AI Model",
+                            commandSubtitle: "Pick the model AI Chat uses", symbol: "cpu", enterLabel: "Use model")
+        case .translate:
+            return ModeInfo(chip: "Translate", placeholder: "Type text to translate…", commandTitle: "Translate",
+                            commandSubtitle: "Translate text with Google Translate", symbol: "character.bubble")
+        case .servers:
+            return ModeInfo(chip: "Servers", placeholder: "Search live servers…", commandTitle: "Live Servers",
+                            commandSubtitle: "Open a local server in the browser", symbol: "server.rack", removeLabel: "Stop")
+        case .drives:
+            return ModeInfo(chip: "Drives", placeholder: "Search drives…", commandTitle: "Connected Drives",
+                            commandSubtitle: "See your drives and eject them", symbol: "eject.fill", aliases: ["Eject"], removeLabel: "Eject")
+        case .pullRequests:
+            return ModeInfo(chip: "PRs", placeholder: "Search pull requests…", commandTitle: "My Pull Requests",
+                            commandSubtitle: "Open a pull request you wrote on GitHub", symbol: "arrow.triangle.pull", aliases: ["GitHub", "PRs"])
+        case .timeZones:
+            return ModeInfo(chip: "Time", placeholder: "Search cities and time zones…", commandTitle: "Time Zones",
+                            commandSubtitle: "See the time anywhere in the world", symbol: "globe", aliases: ["World Clock"])
+        case .weather:
+            return ModeInfo(chip: "Weather", placeholder: "Search places…", commandTitle: "Weather",
+                            commandSubtitle: "See the weather anywhere from yr.no", symbol: "cloud.sun.fill")
         }
     }
+}
 
-    public var chip: String {
-        switch self {
-        case .root: return ""
-        case .emoji: return "Emoji"
-        case .snippets: return "Snippets"
-        case .clipboard: return "Clipboard"
-        case .chat: return "AI"
-        case .models: return "Model"
-        case .translate: return "Translate"
-        case .servers: return "Servers"
-        case .drives: return "Drives"
-        case .pullRequests: return "PRs"
-        case .timeZones: return "Time"
-        case .weather: return "Weather"
-        }
-    }
-
-    public var placeholder: String {
-        switch self {
-        case .root: return "Search apps, quicklinks, or Google…"
-        case .emoji: return "Search emoji…"
-        case .snippets: return "Search snippets…"
-        case .clipboard: return "Search clipboard history…"
-        case .chat: return "Ask anything…"
-        case .models: return "Search models…"
-        case .translate: return "Type text to translate…"
-        case .servers: return "Search live servers…"
-        case .drives: return "Search drives…"
-        case .pullRequests: return "Search pull requests…"
-        case .timeZones: return "Search cities and time zones…"
-        case .weather: return "Search places…"
-        }
-    }
-
-    public var commandTitle: String {
-        switch self {
-        case .root: return ""
-        case .emoji: return "Search Emoji & Symbols"
-        case .snippets: return "Search Snippets"
-        case .clipboard: return "Clipboard History"
-        case .chat: return "AI Chat"
-        case .models: return "Switch AI Model"
-        case .translate: return "Translate"
-        case .servers: return "Live Servers"
-        case .drives: return "Connected Drives"
-        case .pullRequests: return "My Pull Requests"
-        case .timeZones: return "Time Zones"
-        case .weather: return "Weather"
-        }
-    }
-
-    public var commandSubtitle: String {
-        switch self {
-        case .root: return ""
-        case .emoji: return "Paste an emoji"
-        case .snippets: return "Paste saved text"
-        case .clipboard: return "Paste something you copied earlier"
-        case .chat: return "Chat with AI through OpenRouter"
-        case .models: return "Pick the model AI Chat uses"
-        case .translate: return "Translate text with Google Translate"
-        case .servers: return "Open a local server in the browser"
-        case .drives: return "See your drives and eject them"
-        case .pullRequests: return "Open a pull request you wrote on GitHub"
-        case .timeZones: return "See the time anywhere in the world"
-        case .weather: return "See the weather anywhere from yr.no"
-        }
-    }
-
-    public var removeLabel: String? {
-        switch self {
-        case .clipboard: return "Delete"
-        case .servers: return "Stop"
-        case .drives: return "Eject"
-        case .root, .emoji, .snippets, .chat, .models, .translate, .timeZones, .weather, .pullRequests: return nil
-        }
-    }
-
-    public var aliases: [String] {
-        switch self {
-        case .drives: return ["Eject"]
-        case .pullRequests: return ["GitHub", "PRs"]
-        case .timeZones: return ["World Clock"]
-        default: return []
-        }
-    }
-
-    public var enterLabel: String? {
-        switch self {
-        case .models: return "Use model"
-        case .root, .emoji, .snippets, .clipboard, .chat, .translate, .servers, .drives, .timeZones, .weather, .pullRequests: return nil
-        }
-    }
-
-    public var parent: Mode {
-        self == .models ? .chat : .root
-    }
-
-    public var symbol: String {
-        switch self {
-        case .root: return "magnifyingglass"
-        case .emoji: return "face.smiling"
-        case .snippets: return "text.quote"
-        case .clipboard: return "doc.on.clipboard"
-        case .chat: return "sparkles"
-        case .models: return "cpu"
-        case .translate: return "character.bubble"
-        case .servers: return "server.rack"
-        case .drives: return "eject.fill"
-        case .pullRequests: return "arrow.triangle.pull"
-        case .timeZones: return "globe"
-        case .weather: return "cloud.sun.fill"
-        }
-    }
+public struct ModeInfo {
+    public let chip: String
+    public let placeholder: String
+    public let commandTitle: String
+    public let commandSubtitle: String
+    public let symbol: String
+    public var aliases: [String] = []
+    public var removeLabel: String?
+    public var enterLabel: String?
+    public var gridColumns: Int?
 }

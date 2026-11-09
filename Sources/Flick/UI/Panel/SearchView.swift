@@ -41,7 +41,7 @@ struct SearchView: View {
             if model.mode == .translate {
                 LanguageBar(translator: model.translator, onChange: model.translateAgain)
             }
-            if model.mode == .pullRequests, model.isLoadingPullRequests {
+            if model.isLoading {
                 ProgressView().controlSize(.small)
             }
         }

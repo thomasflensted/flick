@@ -13,7 +13,6 @@ final class SearchModel: ObservableObject {
     @Published private(set) var focus: Field = .query
     @Published private(set) var focusRequest = 0
     @Published private(set) var runningAppPaths: Set<String> = []
-    @Published private(set) var isLoadingPullRequests = false
 
     var onDone: () -> Void = {}
     private let library: Library
@@ -23,11 +22,8 @@ final class SearchModel: ObservableObject {
     private let rates: CurrencyRatesStore
     let translator: Translator
     private let suggesters: [Quicklink: Suggesting] = [.googleSearch: Suggester(), .googleMaps: PlaceSuggester()]
-    private let weather = WeatherSearch()
+    private let sources: [Mode: ModeSource]
     private var apps = AppIndex.scan()
-    private var servers: [LiveServer] = []
-    private var drives: [Drive] = []
-    private var pullRequests: PullRequestsState = .loading
 
     init(library: Library, usage: UsageStore, runner: ResultRunner, chat: ChatSession,
          rates: CurrencyRatesStore, translator: Translator) {
@@ -37,10 +33,22 @@ final class SearchModel: ObservableObject {
         self.chat = chat
         self.rates = rates
         self.translator = translator
+        sources = [
+            .emoji: EmojiSource(usage: usage),
+            .snippets: SnippetsSource(snippets: library.snippets, usage: usage),
+            .clipboard: ClipboardSource(clipboard: library.clipboard),
+            .models: ModelsSource(settings: chat.settings),
+            .translate: TranslateSource(translator: translator),
+            .servers: ServersSource(),
+            .drives: DrivesSource(),
+            .pullRequests: PullRequestsSource(),
+            .timeZones: TimeZonesSource(),
+            .weather: WeatherSource(),
+        ]
         rates.onUpdate = { [weak self] in if self?.mode == .root { self?.refresh() } }
-        translator.onUpdate = { [weak self] in if self?.mode == .translate { self?.refresh() } }
-        chat.settings.onModelsLoaded = { [weak self] in if self?.mode == .models { self?.refreshKeepingSelection() } }
-        weather.onUpdate = { [weak self] in if self?.mode == .weather { self?.refreshKeepingSelection() } }
+        for (mode, source) in sources {
+            source.onUpdate = { [weak self] in if self?.mode == mode { self?.refreshKeepingSelection() } }
+        }
         for (ql, suggester) in suggesters {
             suggester.onUpdate = { [weak self] in if self?.argumentTarget == ql { self?.refreshKeepingSelection() } }
         }
@@ -82,12 +90,7 @@ final class SearchModel: ObservableObject {
         self.mode = mode
         if mode == .chat { chat.clearIfIdle(now: Date()) }
         query = mode == .chat ? chat.draft : ""
-        if mode == .translate { translator.translate("") }
-        if mode == .servers { rescanServers() }
-        if mode == .drives { drives = MountedDrives.scan() }
-        if mode == .pullRequests { reloadPullRequests() }
-        if mode == .weather { weather.clear() }
-        if mode == .models { chat.settings.loadModels() }
+        sources[mode]?.enter()
         refresh()
         requestFocus(.query)
     }
@@ -190,24 +193,13 @@ final class SearchModel: ObservableObject {
         run(kind, delivery: delivery)
     }
 
-    func removeSelected() {
-        guard results.indices.contains(selected) else { return }
-        switch results[selected].kind {
-        case .clip(let entry): library.clipboard.delete(entry.id)
-        case .server(let server):
-            ListeningServers.stop(server)
-            servers.removeAll { $0 == server }
-        case .drive(let drive):
-            MountedDrives.eject(drive) { [weak self] in self?.driveEjected(drive) }
-            return
-        default: return
-        }
-        refreshKeepingSelection()
+    var isLoading: Bool {
+        sources[mode]?.isLoading ?? false
     }
 
-    private func driveEjected(_ drive: Drive) {
-        drives.removeAll { $0 == drive }
-        if mode == .drives { refreshKeepingSelection() }
+    func removeSelected() {
+        guard results.indices.contains(selected) else { return }
+        sources[mode]?.remove(results[selected].kind)
     }
 
     func translateAgain() {
@@ -268,8 +260,7 @@ final class SearchModel: ObservableObject {
             enterArgument(ql)
         } else {
             if mode == .chat { chat.draft = query }
-            if mode == .translate { translator.translate(query) }
-            if mode == .weather { weather.search(query) }
+            sources[mode]?.queryChanged(query)
             refresh()
         }
     }
@@ -291,38 +282,12 @@ final class SearchModel: ObservableObject {
     }
 
     private func currentResults() -> [ResultItem] {
-        switch mode {
-        case .root:
-            if let suggester, let argumentTarget {
-                return Suggestions.results(suggester.suggestions, for: argumentTarget)
-            }
-            let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
-            return error + searchResults.results(for: query)
-        case .emoji:
-            return EmojiCatalog.results(for: query, usage: usage.counts)
-        case .snippets:
-            return SnippetSearch.results(for: query, snippets: library.snippets.items, usage: usage.counts)
-        case .clipboard:
-            return ClipHistory.results(for: query, in: library.clipboard.entries, now: Date())
-        case .translate:
-            return GoogleTranslate.results(for: translator.state, text: query, pair: translator.pair,
-                                           languages: translator.languages, locale: .current)
-        case .servers:
-            return LiveServers.results(for: query, in: servers)
-        case .drives:
-            return Drives.results(for: query, in: drives)
-        case .pullRequests:
-            return PullRequests.results(for: query, in: pullRequests)
-        case .timeZones:
-            return WorldClock.results(for: query, now: Date(), local: .current, locale: .current)
-        case .weather:
-            return WeatherResults.results(for: query, reports: weather.reports)
-        case .chat:
-            return []
-        case .models:
-            let settings = chat.settings
-            return ModelCatalog.results(for: query, popular: settings.popularModels, all: settings.models, currentID: settings.modelID)
+        guard mode == .root else { return sources[mode]?.results(for: query) ?? [] }
+        if let suggester, let argumentTarget {
+            return Suggestions.results(suggester.suggestions, for: argumentTarget)
         }
+        let error = library.quicklinks.loadError.map { [ResultItem.message($0)] } ?? []
+        return error + searchResults.results(for: query)
     }
 
     private func requestFocus(_ field: Field) {
@@ -330,35 +295,10 @@ final class SearchModel: ObservableObject {
         focusRequest += 1
     }
 
-    private func rescanServers() {
-        DispatchQueue.global(qos: .userInitiated).async {
-            let scanned = ListeningServers.scan()
-            DispatchQueue.main.async {
-                self.servers = scanned
-                if self.mode == .servers { self.refresh() }
-            }
-        }
-    }
-
-    private func reloadPullRequests() {
-        isLoadingPullRequests = true
-        DispatchQueue.global(qos: .userInitiated).async {
-            let fetched = OpenPullRequests.fetch()
-            DispatchQueue.main.async {
-                self.pullRequests = fetched
-                self.isLoadingPullRequests = false
-                if self.mode == .pullRequests { self.refreshKeepingSelection() }
-            }
-        }
-    }
-
     private func rescanApps() {
-        DispatchQueue.global(qos: .userInitiated).async {
-            let scanned = AppIndex.scan()
-            DispatchQueue.main.async {
-                self.apps = scanned
-                self.refresh()
-            }
+        Background.load(AppIndex.scan) { [weak self] in
+            self?.apps = $0
+            self?.refresh()
         }
     }
 }
