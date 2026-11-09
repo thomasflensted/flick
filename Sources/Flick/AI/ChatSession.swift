@@ -5,7 +5,9 @@ final class ChatSession: ObservableObject {
     @Published private(set) var messages: [ChatMessage] = []
     @Published private(set) var isAnswering = false
     @Published private(set) var error: String?
-    var draft = ""
+    var draft = "" {
+        didSet { lastActivity = Date() }
+    }
 
     let settings: AISettings
     private let editable: EditableSettings
@@ -40,7 +42,9 @@ final class ChatSession: ObservableObject {
     }
 
     func clearIfIdle(now: Date) {
-        if !isAnswering, ChatExpiry.isExpired(lastActivity: lastActivity, now: now) { newChat() }
+        guard !isAnswering, ChatExpiry.isExpired(lastActivity: lastActivity, now: now) else { return }
+        newChat()
+        draft = ""
     }
 
     func newChat() {
