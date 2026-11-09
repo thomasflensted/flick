@@ -120,7 +120,7 @@ final class SearchModel: ObservableObject {
 
     func escape() -> Bool {
         if argumentTarget != nil { exitArgument(); return true }
-        if !query.isEmpty { query = ""; return true }
+        if !query.isEmpty, mode != .chat { query = ""; return true }
         if mode != .root { enter(mode.parent); return true }
         return false
     }
