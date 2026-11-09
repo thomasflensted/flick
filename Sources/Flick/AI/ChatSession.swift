@@ -5,6 +5,7 @@ final class ChatSession: ObservableObject {
     @Published private(set) var messages: [ChatMessage] = []
     @Published private(set) var isAnswering = false
     @Published private(set) var error: String?
+    var draft = ""
 
     let settings: AISettings
     private let editable: EditableSettings

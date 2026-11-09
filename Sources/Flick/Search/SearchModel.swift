@@ -78,7 +78,7 @@ final class SearchModel: ObservableObject {
 
     func enter(_ mode: Mode) {
         self.mode = mode
-        query = ""
+        query = mode == .chat ? chat.draft : ""
         if mode == .translate { translator.translate("") }
         if mode == .chat { chat.clearIfIdle(now: Date()) }
         if mode == .servers { rescanServers() }
@@ -264,6 +264,7 @@ final class SearchModel: ObservableObject {
             refresh()
             enterArgument(ql)
         } else {
+            if mode == .chat { chat.draft = query }
             if mode == .translate { translator.translate(query) }
             if mode == .weather { weather.search(query) }
             refresh()
