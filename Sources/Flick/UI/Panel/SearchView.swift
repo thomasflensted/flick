@@ -81,6 +81,9 @@ struct SearchView: View {
             } else if model.selectedProducesText {
                 KeyHint(key: "↵", label: "Paste")
                 KeyHint(key: "⌘↵", label: "Copy")
+            } else if model.selectedHasLink {
+                KeyHint(key: "↵", label: "Open")
+                KeyHint(key: "⌘↵", label: "Copy link")
             } else {
                 KeyHint(key: "↵", label: "Open")
             }

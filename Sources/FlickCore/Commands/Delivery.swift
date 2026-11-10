@@ -22,6 +22,11 @@ extension ResultKind {
     public var producesText: Bool {
         text(locale: .current) != nil
     }
+
+    public var link: URL? {
+        guard case .pullRequest(let pullRequest) = self else { return nil }
+        return pullRequest.url
+    }
 }
 
 extension Command {

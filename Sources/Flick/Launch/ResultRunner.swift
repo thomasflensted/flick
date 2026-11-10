@@ -26,6 +26,7 @@ final class ResultRunner {
 
     private func perform(_ kind: ResultKind, delivery: Delivery) -> RunOutcome {
         if let text = kind.text(locale: .current) { return .done(delivered: Paster.deliver(text, delivery)) }
+        if delivery == .copy, let link = kind.link { return .done(delivered: Paster.deliver(link.absoluteString, .copy)) }
         switch kind {
         case .quicklink(let ql, nil) where ql.takesArgument: return .askArgument(ql)
         case .quicklink(let ql, let argument): Launcher.open(ql, argument: argument ?? "")

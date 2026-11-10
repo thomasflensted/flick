@@ -176,6 +176,10 @@ final class SearchModel: ObservableObject {
         argumentTarget == nil && results.indices.contains(selected) && results[selected].kind.producesText
     }
 
+    var selectedHasLink: Bool {
+        argumentTarget == nil && results.indices.contains(selected) && results[selected].kind.link != nil
+    }
+
     func activate(_ index: Int? = nil, delivery: Delivery = .paste) {
         if mode == .chat {
             sendChatMessage()
