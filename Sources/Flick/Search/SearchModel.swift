@@ -41,6 +41,7 @@ final class SearchModel: ObservableObject {
             .translate: TranslateSource(translator: translator),
             .servers: ServersSource(),
             .drives: DrivesSource(),
+            .files: FilesSource(),
             .pullRequests: PullRequestsSource(),
             .timeZones: TimeZonesSource(),
             .weather: WeatherSource(),

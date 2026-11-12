@@ -40,6 +40,7 @@ final class ResultRunner {
         case .weather(let report): Launcher.open(YrAPI.pageURL(report.place))
         case .server(let server): if let url = server.url { Launcher.open(url) }
         case .drive(let drive): Launcher.open(drive.url)
+        case .file(let file): Launcher.open(file.url)
         case .pullRequest(let pullRequest): Launcher.open(pullRequest.url)
         case .model(let model): return .useModel(model)
         case .hint: return .stay

@@ -15,7 +15,7 @@ extension ResultKind {
         case .conversion(let conversion): return conversion.plainValue(locale)
         case .time(let time): return time.time(locale)
         case .translation(let translation): return translation.text
-        case .quicklink, .app, .url, .google, .askAI, .mode, .server, .model, .drive, .pullRequest, .weather, .hint, .quicklinksError: return nil
+        case .quicklink, .app, .url, .google, .askAI, .mode, .server, .model, .drive, .file, .pullRequest, .weather, .hint, .quicklinksError: return nil
         }
     }
 

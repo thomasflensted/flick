@@ -28,6 +28,7 @@ public enum ResultKind: Equatable {
     case server(LiveServer)
     case model(AIModel)
     case drive(Drive)
+    case file(FoundFile)
     case pullRequest(PullRequest)
     case hint(String)
     case quicklinksError(String)
@@ -147,6 +148,12 @@ public struct ResultItem: Identifiable, Equatable {
     }
 
     public static func driveID(_ drive: Drive) -> String { "drive:\(drive.url.path)" }
+
+    public static func file(_ file: FoundFile) -> ResultItem {
+        ResultItem(id: fileID(file), kind: .file(file), title: file.name, subtitle: file.details())
+    }
+
+    public static func fileID(_ file: FoundFile) -> String { "file:\(file.url.path)" }
 
     public static func pullRequest(_ pullRequest: PullRequest) -> ResultItem {
         ResultItem(id: pullRequestID(pullRequest), kind: .pullRequest(pullRequest), title: pullRequest.title, subtitle: pullRequest.details)

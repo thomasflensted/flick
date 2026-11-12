@@ -9,6 +9,7 @@ public enum Mode: String, Hashable, CaseIterable {
     case translate
     case servers
     case drives
+    case files
     case pullRequests
     case timeZones
     case weather
@@ -59,6 +60,10 @@ public enum Mode: String, Hashable, CaseIterable {
         case .drives:
             return ModeInfo(chip: "Drives", placeholder: "Search drives…", commandTitle: "Connected Drives",
                             commandSubtitle: "See your drives and eject them", symbol: "eject.fill", aliases: ["Eject"], removeLabel: "Eject")
+        case .files:
+            return ModeInfo(chip: "Files", placeholder: "Search files and folders…", commandTitle: "Search Files",
+                            commandSubtitle: "Open a file or folder found by Spotlight", symbol: "doc.text.magnifyingglass",
+                            aliases: ["Folders", "Find"])
         case .pullRequests:
             return ModeInfo(chip: "PRs", placeholder: "Search pull requests…", commandTitle: "My Pull Requests",
                             commandSubtitle: "Open a pull request you wrote on GitHub", symbol: "arrow.triangle.pull", aliases: ["GitHub", "PRs"])
