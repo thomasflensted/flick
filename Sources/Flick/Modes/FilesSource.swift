@@ -9,6 +9,7 @@ final class FilesSource: ModeSource {
 
     func enter() {
         search.clear()
+        search.requestAccess()
     }
 
     func queryChanged(_ query: String) {

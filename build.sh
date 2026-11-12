@@ -23,6 +23,9 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSDesktopFolderUsageDescription</key><string>Flick searches your Desktop when you use Search Files.</string>
+  <key>NSDocumentsFolderUsageDescription</key><string>Flick searches your Documents when you use Search Files.</string>
+  <key>NSDownloadsFolderUsageDescription</key><string>Flick searches your Downloads when you use Search Files.</string>
 </dict></plist>
 PLIST
 IDENTITY=$(security find-identity -v -p codesigning | grep -o '"Apple Development[^"]*"' | head -1 | tr -d '"')

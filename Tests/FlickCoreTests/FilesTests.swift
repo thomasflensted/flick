@@ -3,8 +3,8 @@ import Testing
 @testable import FlickCore
 
 struct FilesTests {
-    private let report = FoundFile(name: "Report.pdf", url: URL(fileURLWithPath: "/Users/me/Documents/Report.pdf"))
-    private let reports = FoundFile(name: "Old reports", url: URL(fileURLWithPath: "/Users/me/Archive/Old reports"))
+    private let report = FoundFile(path: "/Users/me/Documents/Report.pdf")
+    private let reports = FoundFile(path: "/Users/me/Archive/Old reports")
 
     @Test func showsTheContainingFolderRelativeToHome() {
         #expect(report.details(home: "/Users/me") == "~/Documents")
@@ -13,6 +13,16 @@ struct FilesTests {
 
     @Test func ranksNamesStartingWithTheQueryFirst() {
         #expect(FileResults.results(for: "rep", in: [reports, report]).map(\.title) == ["Report.pdf", "Old reports"])
+    }
+
+    @Test func keepsAnExactNameAmongManyLooserMatches() {
+        let many = (0..<100).map { FoundFile(path: "/tmp/old downloads \($0).zip") } + [FoundFile(path: "/Users/me/Downloads")]
+        #expect(FileResults.results(for: "downloads", in: many).first?.title == "Downloads")
+    }
+
+    @Test func showsOnlyTheBestMatches() {
+        let many = (0..<100).map { FoundFile(path: "/tmp/report \($0)") }
+        #expect(FileResults.results(for: "report", in: many).count == FileResults.limit)
     }
 
     @Test func asksForInputWhenTheQueryIsEmpty() {
