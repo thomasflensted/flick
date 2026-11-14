@@ -111,12 +111,26 @@ final class SearchModel: ObservableObject {
     func tab() {
         if argumentTarget != nil { exitArgument(); return }
         if let ql = inlineArgumentLink { enterArgument(ql); return }
-        if mode == .root { askAI(query) }
+        guard mode == .root else { return }
+        if let feature = selectedFeature { run(feature); return }
+        openChat(drafting: query)
+    }
+
+    private func openChat(drafting text: String) {
+        if !text.isEmpty { chat.draft = text }
+        enter(.chat)
     }
 
     var tabHint: String {
         if argumentTarget != nil { return "Back to search" }
-        return inlineArgumentLink == nil ? "Ask AI" : "Add query"
+        if inlineArgumentLink != nil { return "Add query" }
+        return selectedFeature == nil ? "AI chat" : "Open"
+    }
+
+    private var selectedFeature: ResultKind? {
+        guard !query.isEmpty, results.indices.contains(selected),
+              case .mode = results[selected].kind else { return nil }
+        return results[selected].kind
     }
 
     private func askAI(_ question: String) {
