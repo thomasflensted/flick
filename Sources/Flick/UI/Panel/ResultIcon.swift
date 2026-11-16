@@ -22,6 +22,7 @@ struct ResultIcon: View {
         case .snippet: SymbolTile(symbol: Mode.snippets.symbol, color: Mode.snippets.tint)
         case .clip(let entry): clipIcon(entry)
         case .conversion: SymbolTile(symbol: "dollarsign.arrow.circlepath", color: .green)
+        case .calculation: SymbolTile(symbol: "plus.forwardslash.minus", color: .orange)
         case .time: SymbolTile(symbol: Mode.timeZones.symbol, color: Mode.timeZones.tint)
         case .weather(let report):
             SymbolTile(symbol: report.weather.map { WeatherSymbol.sfSymbol($0.symbolCode) } ?? Mode.weather.symbol, color: Mode.weather.tint)

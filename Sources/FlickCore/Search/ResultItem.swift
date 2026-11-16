@@ -22,6 +22,7 @@ public enum ResultKind: Equatable {
     case snippet(Snippet)
     case clip(ClipEntry)
     case conversion(Conversion)
+    case calculation(Calculation)
     case time(ZoneTime)
     case weather(WeatherReport)
     case translation(Translation)
@@ -112,6 +113,10 @@ public struct ResultItem: Identifiable, Equatable {
     public static func conversion(_ conversion: Conversion, locale: Locale) -> ResultItem {
         ResultItem(id: "conversion:\(conversion.to)", kind: .conversion(conversion),
                    title: conversion.formattedValue(locale), subtitle: conversion.summary(locale))
+    }
+
+    public static func calculation(_ calculation: Calculation, locale: Locale) -> ResultItem {
+        ResultItem(id: "calculation", kind: .calculation(calculation), title: calculation.formattedValue(locale), subtitle: calculation.expression)
     }
 
     public static func time(_ time: ZoneTime, locale: Locale) -> ResultItem {

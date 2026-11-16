@@ -13,6 +13,7 @@ extension ResultKind {
         case .snippet(let snippet): return snippet.expanded()
         case .clip(let entry): return entry.text
         case .conversion(let conversion): return conversion.plainValue(locale)
+        case .calculation(let calculation): return calculation.plainValue(locale)
         case .time(let time): return time.time(locale)
         case .translation(let translation): return translation.text
         case .quicklink, .app, .url, .google, .askAI, .mode, .server, .model, .drive, .file, .pullRequest, .weather, .hint, .quicklinksError: return nil

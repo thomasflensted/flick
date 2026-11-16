@@ -42,7 +42,7 @@ public struct SearchResults {
             .sorted { $0.score > $1.score }
             .prefix(Self.resultLimit)
             .map(\.item)
-        return conversions(trimmed) + zoneTimes(trimmed) + ranked + webResults(trimmed)
+        return calculations(trimmed) + conversions(trimmed) + zoneTimes(trimmed) + ranked + webResults(trimmed)
     }
 
     public func linkTriggered(by text: String) -> Quicklink? {
@@ -121,6 +121,10 @@ public struct SearchResults {
         let trigger = query[..<space].lowercased()
         guard trigger.count >= minimumTriggerPrefix, keepAwakeTriggers.contains(where: { $0.hasPrefix(trigger) }) else { return nil }
         return DurationText.minutes(from: String(query[query.index(after: space)...]))
+    }
+
+    private func calculations(_ query: String) -> [ResultItem] {
+        Calculation.evaluate(query).map { [.calculation($0, locale: locale)] } ?? []
     }
 
     private func conversions(_ query: String) -> [ResultItem] {

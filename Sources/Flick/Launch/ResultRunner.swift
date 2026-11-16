@@ -36,7 +36,7 @@ final class ResultRunner {
         case .askAI(let question): return .ask(question)
         case .command(let command): commands.run(command)
         case .mode(let mode): return .enter(mode)
-        case .emoji, .snippet, .clip, .conversion, .time, .translation: break
+        case .emoji, .snippet, .clip, .conversion, .calculation, .time, .translation: break
         case .weather(let report): Launcher.open(YrAPI.pageURL(report.place))
         case .server(let server): if let url = server.url { Launcher.open(url) }
         case .drive(let drive): Launcher.open(drive.url)
