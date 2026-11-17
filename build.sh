@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 swift build -c release
-APP=build/Flick.app
+APP=build.noindex/Flick.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/Flick "$APP/Contents/MacOS/Flick"
