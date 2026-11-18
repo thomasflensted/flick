@@ -18,6 +18,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hotKeys: [HotKey] = []
     private var statusMenu: StatusMenu?
 
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        removeClaudeSessionVariables()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         MainMenu.install()
         statusMenu = StatusMenu(
