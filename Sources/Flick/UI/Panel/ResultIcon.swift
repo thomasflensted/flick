@@ -40,6 +40,8 @@ struct ResultIcon: View {
     @ViewBuilder private func quicklinkIcon(_ ql: Quicklink) -> some View {
         if let host = ql.webHost {
             FaviconView(host: host) { symbol("link") }
+        } else if let path = ql.filePath {
+            fileIcon(path)
         } else if let app = Launcher.appURL(for: ql.openWith) {
             fileIcon(app.path)
         } else {

@@ -28,6 +28,13 @@ struct QuicklinkTests {
         #expect(Quicklink(name: "", link: "~/Developer").webHost == nil)
     }
 
+    @Test func filePathForPathLinksOnly() {
+        #expect(Quicklink(name: "", link: "/Applications/Search.app").filePath == "/Applications/Search.app")
+        #expect(Quicklink(name: "", link: "~/Developer").filePath == NSHomeDirectory() + "/Developer")
+        #expect(Quicklink(name: "", link: "~/Developer/{argument}").filePath == nil)
+        #expect(Quicklink(name: "", link: "https://github.com").filePath == nil)
+    }
+
     @Test func builtInsReplaceUserQuicklinksWithTheSameID() {
         let oldGoogle = Quicklink(id: Quicklink.googleSearch.id, name: "Search Google", link: "https://google.com/search?q={argument}")
         let github = Quicklink(name: "GitHub", link: "https://github.com")

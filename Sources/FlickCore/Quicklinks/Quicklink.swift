@@ -34,6 +34,11 @@ public struct Quicklink: Codable, Identifiable, Hashable, Listable {
         return url.host
     }
 
+    public var filePath: String? {
+        guard URLText.isPath(link), !takesArgument else { return nil }
+        return URLText.expandingTilde(link)
+    }
+
     public func resolved(argument: String) -> String {
         LinkTemplate.resolve(link, argument: argument)
     }
