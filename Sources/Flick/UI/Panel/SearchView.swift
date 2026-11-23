@@ -28,8 +28,9 @@ struct SearchView: View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass").font(.system(size: 18)).foregroundStyle(.secondary)
             if model.mode != .root { ModeChip(title: model.mode.chip) }
-            TextField(model.mode.placeholder, text: $model.query)
+            TextField(model.mode.placeholder, text: $model.query, axis: .vertical)
                 .textFieldStyle(.plain)
+                .lineLimit(1...6)
                 .font(.system(size: Self.queryFontSize))
                 .focused($focus, equals: .query)
                 .frame(width: queryWidth, alignment: .leading)
@@ -46,7 +47,8 @@ struct SearchView: View {
             }
         }
         .padding(.horizontal, 18)
-        .frame(height: 56)
+        .padding(.vertical, 14)
+        .frame(minHeight: 56)
     }
 
     private var queryWidth: CGFloat? {
