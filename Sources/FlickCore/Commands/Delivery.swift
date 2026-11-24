@@ -35,7 +35,7 @@ extension Command {
         switch self {
         case .loremSentence: return LoremIpsum.sentence()
         case .loremParagraph: return LoremIpsum.paragraph()
-        case .keepAwake, .keepAwakeFor, .allowSleep, .tile, .toggleFullScreen: return nil
+        case .keepAwake, .keepAwakeFor, .allowSleep, .tile, .toggleFullScreen, .downloadVideo: return nil
         }
     }
 }

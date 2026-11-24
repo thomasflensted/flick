@@ -13,6 +13,7 @@ final class SearchModel: ObservableObject {
     @Published private(set) var focus: Field = .query
     @Published private(set) var focusRequest = 0
     @Published private(set) var runningAppPaths: Set<String> = []
+    @Published var downloadProgress: Int?
 
     var onDone: () -> Void = {}
     private let library: Library

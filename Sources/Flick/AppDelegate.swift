@@ -30,6 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onImport: { [weak self] in self?.importFromRaycast() })
         commands.keepAwake.onChange = { [weak self] active in self?.statusMenu?.showKeepingAwake(active) }
         commands.keepAwake.onExpire = { Toast.shared.show(.sleepAllowed) }
+        commands.videoDownloader.onProgress = { [weak self] percent in self?.model.downloadProgress = percent }
         registerHotKeys()
         expander.start()
         clipboardMonitor.start()

@@ -1,3 +1,5 @@
+import Foundation
+
 public enum Command: Hashable {
     case keepAwake
     case allowSleep
@@ -6,6 +8,7 @@ public enum Command: Hashable {
     case loremParagraph
     case tile(WindowTile)
     case toggleFullScreen
+    case downloadVideo(URL)
 
     public static func available(isKeepingAwake: Bool) -> [Command] {
         [isKeepingAwake ? .allowSleep : .keepAwake, .loremSentence, .loremParagraph] + WindowTile.allCases.map(Command.tile) + [.toggleFullScreen]
@@ -20,6 +23,7 @@ public enum Command: Hashable {
         case .loremParagraph: return "loremParagraph"
         case .tile(let tile): return "tile.\(tile.id)"
         case .toggleFullScreen: return "toggleFullScreen"
+        case .downloadVideo: return "downloadVideo"
         }
     }
 
@@ -32,6 +36,7 @@ public enum Command: Hashable {
         case .loremParagraph: return "Lorem Ipsum: Generate Paragraph"
         case .tile(let tile): return tile.title
         case .toggleFullScreen: return "Toggle Full Screen"
+        case .downloadVideo: return "Download Video"
         }
     }
 
@@ -39,7 +44,7 @@ public enum Command: Hashable {
         switch self {
         case .keepAwake, .keepAwakeFor: return ["Caffeinate"]
         case .allowSleep: return ["Decaffeinate"]
-        case .loremSentence, .loremParagraph: return []
+        case .loremSentence, .loremParagraph, .downloadVideo: return []
         case .tile(let tile): return tile.aliases
         case .toggleFullScreen: return ["Full Screen", "Enter Full Screen", "Exit Full Screen"]
         }
@@ -53,6 +58,7 @@ public enum Command: Hashable {
         case .loremSentence, .loremParagraph: return "Paste placeholder text"
         case .tile(let tile): return tile.subtitle
         case .toggleFullScreen: return "Enter or leave full screen for the front window"
+        case .downloadVideo: return "Save to Downloads with yt-dlp"
         }
     }
 
@@ -64,6 +70,7 @@ public enum Command: Hashable {
         case .loremParagraph: return "text.justify.left"
         case .tile(let tile): return tile.symbol
         case .toggleFullScreen: return "arrow.up.left.and.arrow.down.right"
+        case .downloadVideo: return "arrow.down.circle.fill"
         }
     }
 }
