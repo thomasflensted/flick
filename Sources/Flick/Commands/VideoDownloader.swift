@@ -16,6 +16,7 @@ final class VideoDownloader {
         let downloads = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Downloads")
         let arguments = VideoDownload.ytDlpArguments(for: url, into: downloads)
         let report: (Int) -> Void = { [weak self] percent in DispatchQueue.main.async { self?.onProgress(percent) } }
+        Toast.shared.show(.downloading)
         onProgress(0)
         Task.detached {
             var file = await Self.download(ytDlp, arguments: arguments, report: report)

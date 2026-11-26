@@ -19,6 +19,7 @@ public struct Feedback: Equatable {
         Feedback(text: "Downloaded \(file.deletingPathExtension().lastPathComponent)", symbol: "checkmark.circle.fill")
     }
 
+    public static let downloading = Feedback(text: "Downloading video…", symbol: "arrow.down.circle.fill")
     public static let downloadFailed = Feedback(text: "Couldn't download the video", symbol: "exclamationmark.triangle.fill")
     public static let updatingYtDlp = Feedback(text: "Updating yt-dlp and trying again…", symbol: "arrow.triangle.2.circlepath")
     public static let ytDlpMissing = Feedback(text: "Install yt-dlp to download videos: brew install yt-dlp", symbol: "exclamationmark.triangle.fill")
@@ -31,8 +32,7 @@ public struct Feedback: Equatable {
         case .keepAwakeFor(let minutes):
             return Feedback(text: "Your Mac will stay awake for \(DurationText.format(minutes: minutes))", symbol: "sun.max.fill")
         case .allowSleep: return .sleepAllowed
-        case .downloadVideo: return Feedback(text: "Downloading video…", symbol: "arrow.down.circle.fill")
-        case .loremSentence, .loremParagraph, .tile, .toggleFullScreen: return nil
+        case .loremSentence, .loremParagraph, .tile, .toggleFullScreen, .downloadVideo: return nil
         }
     }
 }
