@@ -28,7 +28,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>NSDownloadsFolderUsageDescription</key><string>Flick searches your Downloads when you use Search Files.</string>
 </dict></plist>
 PLIST
-IDENTITY=$(security find-identity -v -p codesigning | grep -o '"Apple Development[^"]*"' | head -1 | tr -d '"')
+IDENTITY=$(security find-identity -v -p codesigning | grep -o '"Apple Development[^"]*"' | head -1 | tr -d '"' || true)
 codesign --force --sign "${IDENTITY:--}" "$APP"
 if [[ "${1:-}" != "--no-install" ]]; then
   pkill -x Flick 2>/dev/null || true
