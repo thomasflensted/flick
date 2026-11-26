@@ -1,5 +1,3 @@
-import Foundation
-
 public struct Feedback: Equatable {
     public let text: String
     public let symbol: String
@@ -15,15 +13,6 @@ public struct Feedback: Equatable {
         Feedback(text: "Couldn't eject \(drive.name). Close apps using it and try again.", symbol: "exclamationmark.triangle.fill")
     }
 
-    public static func downloaded(_ file: URL) -> Feedback {
-        Feedback(text: "Downloaded \(file.deletingPathExtension().lastPathComponent)", symbol: "checkmark.circle.fill")
-    }
-
-    public static let downloading = Feedback(text: "Downloading video…", symbol: "arrow.down.circle.fill")
-    public static let downloadFailed = Feedback(text: "Couldn't download the video", symbol: "exclamationmark.triangle.fill")
-    public static let updatingYtDlp = Feedback(text: "Updating yt-dlp and trying again…", symbol: "arrow.triangle.2.circlepath")
-    public static let ytDlpMissing = Feedback(text: "Install yt-dlp to download videos: brew install yt-dlp", symbol: "exclamationmark.triangle.fill")
-
     public static func after(_ kind: ResultKind, delivered: Delivery?) -> Feedback? {
         if delivered == .copy { return .copied }
         guard case .command(let command) = kind else { return nil }
@@ -32,7 +21,7 @@ public struct Feedback: Equatable {
         case .keepAwakeFor(let minutes):
             return Feedback(text: "Your Mac will stay awake for \(DurationText.format(minutes: minutes))", symbol: "sun.max.fill")
         case .allowSleep: return .sleepAllowed
-        case .loremSentence, .loremParagraph, .tile, .toggleFullScreen, .downloadVideo: return nil
+        case .loremSentence, .loremParagraph, .tile, .toggleFullScreen: return nil
         }
     }
 }

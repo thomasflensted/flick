@@ -138,10 +138,8 @@ public struct SearchResults {
     }
 
     private func webResults(_ query: String) -> [ResultItem] {
-        let url = URLText.looksLikeWebAddress(query) ? URLText.url(from: query) : nil
-        let open = url.map { ResultItem.url($0, typed: query) }
-        let download = url.flatMap { VideoDownload.isYouTubeVideo($0) ? ResultItem.command(.downloadVideo($0)) : nil }
-        return [open, download, .google(query), .askAI(query)].compactMap { $0 }
+        let open = URLText.looksLikeWebAddress(query) ? URLText.url(from: query).map { ResultItem.url($0, typed: query) } : nil
+        return [open, .google(query), .askAI(query)].compactMap { $0 }
     }
 
     private var ranker: Ranker { Ranker(usage: usage) }

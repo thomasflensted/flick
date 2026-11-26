@@ -24,7 +24,6 @@ extension Command {
         case .allowSleep: return .indigo
         case .loremSentence, .loremParagraph: return .teal
         case .tile, .toggleFullScreen: return .blue
-        case .downloadVideo: return .red
         }
     }
 }

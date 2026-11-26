@@ -45,9 +45,6 @@ struct SearchView: View {
             if model.isLoading {
                 ProgressView().controlSize(.small)
             }
-            if let percent = model.downloadProgress {
-                DownloadProgress(percent: percent)
-            }
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)

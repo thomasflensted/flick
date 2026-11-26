@@ -2,7 +2,6 @@ import FlickCore
 
 final class CommandRunner {
     let keepAwake = KeepAwake()
-    let videoDownloader = VideoDownloader()
 
     var available: [Command] { Command.available(isKeepingAwake: keepAwake.isActive) }
 
@@ -14,7 +13,6 @@ final class CommandRunner {
         case .loremSentence, .loremParagraph: break
         case .tile(let tile): WindowTiler.tile(tile)
         case .toggleFullScreen: WindowTiler.toggleFullScreen()
-        case .downloadVideo(let url): videoDownloader.download(url)
         }
     }
 }
