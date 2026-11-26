@@ -20,7 +20,7 @@ final class VideoDownloader {
         Task.detached {
             var file = await Self.download(ytDlp, arguments: arguments, report: report)
             if file == nil { file = await Self.upgradeAndRetry(ytDlp, arguments: arguments, report: report) }
-            await MainActor.run { [weak self] in
+            await MainActor.run { [weak self, file] in
                 self?.onProgress(nil)
                 Self.finish(file)
             }
